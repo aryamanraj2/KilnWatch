@@ -1,3 +1,4 @@
+import KilnWatchCore
 import SwiftUI
 
 extension KilnStatus {
@@ -9,6 +10,7 @@ extension KilnStatus {
         case .compliant: "Compliant"
         case .notAKiln: "Not a kiln"
         case .closed: "Closed"
+        case .unknown(let raw): "Status: \(raw.replacingOccurrences(of: "_", with: " "))"
         }
     }
 
@@ -28,6 +30,7 @@ extension KilnStatus {
         case .compliant: "checkmark.seal.fill"
         case .notAKiln: "square.slash"
         case .closed: "pause.circle.fill"
+        case .unknown: "questionmark.circle"
         }
     }
 
@@ -38,6 +41,7 @@ extension KilnStatus {
         case .compliant: .compliant
         case .notAKiln: .notKiln
         case .closed: .closed
+        case .unknown: .inkSecondary
         }
     }
 }
@@ -65,7 +69,7 @@ struct StatusBadge: View {
 
 #Preview("All statuses") {
     VStack(alignment: .leading, spacing: Space.s) {
-        ForEach(KilnStatus.allCases, id: \.self) { StatusBadge(status: $0) }
+        ForEach(KilnStatus.knownCases, id: \.self) { StatusBadge(status: $0) }
         StatusBadge(status: .flagged, detailed: true)
     }
     .padding(Space.margin)

@@ -1,20 +1,24 @@
+import KilnWatchCore
 import SwiftUI
 
 /// The searchable registry.
 struct KilnsView: View {
     @Environment(AppModel.self) private var model
     @Namespace private var zoom
-    @State private var query = UserDefaults.standard.string(forKey: "query") ?? ""
+    @State private var query = DemoOptions.string("query") ?? ""
     @State private var status: KilnStatus?
     @State private var district = "Hapur"
 
+    private var districts: [String] {
+        Array(Set(model.allKilns.map { $0.district ?? "District unavailable" })).sorted()
+    }
     private var results: [Kiln] {
         model.allKilns.filter { kiln in
-            kiln.district == district
-                && (status == nil || kiln.status == status)
+            (kiln.district ?? "District unavailable") == district
+                && (status == nil || model.status(for: kiln) == status)
                 && (query.isEmpty
-                    || kiln.kilnID.localizedStandardContains(query)
-                    || kiln.violations.contains { $0.ruleID.localizedStandardContains(query) })
+                    || kiln.kilnId.localizedStandardContains(query)
+                    || kiln.violations.contains { $0.ruleId.localizedStandardContains(query) })
         }
     }
 
@@ -24,8 +28,8 @@ struct KilnsView: View {
             List {
                 Section {
                     ForEach(results) { kiln in
-                        NavigationLink(value: kiln.kilnID) { KilnRow(kiln: kiln) }
-                            .matchedTransitionSource(id: kiln.kilnID, in: zoom)
+                        NavigationLink(value: kiln.kilnId) { KilnRow(kiln: kiln) }
+                            .matchedTransitionSource(id: kiln.kilnId, in: zoom)
                             .listRowBackground(Color.surface)
                     }
                 } header: {
@@ -53,7 +57,7 @@ struct KilnsView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Picker("District", selection: $district) {
-                            ForEach(Mock.districts, id: \.self) { Text($0) }
+                            ForEach(districts, id: \.self) { Text($0) }
                         }
                     } label: {
                         Label("District: \(district)", systemImage: "mappin.and.ellipse")
@@ -63,7 +67,7 @@ struct KilnsView: View {
                     Menu {
                         Picker("Status", selection: $status) {
                             Text("All statuses").tag(KilnStatus?.none)
-                            ForEach(KilnStatus.allCases, id: \.self) { s in
+                            ForEach(KilnStatus.knownCases, id: \.self) { s in
                                 Label(s.label, systemImage: s.symbol).tag(Optional(s))
                             }
                         }
@@ -82,6 +86,7 @@ struct KilnsView: View {
 }
 
 private struct KilnRow: View {
+    @Environment(AppModel.self) private var model
     let kiln: Kiln
     @Environment(\.dynamicTypeSize) private var typeSize
 
@@ -93,15 +98,15 @@ private struct KilnRow: View {
             VStack(alignment: .leading, spacing: Space.xxs) {
                 KilnIDLabel(kiln: kiln)
                 if let top = kiln.topViolation {
-                    Text("\(Text(top.ruleID).monospaced()) · \(top.compactLine(for: kiln))")
+                    Text("\(Text(top.ruleId).monospaced()) · \(top.compactLine(for: kiln))")
                         .font(.subheadline)
                         .foregroundStyle(.ink)
                 }
             }
             if !typeSize.isAccessibilitySize { Spacer(minLength: Space.xs) }
             VStack(alignment: typeSize.isAccessibilitySize ? .leading : .trailing, spacing: Space.xxs) {
-                StatusBadge(status: kiln.status)
-                Text("\(kiln.exposure.peopleWithin800m.grouped) people")
+                StatusBadge(status: model.status(for: kiln))
+                Text("\(kiln.exposure.people.grouped) people")
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.inkSecondary)
             }

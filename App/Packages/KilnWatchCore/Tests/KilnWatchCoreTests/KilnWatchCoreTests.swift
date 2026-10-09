@@ -198,8 +198,171 @@ private final class StubProtocol: URLProtocol {
             return
         }
         let (code, body) = handler(request)
+        if code < 0 { client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet)); return }
         client?.urlProtocol(self, didReceive: HTTPURLResponse(url: url, statusCode: code, httpVersion: nil, headerFields: nil)!, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: body)
         client?.urlProtocolDidFinishLoading(self)
     }
+}
+
+// MARK: - Phase 2
+private func legacyRouteData() throws -> Data {
+    var object = try #require(JSONSerialization.jsonObject(with: Fixtures.data("route_today")) as? [String: Any])
+    for key in ["route_id", "depart", "budget_min", "legs"] { object.removeValue(forKey: key) }
+    var stops = try #require(object["stops"] as? [[String: Any]])
+    for index in stops.indices { for key in ["access", "service_min"] { stops[index].removeValue(forKey: key) } }
+    object["stops"] = stops
+    var kilns = try #require(object["kilns"] as? [[String: Any]])
+    for index in kilns.indices {
+        kilns[index].removeValue(forKey: "district")
+        var violations = try #require(kilns[index]["violations"] as? [[String: Any]])
+        for v in violations.indices { violations[v].removeValue(forKey: "measured_to") }
+        kilns[index]["violations"] = violations
+    }
+    object["kilns"] = kilns
+    return try JSONSerialization.data(withJSONObject: object)
+}
+
+@Test func legacySavedRouteKeepsStopsWithoutInventingMetadata() throws {
+    let legacy = try JSONDecoder.kilnWatch.decode(Route.self, from: legacyRouteData())
+    #expect(legacy.usableStops.count == 9)
+    #expect(legacy.legs == nil && legacy.depart == nil && legacy.predictedSeconds == nil)
+    #expect(legacy.kilns.allSatisfy { $0.district == nil && $0.violations.allSatisfy { $0.measuredTo == nil } })
+    #expect(legacy.stops.allSatisfy { $0.access == nil && $0.serviceMin == nil })
+    let dir = tempDirectory()
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let cache = RouteCache(directory: dir)
+    try cache.save(legacy)
+    #expect(try cache.load() == legacy)
+}
+
+@Test func routeFixtureMetadataAndEmbeddedRecordsAgree() throws {
+    let route = Fixtures.route
+    #expect(route.stops.count == 9 && route.legs?.count == 9)
+    let predicted = try #require(route.predictedSeconds)
+    #expect(predicted == 26_100.0)
+    for kiln in route.kilns { #expect(Fixtures.kilns.first { $0.kilnId == kiln.kilnId } == kiln) }
+    for stop in route.stops {
+        #expect(stop.access?.coordinate.isValid == true)
+        let leg = try #require(route.legs?.first { $0.toKilnId == stop.kilnId })
+        #expect(leg.geometry?.validatedCoordinates.last == stop.access?.coordinate)
+    }
+    let dir = tempDirectory()
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let cache = RouteCache(directory: dir)
+    try cache.save(route)
+    #expect(try cache.load() == route)
+}
+
+@Test(arguments: [
+    RouteGeometry(type: "Polygon", coordinates: [[77, 28], [78, 29]]),
+    RouteGeometry(type: "LineString", coordinates: [[77, 28]]),
+    RouteGeometry(type: "LineString", coordinates: [[77], [78, 29]]),
+    RouteGeometry(type: "LineString", coordinates: [[77, 28, 0], [78, 29]]),
+    RouteGeometry(type: "LineString", coordinates: [[181, 28], [78, 29]]),
+    RouteGeometry(type: "LineString", coordinates: [[77, 91], [78, 29]]),
+    RouteGeometry(type: "LineString", coordinates: [[.nan, 28], [78, 29]])
+])
+func malformedGeometryIsNeverMapped(geometry: RouteGeometry) { #expect(geometry.validatedCoordinates.isEmpty) }
+
+@Test func malformedOptionalGeometryAndAxisOrder() throws {
+    let malformed = try JSONDecoder.kilnWatch.decode(RouteGeometry.self, from: Data(#"{"type":"LineString","coordinates":[["bad"],[]]}"#.utf8))
+    #expect(malformed.validatedCoordinates.isEmpty)
+    let valid = RouteGeometry(type: "LineString", coordinates: [[77.7, 28.7], [77.8, 28.8]])
+    #expect(valid.validatedCoordinates.first == Coordinate(latitude: 28.7, longitude: 77.7))
+}
+
+@Test func navigationUsesAccessThenKilnFallbackAndServerOrder() throws {
+    let route = Fixtures.route
+    let first = try #require(route.stops.first)
+    #expect(route.destination(for: first) == first.access?.coordinate)
+    let url = try #require(route.mapsURL(startingAt: route.stops[2].kilnId))
+    let query = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
+    #expect(query.filter { $0.name == "waypoint" }.map(\.value) == route.stops.dropFirst(2).dropLast().map { "\($0.access!.lat),\($0.access!.lon)" })
+    #expect(query.first { $0.name == "destination" }?.value == "\(route.stops.last!.access!.lat),\(route.stops.last!.access!.lon)")
+    #expect(!query.contains { $0.name == "source" })
+    let legacy = try JSONDecoder.kilnWatch.decode(Route.self, from: legacyRouteData())
+    #expect(legacy.destination(for: legacy.stops[0]) == legacy.kilns[0].footprint.centroid)
+    let single = Route(district: route.district, generatedAt: route.generatedAt, stops: [first], kilns: route.kilns)
+    let singleURL = try #require(single.mapsURL(startingAt: nil))
+    let singleQuery = try #require(URLComponents(url: singleURL, resolvingAgainstBaseURL: false)?.queryItems)
+    #expect(!singleQuery.contains { $0.name == "waypoint" })
+    let empty = Route(district: "Hapur", generatedAt: route.generatedAt, stops: [], kilns: [])
+    #expect(empty.mapsURL(startingAt: nil) == nil)
+    let missing = Route(district: "Hapur", generatedAt: route.generatedAt, stops: [first], kilns: [])
+    #expect(missing.usableStops.isEmpty && missing.mapsURL(startingAt: nil) == nil)
+}
+
+@Test(arguments: [404, 200])
+func authoritativeEmptyInvalidatesSavedRouteOnly(code: Int) async throws {
+    let dir = tempDirectory()
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let cache = RouteCache(directory: dir)
+    try cache.save(Fixtures.route)
+    let sentinel = dir.appending(path: "verdict-sentinel.json")
+    try Data("unsent verdict".utf8).write(to: sentinel)
+    let empty = Route(district: "Hapur", generatedAt: Fixtures.route.generatedAt, stops: [], kilns: [])
+    let body = try JSONEncoder.kilnWatch.encode(empty)
+    let result = try await RouteRefresh.fetch(using: Stub { _ in (code, body) }.api, cache: cache)
+    guard case .empty = result else { Issue.record("Expected authoritative empty"); return }
+    #expect(try cache.load() == nil)
+    #expect(try Data(contentsOf: sentinel) == Data("unsent verdict".utf8))
+}
+
+@Test(arguments: [401, 403, 503, 200])
+func failedRefreshPreservesValidCacheWithoutSampleFallback(code: Int) async throws {
+    let dir = tempDirectory()
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let cache = RouteCache(directory: dir)
+    try cache.save(Fixtures.route)
+    let result = try await RouteRefresh.fetch(using: Stub { _ in (code, Data("malformed body".utf8)) }.api, cache: cache)
+    guard case .failure = result else { Issue.record("Expected failure"); return }
+    #expect(try cache.load() == Fixtures.route)
+}
+
+@Test func transportFailureUsesCacheAndCorruptOrAbsentCacheRecovers() async throws {
+    let dir = tempDirectory()
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let cache = RouteCache(directory: dir)
+    let api = Stub { _ in (-1, Data()) }.api
+    let absent = try await RouteRefresh.fetch(using: api, cache: cache)
+    guard case .failure = absent else { Issue.record("Expected no-cache recovery"); return }
+    try cache.save(Fixtures.route)
+    let saved = try await RouteRefresh.fetch(using: api, cache: cache)
+    guard case .offline(let route) = saved else { Issue.record("Expected saved route"); return }
+    #expect(route == Fixtures.route)
+    try Data("corrupt".utf8).write(to: cache.fileURL)
+    let corrupt = try await RouteRefresh.fetch(using: api, cache: cache)
+    guard case .failure = corrupt else { Issue.record("Expected corrupt-cache recovery"); return }
+    #expect(try Data(contentsOf: cache.fileURL) == Data("corrupt".utf8))
+}
+
+@Test func successfulRefreshSavesFullResponse() async throws {
+    let dir = tempDirectory()
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let data = try Fixtures.data("route_today")
+    let cache = RouteCache(directory: dir)
+    let result = try await RouteRefresh.fetch(using: Stub { request in
+        #expect(request.url?.path == "/v1/routes/today")
+        return (200, data)
+    }.api, cache: cache)
+    guard case .loaded(let route, nil) = result else { Issue.record("Expected loaded and saved"); return }
+    #expect(try cache.load() == route)
+}
+
+@Test func unknownEmbeddedEnumsSurviveFullRouteCache() throws {
+    let data = try Fixtures.data("route_today")
+    let original = try #require(String(data: data, encoding: .utf8))
+    let json = original.replacingOccurrences(of: #""status": "flagged""#, with: #""status": "under_review""#)
+        .replacingOccurrences(of: #""type": "FCBK""#, with: #""type": "Hoffmann""#)
+    let route = try JSONDecoder.kilnWatch.decode(Route.self, from: Data(json.utf8))
+    let dir = tempDirectory()
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let cache = RouteCache(directory: dir)
+    try cache.save(route)
+    let cached = try cache.load()
+    let saved = try #require(cached)
+    #expect(saved.kilns[0].status == .unknown("under_review"))
+    #expect(saved.kilns[0].type == .unknown("Hoffmann"))
+    #expect(saved.mapsURL(startingAt: "missing-id") == nil)
 }

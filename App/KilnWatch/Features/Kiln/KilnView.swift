@@ -1,15 +1,25 @@
+import KilnWatchCore
 import MapKit
 import SwiftUI
 
 /// Everything about one kiln: evidence, flagged rules, exposure, what to check on site.
 struct KilnView: View {
     let id: String
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        if let kiln = model.kiln(id) { KilnDetailView(id: id, kiln: kiln) }
+        else { ContentUnavailableView("Kiln unavailable", systemImage: "questionmark.folder", description: Text("No record is available for \(id).")) }
+    }
+}
+
+private struct KilnDetailView: View {
+    let id: String
 
     @Environment(AppModel.self) private var model
     @State private var showVerdict = false
     @State private var scroll = ScrollPosition(edge: .top)
 
-    private var kiln: Kiln { model.kiln(id) }
+    let kiln: Kiln
 
     var body: some View {
         ScrollView {
@@ -19,8 +29,8 @@ struct KilnView: View {
                     .card()
                 section("Flagged rules", id: "rules") {
                     VStack(alignment: .leading, spacing: Space.l) {
-                        ForEach(kiln.violations, id: \.ruleID) { violation in
-                            RuleDistanceBar(violation: violation, kiln: kiln, color: kiln.status.color)
+                        ForEach(kiln.violations, id: \.ruleId) { violation in
+                            RuleDistanceBar(violation: violation, kiln: kiln, color: model.status(for: kiln).color)
                         }
                     }
                     .card()
@@ -32,10 +42,10 @@ struct KilnView: View {
                     BufferMap(kiln: kiln).card()
                 }
                 section("Check on site", id: "checks") {
-                    SiteChecklist(kiln: kiln).card()
+                    SiteChecklist(kiln: kiln, sheet: model.stops.first { $0.kilnId == id }?.sheet).card()
                 }
                 Button {
-                    model.askDraft = "Explain the flags on \(kiln.kilnID)."
+                    model.askDraft = "Explain the flags on \(kiln.kilnId)."
                     model.tab = .ask
                 } label: {
                     HStack {
@@ -61,7 +71,7 @@ struct KilnView: View {
         .background(.canvas)
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaBar(edge: .bottom) { actions }
-        .sheet(isPresented: $showVerdict) { VerdictSheet(kilnID: id) }
+        .sheet(isPresented: $showVerdict) { VerdictSheet(kilnId: id) }
         #if DEBUG
         .task { await debugAutoplay() }
         #endif
@@ -84,14 +94,14 @@ struct KilnView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
-            Text(kiln.kilnID)
+            Text(kiln.kilnId)
                 .font(.largeTitle.weight(.semibold).monospaced())
                 .foregroundStyle(.ink)
                 .accessibilityAddTraits(.isHeader)
             Text(typeLine)
                 .font(.subheadline)
                 .foregroundStyle(.inkSecondary)
-            StatusBadge(status: kiln.status, detailed: true)
+            StatusBadge(status: model.status(for: kiln), detailed: true)
                 .padding(.top, Space.xxs)
         }
         .padding(.top, Space.xs)
@@ -100,7 +110,7 @@ struct KilnView: View {
     private var typeLine: String {
         let type = kiln.typeIsCertain ? kiln.type.rawValue : "likely \(kiln.type.rawValue)"
         let check = kiln.typeIsCertain ? "" : " · confirm on site"
-        return "\(type) · \(kiln.type.longName) · \(kiln.district)\(check)"
+        return "\(type) · \(kiln.type.longName) · \(kiln.district ?? "District unavailable")\(check)"
     }
 
     private var actions: some View {
@@ -128,11 +138,7 @@ struct KilnView: View {
         .id(id)
     }
 
-    private func openDirections() {
-        let item = MKMapItem(location: CLLocation(latitude: kiln.coordinate.latitude, longitude: kiln.coordinate.longitude), address: nil)
-        item.name = kiln.kilnID
-        item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving])
-    }
+    private func openDirections() { model.maps.navigate(id: id, model: model) }
 }
 
 /// The kiln, its 800 m buffer and the nearest home and school with measured distances.
@@ -141,8 +147,8 @@ private struct BufferMap: View {
 
     private var points: [(symbol: String, label: String, violation: Violation)] {
         kiln.violations.compactMap { v in
-            guard v.measuredTo != nil, let m = v.measured else { return nil }
-            switch v.ruleID {
+            guard v.measuredTo != nil, let m = v.measuredDistanceM else { return nil }
+            switch v.ruleId {
             case "C-HAB-800": return ("house.fill", "Home · \(Int(m).grouped) m", v)
             case "UP-SCH-1K": return ("graduationcap.fill", "School · \(Int(m).grouped) m", v)
             default: return nil
@@ -157,7 +163,7 @@ private struct BufferMap: View {
                 MapCircle(center: kiln.coordinate, radius: 800)
                     .foregroundStyle(Color.ink.opacity(0.04))
                     .stroke(Color.ink.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
-                Annotation(kiln.kilnID, coordinate: kiln.coordinate) {
+                Annotation(kiln.kilnId, coordinate: kiln.coordinate) {
                     Rectangle()
                         .stroke(.black.opacity(0.7), lineWidth: 4)
                         .overlay { Rectangle().stroke(.obb, lineWidth: 2) }
@@ -165,7 +171,7 @@ private struct BufferMap: View {
                         .rotationEffect(.degrees(-28))
                 }
                 .annotationTitles(.hidden)
-                ForEach(points, id: \.violation.ruleID) { point in
+                ForEach(points, id: \.violation.ruleId) { point in
                     if let to = point.violation.measuredTo {
                         MapPolyline(coordinates: [kiln.coordinate, to.clLocation])
                             .stroke(Color.ink.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [2, 3]))
@@ -204,16 +210,20 @@ private struct BufferMap: View {
 
     private var accessibilityText: String {
         let parts = points.map { $0.label.replacingOccurrences(of: " m", with: " metres") }
-        return "Map of \(kiln.kilnID) and its 800 metre buffer. " + parts.joined(separator: ". ")
+        return "Map of \(kiln.kilnId) and its 800 metre buffer. " + parts.joined(separator: ". ")
     }
 }
 
 /// What the inspector verifies on the ground (concept p.10).
 private struct SiteChecklist: View {
     let kiln: Kiln
+    var sheet: InspectionSheet?
 
     private var items: [(title: String, detail: String, symbol: String)] {
-        let home = kiln.violations.first { $0.ruleID == "C-HAB-800" }
+        if let sheet {
+            return sheet.onSiteChecks.map { (title: $0, detail: "Confirm on site.", symbol: "checklist") }
+        }
+        let home = kiln.violations.first { $0.ruleId == "C-HAB-800" }
         return [
             ("Chimney type",
              kiln.typeIsCertain ? "Satellite reads \(kiln.type.rawValue). Zigzag is required within 10 km of Delhi."
@@ -221,7 +231,7 @@ private struct SiteChecklist: View {
              "building.columns"),
             ("Fuel on site", "Note coal, biomass or other fuel stocked at the kiln.", "shippingbox"),
             ("Distance to the nearest home",
-             home.map { "Measured \(Int($0.measured ?? 0).grouped) m. Rule requires \(Int($0.threshold ?? 0).grouped) m." }
+             home.map { "Measured \(Int($0.measuredDistanceM ?? 0).grouped) m. Rule requires \(Int($0.thresholdM ?? 0).grouped) m." }
                 ?? "Confirm no homes within 800 m.",
              "ruler"),
         ]

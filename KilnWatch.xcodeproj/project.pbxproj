@@ -6,12 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4B0A00000000000000000010 /* KilnWatchCore in Frameworks */ = {isa = PBXBuildFile; productRef = 4B0A00000000000000000012 /* KilnWatchCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		4B0A00000000000000000001 /* KilnWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KilnWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4B0A00000000000000000002 /* KilnWatch */ = {
+		4B0A00000000000000000002 /* App/KilnWatch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = App/KilnWatch;
 			sourceTree = "<group>";
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B0A00000000000000000010 /* KilnWatchCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,7 +37,7 @@
 		4B0A00000000000000000004 = {
 			isa = PBXGroup;
 			children = (
-				4B0A00000000000000000002 /* KilnWatch */,
+				4B0A00000000000000000002 /* App/KilnWatch */,
 				4B0A00000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,10 +66,11 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				4B0A00000000000000000002 /* KilnWatch */,
+				4B0A00000000000000000002 /* App/KilnWatch */,
 			);
 			name = KilnWatch;
 			packageProductDependencies = (
+				4B0A00000000000000000012 /* KilnWatchCore */,
 			);
 			productName = KilnWatch;
 			productReference = 4B0A00000000000000000001 /* KilnWatch.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 4B0A00000000000000000004;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4B0A00000000000000000011 /* XCLocalSwiftPackageReference "App/Packages/KilnWatchCore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4B0A00000000000000000005 /* Products */;
 			projectDirPath = "";
@@ -150,7 +159,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -180,7 +189,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -197,9 +206,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2U6LMN6748;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = KilnWatch;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Show your position on the inspection route when you tap My location.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -228,9 +239,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2U6LMN6748;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = KilnWatch;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Show your position on the inspection route when you tap My location.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -274,6 +287,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		4B0A00000000000000000011 /* XCLocalSwiftPackageReference "App/Packages/KilnWatchCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = App/Packages/KilnWatchCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4B0A00000000000000000012 /* KilnWatchCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B0A00000000000000000011 /* XCLocalSwiftPackageReference "App/Packages/KilnWatchCore" */;
+			productName = KilnWatchCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4B0A00000000000000000009 /* Project object */;
 }

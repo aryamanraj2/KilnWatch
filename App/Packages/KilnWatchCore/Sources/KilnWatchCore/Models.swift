@@ -22,6 +22,8 @@ public struct Kiln: Codable, Hashable, Sendable, Identifiable {
     /// Changed only by an inspector's verdict or an approved review.
     public let status: KilnStatus
     public let evidence: Evidence
+    /// Optional in older records; never an authorization claim.
+    public let district: String?
 
     public var id: String { kilnId }
 }
@@ -51,6 +53,8 @@ public struct Violation: Codable, Hashable, Sendable {
     /// Legal source, for example "Central 2022 rules".
     public let source: String
     public let evidenceUrl: URL
+    /// Supplied feature coordinate; absent when unknown.
+    public let measuredTo: Coordinate?
 }
 
 /// People living within 800 m of the kiln footprint (HRSL population layers).
@@ -132,6 +136,12 @@ public struct Rule: Codable, Hashable, Sendable, Identifiable {
     public let overrides: [Override]
     public let source: String
 
+    public init(id: String, check: String, thresholdM: Double? = nil, requirement: String? = nil,
+                overrides: [Override] = [], source: String) {
+        self.id = id; self.check = check; self.thresholdM = thresholdM
+        self.requirement = requirement; self.overrides = overrides; self.source = source
+    }
+
     public struct Override: Codable, Hashable, Sendable {
         /// Two-letter state code, for example "UP".
         public let state: String
@@ -147,6 +157,17 @@ public struct Route: Codable, Hashable, Sendable {
     public let stops: [Stop]
     /// Full records for every stop, so the day works offline.
     public let kilns: [Kiln]
+    public let routeId: String?
+    public let depart: Date?
+    /// Planning limit, not a prediction.
+    public let budgetMin: Int?
+    public let legs: [RouteLeg]?
+
+    public init(district: String, generatedAt: Date, stops: [Stop], kilns: [Kiln],
+                routeId: String? = nil, depart: Date? = nil, budgetMin: Int? = nil, legs: [RouteLeg]? = nil) {
+        self.district = district; self.generatedAt = generatedAt; self.stops = stops; self.kilns = kilns
+        self.routeId = routeId; self.depart = depart; self.budgetMin = budgetMin; self.legs = legs
+    }
 }
 
 public struct Stop: Codable, Hashable, Sendable, Identifiable {
@@ -155,6 +176,14 @@ public struct Stop: Codable, Hashable, Sendable, Identifiable {
     public let kilnId: String
     public let eta: Date
     public let sheet: InspectionSheet
+    public let serviceMin: Int?
+    public let access: RoadAccess?
+
+    public init(order: Int, kilnId: String, eta: Date, sheet: InspectionSheet,
+                serviceMin: Int? = nil, access: RoadAccess? = nil) {
+        self.order = order; self.kilnId = kilnId; self.eta = eta; self.sheet = sheet
+        self.serviceMin = serviceMin; self.access = access
+    }
 
     public var id: String { kilnId }
 }
@@ -221,5 +250,55 @@ public struct VerdictReceipt: Codable, Hashable, Sendable {
         public let photoId: UUID
         /// Presigned S3 PUT URL. Send without the bearer token.
         public let uploadUrl: URL
+    }
+}
+
+
+public struct RoadAccess: Codable, Hashable, Sendable {
+    public let lat: Double
+    public let lon: Double
+    public let note: String?
+    public var coordinate: Coordinate { Coordinate(latitude: lat, longitude: lon) }
+}
+
+public struct RouteLeg: Codable, Hashable, Sendable {
+    public let toKilnId: String
+    public let distanceM: Double?
+    public let durationS: Double?
+    public let geometry: RouteGeometry?
+}
+
+/// Geometry alone uses GeoJSON [longitude, latitude], rather than coordinate objects.
+/// A malformed optional geometry is ignored, without losing the stops or records.
+public struct RouteGeometry: Codable, Hashable, Sendable {
+    public let type: String
+    public let coordinates: [[Double]]
+
+    public init(type: String, coordinates: [[Double]]) {
+        self.type = type; self.coordinates = coordinates
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = (try? container.decode(String.self, forKey: .type)) ?? ""
+        coordinates = (try? container.decode([[Double]].self, forKey: .coordinates)) ?? []
+    }
+
+    public var validatedCoordinates: [Coordinate] {
+        guard type == "LineString", coordinates.count >= 2 else { return [] }
+        var result: [Coordinate] = []
+        for pair in coordinates {
+            guard pair.count == 2 else { return [] }
+            let point = Coordinate(latitude: pair[1], longitude: pair[0])
+            guard point.isValid else { return [] }
+            result.append(point)
+        }
+        return result
+    }
+}
+
+extension Coordinate {
+    public var isValid: Bool {
+        latitude.isFinite && longitude.isFinite && (-90...90).contains(latitude) && (-180...180).contains(longitude)
     }
 }

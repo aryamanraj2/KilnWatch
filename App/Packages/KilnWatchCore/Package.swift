@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "KilnWatchCore",
-    platforms: [.iOS(.v26), .macOS(.v26)],
+    platforms: [.iOS("27.0"), .macOS(.v26)],
     products: [
         .library(name: "KilnWatchCore", targets: ["KilnWatchCore"]),
     ],

@@ -1,3 +1,4 @@
+import KilnWatchCore
 import SwiftUI
 
 /// A conversation with the planner agent. Phase 0 plays scripted exchanges from the concept (p.13).
@@ -28,7 +29,7 @@ struct AskView: View {
             .safeAreaBar(edge: .bottom) { composer }
             .navigationDestination(for: String.self) { KilnView(id: $0) }
             .onAppear {
-                if UserDefaults.standard.bool(forKey: "askPlay"), exchanges.isEmpty { send(AskScript.planDay.question) }
+                if DemoOptions.bool("askPlay"), exchanges.isEmpty { send(AskScript.planDay.question) }
             }
         }
     }

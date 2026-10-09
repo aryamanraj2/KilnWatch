@@ -1,3 +1,4 @@
+import KilnWatchCore
 import SwiftUI
 
 /// The hero of the app: a measured distance against a legal threshold.
@@ -10,7 +11,7 @@ struct RuleDistanceBar: View {
     @State private var appeared = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var rule: Rule { Rule.named(violation.ruleID) }
+    private var rule: Rule { Rule.named(violation.ruleId) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
@@ -18,7 +19,7 @@ struct RuleDistanceBar: View {
                 HStack(alignment: .firstTextBaseline, spacing: Space.xs) { header }
                 VStack(alignment: .leading, spacing: Space.xxs) { header }
             }
-            if let measured = violation.measured, let threshold = violation.threshold {
+            if let measured = violation.measuredDistanceM, let threshold = violation.thresholdM {
                 bar(measured: measured, threshold: threshold)
                 let shown = appeared ? measured : 0
                 Text("\(Text("\(Int(shown).grouped)\u{00A0}m").monospaced()) · requires \(Text("\(Int(threshold).grouped)\u{00A0}m").monospaced())")
@@ -37,15 +38,15 @@ struct RuleDistanceBar: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
-        .accessibilityAction(named: "Show rule \(violation.ruleID)") {
-            openURL(CitationChip.url(for: violation.ruleID))
+        .accessibilityAction(named: "Show rule \(violation.ruleId)") {
+            openURL(CitationChip.url(for: violation.ruleId))
         }
     }
 
     @Environment(\.openURL) private var openURL
 
     @ViewBuilder private var header: some View {
-        CitationChip(id: violation.ruleID)
+        CitationChip(id: violation.ruleId)
         Text(rule.name)
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(.ink)
@@ -74,10 +75,10 @@ struct RuleDistanceBar: View {
     }
 
     private var accessibilityText: String {
-        guard let m = violation.measured, let t = violation.threshold else {
-            return "\(rule.name). \(technologyLine). Rule \(violation.ruleID)."
+        guard let m = violation.measuredDistanceM, let t = violation.thresholdM else {
+            return "\(rule.name). \(technologyLine). Rule \(violation.ruleId)."
         }
-        return "\(rule.name), \(Int(m).grouped) metres. Rule \(violation.ruleID) requires \(Int(t).grouped) metres."
+        return "\(rule.name), \(Int(m).grouped) metres. Rule \(violation.ruleId) requires \(Int(t).grouped) metres."
     }
 }
 
@@ -107,7 +108,7 @@ private struct ThresholdTick: Shape {
     let kiln = Mock.route[0]
     ScrollView {
         VStack(alignment: .leading, spacing: Space.xl) {
-            ForEach(kiln.violations, id: \.ruleID) { RuleDistanceBar(violation: $0, kiln: kiln) }
+            ForEach(kiln.violations, id: \.ruleId) { RuleDistanceBar(violation: $0, kiln: kiln) }
             RuleDistanceBar(violation: Mock.route[3].violations[1], kiln: Mock.route[3])
             RuleDistanceBar(violation: Mock.registry[10].violations[0], kiln: Mock.registry[10], color: .compliant)
         }
@@ -120,8 +121,8 @@ private struct ThresholdTick: Shape {
 extension Violation {
     /// One plain line stating the measurement against the rule: "410 m from homes · rule requires 800 m".
     func factLine(for kiln: Kiln) -> String {
-        let rule = Rule.named(ruleID)
-        guard let m = measured, let t = threshold else {
+        let rule = Rule.named(ruleId)
+        guard let m = measuredDistanceM, let t = thresholdM else {
             let type = kiln.typeIsCertain ? kiln.type.rawValue : "Likely \(kiln.type.rawValue)"
             return "\(type) within 10 km of Delhi · rule requires zigzag\(kiln.typeIsCertain ? "" : " · confirm on site")"
         }
@@ -130,7 +131,7 @@ extension Violation {
 
     /// Short form for list rows: "410 m · requires 800 m".
     func compactLine(for kiln: Kiln) -> String {
-        guard let m = measured, let t = threshold else {
+        guard let m = measuredDistanceM, let t = thresholdM else {
             return "\(kiln.typeIsCertain ? "" : "likely ")\(kiln.type.rawValue) · zigzag required"
         }
         return "\(Int(m).grouped)\u{00A0}m · requires \(Int(t).grouped)\u{00A0}m"

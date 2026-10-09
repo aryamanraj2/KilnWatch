@@ -1,8 +1,9 @@
+import KilnWatchCore
 import SwiftUI
 
 /// The only way a kiln's status changes. Presented from Kiln at the large detent.
 struct VerdictSheet: View {
-    let kilnID: String
+    let kilnId: String
 
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
@@ -20,7 +21,7 @@ struct VerdictSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Space.xl) {
-                    Text("\(Text(kilnID).monospaced()) · \(stopLine)")
+                    Text("\(Text(kilnId).monospaced()) · \(stopLine)")
                         .font(.headline)
                         .foregroundStyle(.ink)
                     VStack(spacing: Space.xs) {
@@ -35,7 +36,7 @@ struct VerdictSheet: View {
                             .padding(Space.s)
                             .background(.surface, in: .inner)
                     }
-                    Text("This changes \(kilnID)'s status for everyone.")
+                    Text("This changes \(kilnId)'s status for everyone.")
                         .font(.footnote)
                         .foregroundStyle(.inkSecondary)
                 }
@@ -66,7 +67,7 @@ struct VerdictSheet: View {
     }
 
     private var stopLine: String {
-        model.stopNumber(for: kilnID).map { "stop \($0) of \(model.stops.count)" } ?? model.kiln(kilnID).district
+        model.stopNumber(for: kilnId).map { "stop \($0) of \(model.stops.count)" } ?? (model.kiln(kilnId)?.district ?? "District unavailable")
     }
 
     // MARK: Options
@@ -153,7 +154,7 @@ struct VerdictSheet: View {
     }
 
     private func geotag(_ photo: SitePhoto) -> String {
-        let c = model.kiln(kilnID).coordinate
+        guard let c = model.kiln(kilnId)?.coordinate else { return "Location unavailable" }
         let lat = c.latitude.formatted(.number.precision(.fractionLength(4)))
         let lon = c.longitude.formatted(.number.precision(.fractionLength(4)))
         return "\(lat)° N, \(lon)° E · ±6 m · \(photo.time)"
@@ -170,7 +171,7 @@ struct VerdictSheet: View {
         VStack(spacing: Space.xs) {
             HoldToConfirmButton(title: "Hold to submit verdict", feedback: model.isOffline ? .warning : .success) {
                 guard let choice else { return }
-                model.recordVerdict(choice, for: kilnID)
+                model.recordVerdict(choice, for: kilnId)
                 saved = true
                 AccessibilityNotification.Announcement(savedText).post()
             }
@@ -207,13 +208,14 @@ extension KilnStatus {
         case .notAKiln: "The detection is another structure."
         case .closed: "The kiln stands but is not operating."
         case .flagged: "Flagged by satellite · pending inspection"
+        case .unknown: "Status not recognized. Confirm on site."
         }
     }
 }
 
 #Preview {
     Color.canvas.sheet(isPresented: .constant(true)) {
-        VerdictSheet(kilnID: "KW-0412")
+        VerdictSheet(kilnId: "KW-0412")
     }
     .environment(AppModel())
 }

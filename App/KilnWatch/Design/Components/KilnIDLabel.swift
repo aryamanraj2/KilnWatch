@@ -1,3 +1,4 @@
+import KilnWatchCore
 import SwiftUI
 
 /// Monospaced kiln ID with optional type and confidence ("FCBK · 0.82", or "likely CFCBK · 0.64").
@@ -16,7 +17,7 @@ struct KilnIDLabel: View {
     }
 
     @ViewBuilder private var content: some View {
-        Text(kiln.kilnID)
+        Text(kiln.kilnId)
             .font(idFont.monospaced())
             .foregroundStyle(.ink)
         if showsType {
@@ -32,8 +33,8 @@ struct KilnIDLabel: View {
     }
 
     private var accessibilityText: String {
-        guard showsType else { return "Kiln \(kiln.kilnID)" }
-        return "Kiln \(kiln.kilnID), \(kiln.typeIsCertain ? "" : "likely ")\(kiln.type.rawValue), confidence \(kiln.typeConfidence.formatted(.percent))"
+        guard showsType else { return "Kiln \(kiln.kilnId)" }
+        return "Kiln \(kiln.kilnId), \(kiln.typeIsCertain ? "" : "likely ")\(kiln.type.rawValue), confidence \(kiln.typeConfidence.formatted(.percent))"
     }
 }
 

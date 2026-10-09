@@ -1,3 +1,4 @@
+import KilnWatchCore
 import SwiftUI
 
 /// Numbered route stop on the map. Ink disc; clay and 1.2× when selected. Pins enter staggered.
@@ -12,7 +13,7 @@ struct StopPin: View {
 
     var body: some View {
         Button(action: action) {
-            Text(stop.number, format: .number)
+            Text(stop.order, format: .number)
                 .font(.subheadline.weight(.semibold).monospacedDigit())
                 .foregroundStyle(.canvas)
                 .frame(width: size, height: size)
@@ -27,11 +28,11 @@ struct StopPin: View {
         .scaleEffect(entered || reduceMotion ? 1 : 0.6)
         .animation(Motion.select.animation(reduceMotion: reduceMotion), value: isSelected)
         .onAppear {
-            withAnimation(Motion.select.animation(reduceMotion: reduceMotion).delay(Motion.stagger(stop.number - 1))) {
+            withAnimation(Motion.select.animation(reduceMotion: reduceMotion).delay(Motion.stagger(stop.order - 1))) {
                 entered = true
             }
         }
-        .accessibilityLabel("Stop \(stop.number), \(stop.kilnID)")
+        .accessibilityLabel("Stop \(stop.order), \(stop.kilnId)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
@@ -40,7 +41,7 @@ struct StopPin: View {
     @Previewable @State var selected = 1
     HStack(spacing: Space.m) {
         ForEach(Mock.stops.prefix(4)) { stop in
-            StopPin(stop: stop, isSelected: selected == stop.number) { selected = stop.number }
+            StopPin(stop: stop, isSelected: selected == stop.order) { selected = stop.order }
         }
     }
     .padding(Space.xxl)

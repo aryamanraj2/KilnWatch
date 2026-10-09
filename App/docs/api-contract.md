@@ -114,6 +114,8 @@ Lists the kilns in a district. `district` is required (for example `Hapur`). `st
 
 | Field | Notes |
 |---|---|
+| `district` | Optional district name; absent in older records. Display metadata only, never client authorization |
+| `violations[].measured_to` | Optional `{ "latitude": Double, "longitude": Double }` feature coordinate; hide feature markers when absent. Fixture values are illustrative |
 | `footprint.polygon` | The four corners of the oriented bounding box, in order, with the ring not closed |
 | `type` | `FCBK`, `CFCBK` or `Zigzag` (exact case) |
 | `first_seen`, `last_seen` | Acquisition times of the first and latest scenes with a detection |
@@ -148,7 +150,41 @@ Returns the signed-in inspector's route for today, as produced by the planner ag
 }
 ```
 
-`order` is 1-based. Every `stops[].kiln_id` has a matching entry in `kilns`.
+`order` is 1-based. Every `stops[].kiln_id` must have a matching entry in `kilns`. The app follows this server order. Missing records are reported and excluded from browsing/navigation, never substituted.
+
+Phase 2 optional additions (all absent in Phase 1 routes, which still decode):
+
+| Key | Type and meaning |
+|---|---|
+| `route_id` | Optional string identity for the plan |
+| `depart` | Optional RFC 3339 departure time; rendered in Asia/Kolkata for current NCR scope |
+| `budget_min` | Optional integer planning limit; never displayed as predicted duration |
+| `stops[].service_min` | Optional nonnegative integer on-site duration, minutes |
+| `stops[].access` | Optional `{ "lat": Double, "lon": Double, "note": String? }` road access point. This compact form applies only to access, unlike record coordinate objects |
+| `legs` | Optional array of legs in server order |
+| `legs[].to_kiln_id` | Destination stop ID; one driving leg per stop, including the office-to-first-stop leg |
+| `legs[].distance_m` | Optional nonnegative metres |
+| `legs[].duration_s` | Optional nonnegative driving seconds; omitted when unknown |
+| `legs[].geometry` | Optional GeoJSON `{ "type": "LineString", "coordinates": [[longitude, latitude], ...] }` |
+
+**Geometry-specific axis exception:** GeoJSON pairs are `[longitude, latitude]`, unlike coordinate objects elsewhere. A valid LineString needs at least two pairs, exactly two finite numbers per pair, longitude −180…180 and latitude −90…90. Invalid geometry is never drawn or force-indexed. Missing geometry leaves stops and cards usable, without an invented driving line. The app does not call MKDirections to reconstruct legs.
+
+```json
+{ "route_id": "2026-10-10-hapur-ins-17", "depart": "2026-10-10T09:00:00+05:30", "budget_min": 480,
+  "stops": [{ "order": 1, "kiln_id": "KW-0412", "eta": "2026-10-10T09:40:00+05:30", "service_min": 35,
+              "access": { "lat": 28.7162, "lon": 77.6556, "note": "Confirm entrance on site" }, "sheet": "InspectionSheet as above" }],
+  "legs": [{ "to_kiln_id": "KW-0412", "duration_s": 2400, "distance_m": 18240,
+             "geometry": { "type": "LineString", "coordinates": [[77.6400, 28.7290], [77.6556, 28.7162]] } }],
+  "kilns": ["full embedded kiln records"] }
+```
+
+The nine-stop JSON fixture includes **illustrative** access points and schematic linework, not verified rural road routing or server geometry. It is labeled Sample data in the DEBUG app. ETAs and stop order are supplied; driving figures only use `duration_s`. Predicted total is shown only when every stop has valid driving and service durations. Budget is not a prediction.
+
+The app saves successful full route responses atomically. `404` or `200` with zero stops invalidates only the saved route; it never revives an old plan after an authoritative empty response. Transport failures use a readable saved route, with its plan date when different from today. Auth/server/decoding failures show honest errors and preserve a valid cache. No fixtures replace failed live requests. Corrupt route files do not touch the verdict outbox.
+
+Configuration is injected with `KilnWatchAPI` or temporary process environment `KILNWATCH_API_URL` (HTTPS, no `.example` host) and `KILNWATCH_API_TOKEN`; tokens are not hard-coded or persisted by Phase 2. With no configuration, DEBUG shows fixtures and Release shows a configuration/saved-route state. Cognito remains Phase 5.
+
+Primary Maps handoff uses MKMapItem driving directions to `access`, or asks before falling back to the kiln location. The secondary Unified Maps URL preserves remaining server order using repeated `waypoint`, a final `destination` and `mode=driving`, without a source (user location). Opening Maps does not advance or complete a stop. Offline basemap downloads and availability are outside MapKit's APIs.
 
 ### GET /rules
 
@@ -219,7 +255,10 @@ Response: `201` on first receipt, `200` on a replay.
 1. **Footprint shape:** is this coordinate-object form OK, or do you prefer GeoJSON from `ST_AsGeoJSON`? If you prefer GeoJSON, the client would convert it.
 2. **C-HAB-800 in UP:** the rules table gives UP a 1,000 m habitation threshold, but concept p.13 shows KW-0412 (in Hapur, UP) at "410 m vs 800 m". The fixture follows p.13. Which threshold does the rules engine apply in UP, and is `threshold_m` on a violation the post-override value?
 3. **School rule ID:** the p.4 table says `UP/HR-SCH-1K`, while p.13 cites `UP-SCH-1K`. We use `UP-SCH-1K` because deployment is UP only, and `HR-SCH-1K` would come with Haryana. Please confirm the IDs the rules engine writes.
-4. **District on the kiln record:** p.15 has no `district`, but the Cedar policy reads `resource.district`. The client doesn't need it. Should it be exposed anyway?
+4. **District and measured feature coordinates:** the app accepts optional `district` and `violations[].measured_to` for display; absent metadata remains unknown. Please confirm server availability. District metadata never grants authorization.
 5. **ID token or access token** (see Auth).
 6. **Photo upload flow:** please confirm presigned S3 PUT as described. The alternative is multipart to API Gateway, which needs the payload limits checked.
 7. **Pagination** for `GET /kilns`: none in v1. Add `next_cursor` when needed.
+
+8. **Routing additions:** confirm road access points/notes, per-leg GeoJSON shape and `[longitude, latitude]` order, destination linking, departure/ETA time zone and drive/service-duration meanings. The Phase 2 sample is illustrative.
+9. **Configuration:** confirm the real API endpoint, route endpoint/error semantics and token provider/type; no live backend was configured for Phase 2 verification.

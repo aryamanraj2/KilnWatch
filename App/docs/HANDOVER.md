@@ -29,7 +29,7 @@ App/docs/                     DESIGN.md, build-plan.md, api-contract.md, concept
 
 ## Done
 
-**Phase 0: design and clickable mock.** Builds with zero warnings on iOS 26.1, Swift 6, iPhone, portrait.
+**Phase 0: design and clickable mock.** Builds with zero warnings on iOS 27.0, Swift 6, iPhone, portrait.
 - Neutral gray theme with a single clay accent (#A84B25 / #E07A4F). Five status colors, each always paired with a symbol and a word. All 50 contrast pairs pass in light and dark mode.
 - Monospaced IDs and distances. Liquid Glass on the navigation layer only. Three motion tokens with Reduce Motion fallbacks, plus haptics.
 - Nine components: RuleDistanceBar, StatusBadge, KilnIDLabel, BeforeAfterComparator, ExposureBlock, ToolCallTrace, CitationChip, HoldToConfirmButton, StopPin.
@@ -44,6 +44,18 @@ App/docs/                     DESIGN.md, build-plan.md, api-contract.md, concept
 - Fixtures: 11 kilns, a 9-stop Hapur route and 7 rules.
 - `App/docs/api-contract.md` is a proposal the backend owner has not yet confirmed.
 
+**Phase 2: Today, shared models and route navigation.** Builder completion reported and verification report/logs checked by the orchestrator on 2026-10-09. Implemented on `PortalAPP`; iOS 27 SDK and deployment target, per the user's correction. No full code audit or independent test rerun in this closeout; no commit/push or Phase 3 work.
+- The app links KilnWatchCore and consumes its fixtures and embedded route records. Domain duplicates are removed; optional district/feature metadata and route access/geometry/timing retain legacy decoding. Unknown types/statuses and missing kiln IDs have honest presentation.
+- Today renders only validated supplied linework, keeps pin/carousel/list selection synchronized, and separates browsing from the active/current stop. Start/End and the accessory agree across tabs. Native Maps actions use access points and ask before falling back to the kiln location.
+- Route loading distinguishes authoritative empty, saved/offline, no cache, corrupt cache and fetch failures. Successful live responses are cached atomically off the UI actor; failures preserve valid saved data and never substitute fixtures. DEBUG simulations use isolated storage.
+- No backend endpoint/token is configured: reviewed data is explicitly labeled fixtures or an isolated saved fixture cache. Configuration and optional wire keys are documented in `api-contract.md`; the proposal still needs backend confirmation.
+
+
+**Phase 2 verification (2026-10-09):** prescribed root build passed with zero warnings; `swift test` passed all 21 tests with zero warnings, retaining the original 11. Six sequential temporary XCTest UI checks passed on iPhone 17 / iOS 27: route interactions, Maps handoffs, denied location, granted one-shot location, recovery states/mock-screen navigation, and AX3 controls with system Reduce Motion confirmed enabled. The temporary UI target is outside the repository. Recovery simulations cover loading, empty → Ask draft, service failure, no cache, corrupt cache, saved relaunch and missing geometry. Stubbed API tests cover authoritative 404/empty, auth/server/decoding failures and cache preservation.
+- Both single-stop and whole-route actions actually opened Apple Maps and preserved the active stop. Maps presented its own permission/startup UI; successful road guidance and waypoint rendering were not established. Granted/denied app location were verified; remaining physical-device permission cases are listed below. Accessibility labels/actions were inspected and exercised, but a spoken VoiceOver walkthrough was not performed.
+- A transient carousel frame warning was fixed by bounding its initial width; the final missing-geometry/AX3 run emitted no frame warning. iOS 27 beta tool/runtime diagnostics remain in temporary UI logs, separate from the warning-free prescribed app/core checks.
+- Reviewed existing images: `screens/phase-2/selected-stop.png`, `route-list.png`, `active-accessory.png`. Additional light/dark/state images and video were skipped at the user's request. Logs and details: `screens/phase-2/verification.md`. Design tokens, component appearance and tabs are preserved; Navigate and honest route/location states are Phase 2 additions.
+
 **Research** (`App/docs/research/`):
 - `agent-streaming.md`: AgentCore Runtime with NDJSON events. Hold the answer text until citations validate; tool steps stream live.
 - `auth.md`: Cognito managed login with PKCE via ASWebAuthenticationSession, no Amplify. Role from groups, district from `custom:district` in the ID token.
@@ -52,10 +64,10 @@ App/docs/                     DESIGN.md, build-plan.md, api-contract.md, concept
 
 ## Known gaps and pending fixes
 
-1. The app uses its own models in `Mock/MockData.swift`. It must switch to the KilnWatchCore models; that is step 1 of the next phase. The app added `district` and `Violation.measuredTo`, and the core package must agree on both.
-2. The BeforeAfterComparator mock uses a sharp Apple snapshot. Per the research, it should show pixelated 256 px imagery, and the 800 m buffer ring belongs on the mini-map, not on the imagery.
-3. `api-contract.md` still needs `footprint_px`, the route leg geometry and road access points.
-4. The Axiom audits have not run (accessibility, Liquid Glass, layout, codable, concurrency, storage). Run them one at a time, only if the user asks.
+1. The BeforeAfterComparator mock still uses an Apple snapshot. Pixelated 256 px imagery and the mini-map buffer ring belong to Phase 3.
+2. Live route verification needs the real endpoint/token and backend confirmation of access points, geometry/axis order, route timing and error semantics. The sample geometry is schematic, not verified road routing.
+3. Simulator Maps launches do not establish successful turn-by-turn guidance or offline navigation. Physical-device, approximate/restricted location and disabled-service behavior remain to verify.
+4. The Axiom audits have not run. Run them sequentially only if the user asks. No auditor agents were used in Phase 2.
 
 ## Open decisions (user or backend owner)
 
@@ -68,7 +80,6 @@ App/docs/                     DESIGN.md, build-plan.md, api-contract.md, concept
 
 ## Next steps (in order, one at a time)
 
-1. The main work is already pushed to `PortalAPP` (commit 2797153). This handover file and `AGENTS.md` are staged; commit and push them.
-2. Phase 2 prompt: swap in the KilnWatchCore models and fixtures, then make Today use the real route data, MapKit, location and the Apple Maps handoff.
-3. Phase 3: Kiln card and evidence imagery, using the pixelated comparator and the mini-map buffer ring.
-4. Phase 4: Ask with the agent stream. Phase 5: verdict capture, the outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.
+1. Phase 2 completion and verification evidence are recorded; its implementation remains uncommitted on `PortalAPP`. Commit or push only on an explicit user request. Live backend and successful road guidance remain unverified.
+2. Await the user's go for the Phase 3 prompt: Kiln card and evidence imagery, using the pixelated comparator and mini-map buffer ring. Do not begin implementation automatically.
+3. Phase 4: Ask with the agent stream. Phase 5: verdict capture, outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.

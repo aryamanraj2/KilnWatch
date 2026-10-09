@@ -20,6 +20,11 @@ public struct RouteCache: Sendable {
         try JSONEncoder.kilnWatch.encode(route).write(to: fileURL, options: writeOptions)
     }
 
+    /// An authoritative empty response invalidates only the route, never verdict files.
+    public func clear() throws {
+        if FileManager.default.fileExists(atPath: fileURL.path) { try FileManager.default.removeItem(at: fileURL) }
+    }
+
     /// Nil when nothing has been cached yet.
     public func load() throws -> Route? {
         guard FileManager.default.fileExists(atPath: fileURL.path) else { return nil }

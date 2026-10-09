@@ -1,3 +1,4 @@
+import KilnWatchCore
 import MapKit
 import SwiftUI
 
@@ -39,7 +40,7 @@ struct BeforeAfterComparator: View {
                 VStack(alignment: .leading, spacing: Space.xxs) { caption }
             }
         }
-        .task(id: kiln.kilnID) { await loadSnapshot() }
+        .task(id: kiln.kilnId) { await loadSnapshot() }
     }
 
     @ViewBuilder private var caption: some View {
