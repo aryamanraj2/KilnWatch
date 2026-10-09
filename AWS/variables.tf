@@ -1,7 +1,7 @@
 variable "aws_region" {
-  description = "Primary region for compute, API, registry and app data. Keep compute near the Sentinel-2 public bucket."
+  description = "Primary region for API, registry and app data (Mumbai, near NCR inspectors). Offline detection still reads Earth Search imagery in us-west-2."
   type        = string
-  default     = "us-west-2"
+  default     = "ap-south-1"
 }
 
 variable "project_name" {
@@ -185,6 +185,6 @@ variable "inference_image_tag" {
 
 variable "create_registry_runner" {
   description = "Optional temporary SSM runner for private DB migration/import; review before enabling. No inbound ports."
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }

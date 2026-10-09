@@ -94,3 +94,129 @@ prefix reads; public registry publication is disabled. Verified Permissions and
 managed login are not claimed implemented/deployed.
 
 Next artifact for review: [first-record-runbook.md](first-record-runbook.md).
+
+# Integration 2A — local database proof and deployment preflight (2026-10-09)
+
+Sequential, no agents. No `apply`, uploads, live migration/import/bootstrap, Cognito
+users, inference, training, commits or pushes. The local database proof below is a
+**local** proof on a disposable cluster, not an AWS or RDS proof.
+
+## Code and configuration changes
+
+- `registry/store.py`: the evidence upsert keeps an existing `published_url` when a
+  replay has no receipt, and rejects (rolling back the whole batch) a replay that would
+  change the bytes of a side that already has a verified URL (finding 1).
+- `scripts/bootstrap_reader.py`: the failure message now names the exact
+  `pg_roles` check and both recovery branches (finding 4).
+- `tests/test_postgis.py`: six new opt-in tests (listed below); the rollback test now
+  includes evidence rows.
+- Terraform: `fmt` whitespace in `api.tf`, `bridge.tf`, `database.tf`, `network.tf`,
+  `variables.tf`; `api.tf` had an HCL syntax error (a single-line block closed on the
+  next line) that blocked `init`, fixed by moving the brace. Addendum: region default
+  `ap-south-1`, RDS retention on, `PriceClass_200`, partial S3 backend with
+  `required_version >= 1.10`, `backend.hcl.example`, `backend.hcl` ignored.
+
+## Synthetic tests
+
+Before the PostGIS enablement: **30 run, OK, 8 skipped** (the 8 PostGIS tests).
+After, with `KILNWATCH_TEST_DB_PORT=55432`: **30 run, OK, 0 skipped.**
+
+## Local PostgreSQL/PostGIS proof (disposable cluster)
+
+Homebrew `postgresql@17` 17.11 with Homebrew `postgis` 3.6.4
+(`POSTGIS="3.6.4" PGSQL="170"`); extension files in `postgresql@17`'s share directory.
+Throwaway cluster under `.local/integration-2a/pg` (`initdb`, `scram-sha-256`, password
+from a mode-600 file), listening only on `127.0.0.1:55432`, `ssl=on` with a throwaway
+CA and a server certificate whose only name is `localhost`. Started with `pg_ctl`
+(no `brew services`), stopped and the data directory removed after the proof.
+
+PostGIS tests (all **ok**, real database, synthetic data):
+`test_retry_reorder_human_state_and_provenance`,
+`test_mid_transaction_failure_rolls_back_every_table` (now with evidence rows),
+`test_evidence_republication_guard`, `test_district_conflict_rolls_back`,
+`test_migration_checksum_tamper_detected`,
+`test_persisted_list_filters_pagination_and_detail`,
+`test_importer_role_persists_but_cannot_decide`,
+`test_bootstrap_recovery_and_reader_is_select_only`.
+
+**Bug found by the real run:** `bootstrap_reader.py` called
+`format('… PASSWORD %L', %s)` with an untyped pg8000 parameter; PostgreSQL rejected it
+(`42P18 could not determine data type of parameter $1`), so the script could never
+create the reader on any real server. Fixed with `%s::text`.
+
+- **Roles:** the bootstrapped `kilnwatch_api` login can `SELECT` every `kilnwatch`
+  table; `INSERT`, `UPDATE` and `DELETE` on all five tables, and `UPDATE` of
+  `status`/`review_state`/`assessment`, fail with `42501`. A `kilnwatch_importer`
+  login runs `persist` (insert, `SELECT … FOR UPDATE`, evidence upsert and its
+  publication merge) but cannot update `status`/`review_state`/`assessment` (`42501`).
+- **Bootstrap recovery** (Secrets Manager stubbed in-process, no network or AWS):
+  a forced commit failure leaves no role and a secret for a nonexistent role; a rerun
+  creates the role and overwrites the secret with a new password that logs in. When the
+  commit lands but the client sees an error, the role exists, the stored password logs
+  in, and a rerun refuses.
+- **TLS through `registry.db.connect_from_env`:** `DB_HOST=localhost` with the
+  throwaway CA connects (TLSv1.3); `127.0.0.1` fails (`IP address mismatch`); a wrong
+  CA fails (`unable to get local issuer certificate`). This proves the connector checks
+  chain and hostname, not that RDS's certificate works.
+- **Real records** (`registry.cli migrate` as `postgres`, then `registry.cli import` as
+  a `kilnwatch_importer` login over TLS; real `hapur.geojson`, district `Hapur`, real
+  `evidence/manifest.json`, no receipt): import 39 candidates / 39 observations; replay
+  0 / 0. A **simulated** human decision (`confirmed`/`approved` on
+  `KW-fd84509a2e3558a9bd529edaa5b4b97b`, set as `postgres`) survived a third replay
+  (0 / 0) and was then reverted so the saved list is the unreviewed import. Tables:
+  1 run, 39 candidates, 39 observations, 39 run links, 2 evidence rows.
+- **Handler** (`api_handler.handler` as `kilnwatch_api` over TLS, synthetic test-only
+  JWT claims): list 200 with 39; `limit=10` → 4 pages, 39 unique IDs, final
+  `next_cursor=None`; detail `KW-6b3b38da681850e5af46b024f3d3f78e` 200 with
+  `before_metadata`/`after_metadata` and null URLs; Meerut 403; unknown ID 404;
+  `status=bad` 400; wrong port 503 and stopped cluster 503, never an empty list.
+- **Swift:** `KILNWATCH_REAL_CONTRACT_LIST=.local/integration-2a/persisted-list.json
+  swift test` → **26 tests passed**, including
+  `localRealDetectionContractDecodesThroughExistingClient`. No Swift change.
+
+Limits: local `postgres` is a true superuser, not RDS's `rds_superuser`; PostGIS 3.6.4
+locally vs 3.5.x on RDS 17; RDS TLS, parameter groups and extension availability stay
+unproven until deployment. This is database → handler → Swift decode, not API Gateway,
+Cognito or AWS.
+
+## Package (Python 3.12)
+
+`AWS/build/api_handler.zip` SHA-256
+`beeec4f9a9b2d9b29567d59a6c01f448ab4dd04221d3d3785ce238ae5ee661b9`, 94 entries. Top level:
+`api_handler.py`, `rds-ca.pem`, `registry/{__init__,contract,db,store}.py`, `pg8000`,
+`scramp`, `asn1crypto`, `dateutil`, `six.py` and their `dist-info`; no `evidence.py`,
+`cli.py` or `pyproj`. Unpacked and imported with `/usr/local/bin/python3.12 -I`
+(3.12.8): `api_handler`, `registry.store`, `pg8000` load from the ZIP; `rds-ca.pem`
+loads into an `ssl` context (111 CA certificates); `/health` returns 200. This is a
+compatibility smoke test, not a Lambda invocation.
+
+## Terraform
+
+Terraform 1.16.5 (official darwin_arm64 zip, SHA-256 `ecdef65e…4b7dc` matched
+`SHA256SUMS`) in ignored `.local/tools/terraform`. `hashicorp/aws 6.68.0`,
+`archive 2.8.1`, `random` from the unchanged lock file (`git diff` empty, SHA-256
+`3238e308…df6f53` before and after). `init -backend=false -lockfile=readonly`,
+`fmt -check -recursive` and `validate` pass. Then `init -backend-config=backend.hcl`
+on the S3 state bucket and a read-only plan: **75 to add, 0 change, 0 destroy**.
+Details and the plan review are in the runbook's deployment review.
+
+## Portability checklist (ignored artifacts)
+
+Copy privately (not Git, never with credentials) to another workstation:
+
+| Path | Bytes | SHA-256 |
+|---|---|---|
+| `best.pt` | 19,713,480 | `3bcbcd0af696278d894ab6f463c81a742c596192d0493a470f0d03ac4b61f799` |
+| `args.yaml` | 1,678 | `495598de9bbc87cd5928c965c6d145c60e50c7643d4889b242a908145f56afad` |
+| `scores.json` | 994 | `8ac9b684b62db6094f6d5a65b7bdf094bd72ea70d811af4ecf0d0bf1b4c7c504` |
+| `.local/integration-1/hapur.geojson` | 30,388 | `b1e9d177f68d58b48bdd75ff12f93ea244f66944d391710d433a8e2f6be013d0` |
+| `.local/integration-1/hapur.scenes.json` | 24,261 | `1a4719f99cdc446c71920e61526e6b2f6907a1dfc30e4dba6a8cc8abd6f2e78b` |
+| `.local/integration-1/before-scene.json` | 25,079 | `62bcd44f3182b5df8956de2dda5210789ec545b2ecb2c1c1828b75f80498ace1` |
+| `.local/integration-1/evidence/manifest.json` | 4,328 | `7432c03d6aff6dcce1f2d358562b683646e08feb2de29823346265dbf4ebda0e` |
+| `.local/integration-1/evidence/77aa718e….png` (before) | 136,079 | `77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc` |
+| `.local/integration-1/evidence/a0a6c2ca….png` (after) | 147,338 | `a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5` |
+
+Regenerable: `.venv-integration/` (from the requirements files), `AWS/build/`
+(`package_api.py`), previews and real list/detail JSON (from the inputs above).
+**Not regenerable:** the weights `best.pt`; without them the 39 candidates cannot be
+reproduced.

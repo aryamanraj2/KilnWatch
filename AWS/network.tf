@@ -83,10 +83,10 @@ resource "aws_security_group" "db" {
   description = "Private PostgreSQL: API and optional controlled registry runner"
   vpc_id      = aws_vpc.main.id
   ingress {
-    description = "PostgreSQL from controlled registry runner"
-    from_port = 5432
-    to_port = 5432
-    protocol = "tcp"
+    description     = "PostgreSQL from controlled registry runner"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
     security_groups = [aws_security_group.registry_runner.id]
   }
   ingress {

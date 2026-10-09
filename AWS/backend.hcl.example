@@ -1,0 +1,7 @@
+# Copy to the ignored backend.hcl, replace <account-id>, then:
+#   terraform init -backend-config=backend.hcl -lockfile=readonly
+bucket       = "kilnwatch-tfstate-<account-id>-ap-south-1"
+key          = "kilnwatch/hackathon/terraform.tfstate"
+region       = "ap-south-1"
+encrypt      = true
+use_lockfile = true

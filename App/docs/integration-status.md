@@ -47,6 +47,40 @@ Handoff: **ML team mate** supplies saved-run identity/evidence interpretation;
 and reviews the deployment plan before authorized cloud writes; **App** reviews the
 contract and waits for live proof before a separately requested Phase 3.
 
+## Integration 2A — local database proof and deployment preflight (2026-10-09)
+
+**AWS is still not deployed. No apply.** Evidence:
+[`AWS/docs/local-verification.md`](../../AWS/docs/local-verification.md) (Integration 2A)
+and the runbook's "Deployment review (Integration 2A)". Integration 1 is committed at
+`6092cf8`.
+
+- Fixed: replaying evidence without a receipt no longer erases a verified URL; a
+  replay that would swap published bytes is rejected and rolled back.
+- Real local PostGIS 3.6.4 / PostgreSQL 17.11 proof: 30 Python tests run, OK, 0
+  skipped; real 39-record import 39/39, replay 0/0, human state kept; reader is
+  SELECT-only, importer can't change decisions; TLS checks hostname and CA; handler
+  list/pages/detail/403/404/400/503 correct; Swift decodes the persisted list.
+- Fixed a real bug found there: `bootstrap_reader.py` could not create the reader on any
+  PostgreSQL server (untyped `format()` parameter).
+- Terraform 1.16.5: `fmt`/`validate` pass, lock file unchanged; one pre-existing HCL
+  syntax error in `api.tf` fixed.
+- Addendum decisions applied: `ap-south-1`; RDS 7-day backups, deletion protection,
+  final snapshot; CloudFront `PriceClass_200`; S3 remote state with native locking.
+  Publication of the two reviewed PNGs approved (upload in 2B).
+- Only AWS write: state bucket `kilnwatch-tfstate-<account-id>-ap-south-1` (private,
+  versioned, SSE-S3, TLS-only policy; verified). Read-only plan: **75 to add**.
+  Estimated always-on cost ≈ **$38/month** before credits (estimate; assumptions in
+  the runbook).
+
+### App / Phase 3 follow-ups
+
+- `App/KilnWatch/Features/Kiln/KilnView.swift:45` ("Within 800 m"), `:170`/`:212`
+  (a fixed 800 m `MapCircle` and caption) and
+  `App/KilnWatch/Design/Components/ExposureBlock.swift:4,29,43` hard-code 800 m. The
+  800 m vs 1,000 m (UP) habitation rule is unresolved. Real records don't reach this
+  view yet (no registry fetching). Resolve the rule and drive the radius from data in
+  Phase 3; not changed now.
+
 ## People and ownership
 
 - **ML team mate:** trained checkpoint, training-run metadata, detection output, imagery provenance and model evaluation.

@@ -21,7 +21,7 @@ def main():
             cur.execute("SELECT 1 FROM pg_roles WHERE rolname='kilnwatch_api'")
             if cur.fetchone():
                 raise ValueError('Reader login already exists; use a reviewed rotation process.')
-            cur.execute("SELECT format('CREATE ROLE kilnwatch_api LOGIN PASSWORD %L', %s)",(password,))
+            cur.execute("SELECT format('CREATE ROLE kilnwatch_api LOGIN PASSWORD %L', %s::text)",(password,))
             cur.execute(cur.fetchone()[0])
             cur.execute('GRANT kilnwatch_reader TO kilnwatch_api')
         # Write the secret before commit: failure rolls back DB role creation.
@@ -32,7 +32,9 @@ def main():
     except Exception as exc:
         connection.rollback()
         # A commit failure after PutSecretValue can leave a secret for a rolled-back role.
-        print('Reader provisioning failed: '+type(exc).__name__+'. Reconcile DB role and secret before retrying.',file=sys.stderr)
+        print('Reader provisioning failed: '+type(exc).__name__+". As admin run SELECT 1 FROM pg_roles WHERE rolname='kilnwatch_api'. "
+              'No row: rerun this script (new password, secret overwritten). A row: the commit landed; '
+              'verify a SELECT login with the reader secret, do not rerun (runbook section 6).',file=sys.stderr)
         raise SystemExit(1)
     finally:connection.close()
 

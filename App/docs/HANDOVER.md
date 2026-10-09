@@ -94,6 +94,17 @@ and [`AWS/docs/local-verification.md`](../../AWS/docs/local-verification.md). Th
 complete DB/plan/live proof after deployment authorization. The **ML team mate**
 still supplies saved-run identity and evidence interpretation. Phase 3 stays on hold.
 
+## Integration 2A preflight (2026-10-09)
+
+Integration 1 is committed at `6092cf8`. Integration 2A (`prompts/07-first-record-preflight.md`
+plus its addendum) fixed the evidence-republication bug, hardened the runbook, and
+proved the registry on a real local PostgreSQL 17 / PostGIS 3.6.4 cluster (39-record
+import and replay, roles, TLS, handler, Swift decode; it also caught and fixed a bootstrap bug). Terraform `fmt`/`validate` pass. Decisions applied: `ap-south-1`,
+RDS backups/deletion protection/final snapshot, `PriceClass_200`, S3 remote state. The
+only AWS write is the state bucket `kilnwatch-tfstate-<account-id>-ap-south-1`. A
+read-only plan shows 75 resources to add; estimated ≈ $38/month always-on before
+credits. **No apply.** Integration 2B (deployment) needs explicit authorization.
+
 ## Known gaps and pending fixes
 
 Read `App/docs/integration-status.md` for the source inspection and first integration plan. The user confirms AWS is **not deployed yet**. The user supplied and the builder verified the existing baseline `best.pt`, then matching `args.yaml`/`scores.json`; the saved Kaggle version identity remains missing. Weights and raw GeoJSON are intentionally excluded from Git. Phase 3 is on hold while the model-to-AWS record/evidence bridge is prepared.
@@ -115,6 +126,6 @@ Read `App/docs/integration-status.md` for the source inspection and first integr
 ## Next steps (in order, one at a time)
 
 1. Phase 2 was committed and merged with model/AWS source into `main`. Live backend and successful road guidance remain unverified. Commit or push further work only on an explicit user request.
-2. Integration 1 local implementation/contract proof is prepared from `App/docs/prompts/05-model-aws-bridge.md`. Review its runbook and remaining inputs with the **AWS teammate** and **ML team mate**; real PostGIS persistence and live deployment verification remain unrun. No live deployment is authorized by that prompt.
+2. Integration 1 (committed `6092cf8`) and Integration 2A preflight are done. The orchestrator reviews the 2A report, plan and cost estimate; then the user authorizes Integration 2B: apply, private migration/import/bootstrap, evidence publication, an inspector account and live smoke tests.
 3. Review the source/tests and deployment plan, then authorize and verify the first real record through AWS. Resume Phase 3 evidence UI after the contract and required images are available; do not begin automatically.
 4. Phase 4: registry-backed Ask/agent stream and real route planning. Phase 5: verdict capture, outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.

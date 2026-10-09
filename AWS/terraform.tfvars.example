@@ -1,5 +1,5 @@
 # AWS teammate: choose account/profile and encrypted locked state before planning.
-aws_region = "us-west-2"
+aws_region = "ap-south-1"
 project_name = "kilnwatch"
 environment = "hackathon"
 bucket_name_prefix = "replace-with-approved-prefix"

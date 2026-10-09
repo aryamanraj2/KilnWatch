@@ -16,12 +16,12 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      DB_HOST     = aws_db_instance.main.address
-      DB_PORT     = tostring(aws_db_instance.main.port)
-      DB_NAME     = var.db_name
-      DB_CA_BUNDLE = "/var/task/rds-ca.pem"
+      DB_HOST           = aws_db_instance.main.address
+      DB_PORT           = tostring(aws_db_instance.main.port)
+      DB_NAME           = var.db_name
+      DB_CA_BUNDLE      = "/var/task/rds-ca.pem"
       COGNITO_CLIENT_ID = aws_cognito_user_pool_client.web_mobile.id
-      DB_SECRET   = aws_secretsmanager_secret.registry_reader.arn
+      DB_SECRET         = aws_secretsmanager_secret.registry_reader.arn
     }
   }
 
@@ -40,12 +40,14 @@ resource "aws_cognito_user_pool" "main" {
   auto_verified_attributes = ["email"]
   admin_create_user_config { allow_admin_create_user_only = true }
   schema {
-    name = "district"
+    name                = "district"
     attribute_data_type = "String"
-    mutable = false
-    required = false
-    string_attribute_constraints { min_length = 1
-      max_length = 64 }
+    mutable             = false
+    required            = false
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 64
+    }
   }
   password_policy {
     minimum_length                   = 12
@@ -61,8 +63,8 @@ resource "aws_cognito_user_pool_client" "web_mobile" {
   name                          = "${var.project_name}-web-mobile"
   user_pool_id                  = aws_cognito_user_pool.main.id
   generate_secret               = false
-  read_attributes = ["email", "email_verified", "custom:district"]
-  write_attributes = ["email"]
+  read_attributes               = ["email", "email_verified", "custom:district"]
+  write_attributes              = ["email"]
   explicit_auth_flows           = ["ALLOW_USER_SRP_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
   prevent_user_existence_errors = "ENABLED"
   access_token_validity         = 60
@@ -185,7 +187,7 @@ resource "aws_iam_role_policy" "api_lambda_invoke_agentcore" {
 }
 
 resource "aws_cognito_user_group" "inspector" {
-  name = "inspector"
+  name         = "inspector"
   user_pool_id = aws_cognito_user_pool.main.id
-  description = "District-scoped registry reads; membership assigned by an administrator."
+  description  = "District-scoped registry reads; membership assigned by an administrator."
 }

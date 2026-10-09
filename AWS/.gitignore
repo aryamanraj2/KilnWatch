@@ -3,6 +3,7 @@ terraform.tfstate
 terraform.tfstate.*
 *.tfplan
 terraform.tfvars
+backend.hcl
 !terraform.tfvars.example
 build/
 .DS_Store

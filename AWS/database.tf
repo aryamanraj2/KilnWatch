@@ -18,9 +18,11 @@ resource "aws_db_instance" "main" {
   vpc_security_group_ids      = [aws_security_group.db.id]
   publicly_accessible         = false
   storage_encrypted           = true
-  backup_retention_period     = 1
-  deletion_protection         = false
-  skip_final_snapshot         = true
+  backup_retention_period     = 7
+  deletion_protection         = true
+  skip_final_snapshot         = false
+  final_snapshot_identifier   = "${var.project_name}-${var.environment}-db-final"
+  copy_tags_to_snapshot       = true
   auto_minor_version_upgrade  = true
   apply_immediately           = true
 }
@@ -29,17 +31,17 @@ resource "aws_db_instance" "main" {
 # Terraform provisions the RDS instance but does not execute SQL schema migrations.
 
 resource "aws_db_parameter_group" "registry" {
-  name = "${var.project_name}-registry-pg17"
+  name   = "${var.project_name}-registry-pg17"
   family = "postgres17"
   parameter {
-    name = "rds.force_ssl"
+    name  = "rds.force_ssl"
     value = "1"
   }
 }
 
 # Secret value is provisioned through the reviewed runbook; Terraform holds no password.
 resource "aws_secretsmanager_secret" "registry_reader" {
-  name = "${var.project_name}/${var.environment}/registry-reader"
-  description = "Dedicated SELECT-only DB login. No master credential in Lambda."
+  name                    = "${var.project_name}/${var.environment}/registry-reader"
+  description             = "Dedicated SELECT-only DB login. No master credential in Lambda."
   recovery_window_in_days = 7
 }

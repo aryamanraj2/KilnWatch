@@ -43,17 +43,19 @@ The commands below are a concrete review sequence, not an instruction to deploy 
 
 ## Decisions the AWS teammate must confirm before planning
 
-1. Account ID, named AWS profile, us-west-2 availability, deployment operator and
-   state owner. Use private encrypted state with locking; agree backend configuration
+1. Account ID, named AWS profile (`kilnwatch`, IAM user, never root), region
+   `ap-south-1` (Mumbai), deployment operator and state owner. Use private encrypted state with locking; agree backend configuration
    and credentials separately. No state, plans, tokens or local `.tfvars` in Git.
 2. Approve district `Hapur` for this AOI. The importer receives an administrative
    district assignment; it does not establish district boundaries. Re-import with a
    different district is rejected. Multi-district identities are deferred.
+   (Still open: the AWS teammate has not yet confirmed district `Hapur`.)
 3. Review RDS 17/PostGIS support, instance/storage, Secrets Manager interface endpoint
-   in two private subnets, CloudFront, logs and optional runner costs. No monthly total
-   is claimed. Keep backups/deletion protection appropriate before retaining real data;
-   the foundation still skips final snapshots and has deletion protection disabled.
-4. Approve public publication of only the selected Copernicus satellite PNGs. Model,
+   in two private subnets, CloudFront, logs and optional runner costs. **Decided
+   2026-10-09:** 7-day backups, deletion protection and a final snapshot; see the
+   cost estimate in the deployment review.
+4. Approve public publication of only the selected Copernicus satellite PNGs
+   (**approved 2026-10-09** by the AWS teammate; upload in 2B). Model,
    raw export, field-photo and import prefixes stay private. The resident endpoint
    remains unavailable (503) until a reviewed projection/policy exists.
 5. Select an approved existing VPC runner/VPN, or review enabling the optional SSM
@@ -159,17 +161,24 @@ pass before live import. Transaction spies are not a replacement for this proof.
 ## 4. Review infrastructure plan — AWS teammate (future, read access required)
 
 ```sh
-export AWS_PROFILE='<approved-profile>' AWS_REGION=us-west-2
+export AWS_PROFILE=kilnwatch AWS_REGION=ap-south-1
 aws sts get-caller-identity
 cd AWS
 cp terraform.tfvars.example terraform.tfvars
 # Set approved names/region/runner choice in the ignored file.
-terraform init  # use the agreed encrypted/locked backend config; do not upgrade providers
+cp backend.hcl.example backend.hcl   # ignored; set the account ID
+terraform init -backend-config=backend.hcl -lockfile=readonly  # never -upgrade
 terraform fmt -check -recursive
 terraform validate
 terraform plan -out=first-record.tfplan
 terraform show first-record.tfplan
 ```
+
+`AWS/versions.tf` has a partial `backend "s3" {}` block; its values live in the ignored
+`AWS/backend.hcl` (template: `backend.hcl.example`). Locking is S3-native
+(`use_lockfile = true`, Terraform >= 1.10, no DynamoDB). State for a shared deployment
+must never be local on a laptop. `init -backend=false` remains available for offline
+`validate`. The state bucket is created once, outside Terraform (section 4a).
 
 Confirm identity, resource count, private RDS, two private Secrets Manager endpoint
 interfaces, evidence-only S3 policy, runtime secret separation, and disabled optional
@@ -187,6 +196,38 @@ AgentCore, SageMaker training, Amplify and long-running ECS service stay disable
 Existing batch ECS/Step Functions/ECR scaffolding remains unfinished; do not start
 it or create an inference container in this step. The API has no StartExecution
 permission and jobs return 501. Routes, rules, agents and verdict endpoints are absent.
+
+## 4a. Terraform state bucket (created 2026-10-09, outside Terraform)
+
+One bucket per account/region, created once with the AWS CLI by the `kilnwatch`
+profile (IAM user, never root). Terraform never manages it.
+
+```sh
+export AWS_PROFILE=kilnwatch AWS_REGION=ap-south-1
+B=kilnwatch-tfstate-<account-id>-ap-south-1
+aws s3api create-bucket --bucket "$B" --create-bucket-configuration LocationConstraint=ap-south-1
+aws s3api put-public-access-block --bucket "$B" --public-access-block-configuration \
+  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+aws s3api put-bucket-versioning --bucket "$B" --versioning-configuration Status=Enabled
+aws s3api put-bucket-encryption --bucket "$B" --server-side-encryption-configuration \
+  '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+aws s3api put-bucket-policy --bucket "$B" --policy '{"Version":"2012-10-17","Statement":[{"Sid":"DenyInsecureTransport","Effect":"Deny","Principal":"*","Action":"s3:*","Resource":["arn:aws:s3:::'"$B"'","arn:aws:s3:::'"$B"'/*"],"Condition":{"Bool":{"aws:SecureTransport":"false"}}}]}'
+# Verify (read-only):
+aws s3api get-public-access-block --bucket "$B"
+aws s3api get-bucket-versioning --bucket "$B"
+aws s3api get-bucket-encryption --bucket "$B"
+aws s3api get-bucket-policy --bucket "$B"
+```
+
+**Removal** (only after the deployment is destroyed or its state moved; this deletes
+every state version):
+
+```sh
+aws s3api list-object-versions --bucket "$B" --output json \
+  --query '{Objects: [Versions, DeleteMarkers][][].{Key: Key, VersionId: VersionId}}' > /tmp/v.json
+aws s3api delete-objects --bucket "$B" --delete file:///tmp/v.json   # skip if the list is empty
+aws s3api delete-bucket --bucket "$B"
+```
 
 ## 5. Apply only after explicit user authorization — AWS teammate
 
@@ -217,7 +258,11 @@ source (does not require a commit) and upload source/inputs to **private** `impo
 # Repository root, on the approved operator workstation:
 tar --exclude=__pycache__ -czf .local/integration-1/operator-source.tgz \
   AWS/registry AWS/migrations AWS/scripts AWS/lambda/requirements.txt AWS/requirements-operator.txt
-aws s3 cp .local/integration-1/ "s3://<data-bucket>/imports/integration-1/" --recursive
+# Upload only the required inputs, never previews or real list/detail JSON:
+aws s3 cp .local/integration-1/hapur.geojson 's3://<data-bucket>/imports/integration-1/hapur.geojson'
+aws s3 cp .local/integration-1/operator-source.tgz 's3://<data-bucket>/imports/integration-1/operator-source.tgz'
+aws s3 cp .local/integration-1/evidence/ 's3://<data-bucket>/imports/integration-1/evidence/' --recursive
+# The publication receipt follows separately in section 7.
 aws ssm start-session --target '<registry-runner-id>'
 ```
 
@@ -232,6 +277,8 @@ python3.12 -m venv .venv
 .venv/bin/python -m pip install -r AWS/requirements-operator.txt
 curl --fail --silent --show-error \
   https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -o rds-ca.pem
+# boto3 needs an explicit region on the runner; Lambda sets AWS_REGION itself.
+export AWS_REGION='<region>' AWS_DEFAULT_REGION='<region>'
 export DB_HOST='<private-rds-endpoint>' DB_PORT=5432 DB_NAME=kilnwatch
 export DB_CA_BUNDLE="$PWD/rds-ca.pem" DB_SECRET='<registry-admin-secret-arn>'
 export REGISTRY_READER_SECRET='<registry-reader-secret-arn>'
@@ -251,8 +298,30 @@ assessment. The initial controlled administrative import may use master credenti
 subsequent automated imports should provision a login with `kilnwatch_importer`.
 Lambda only reads the separate `kilnwatch_api` login/secret with `kilnwatch_reader`.
 Do not grant it the master secret. Bootstrap creates the reader once, fails on an
-existing role, and never prints credentials; reconcile DB/secret if a commit fails
-between secret publication and DB commit. Rotation needs its own reviewed procedure.
+existing role, and never prints credentials. Rotation needs its own reviewed procedure.
+
+`CREATE ROLE … PASSWORD` text reaches the server. Before bootstrapping, the AWS
+teammate confirms the RDS `log_statement` parameter is not `ddl` or `all` (the
+default is `none`), so the password is not written to the database log.
+
+Bootstrap writes the reader secret **before** `COMMIT`. If it fails, recover with
+these checks, not guesswork:
+
+1. As admin (`DB_SECRET` = master secret), run
+   `SELECT 1 FROM pg_roles WHERE rolname='kilnwatch_api'`.
+2. **No row:** the role creation rolled back. The secret may hold a password for a
+   role that does not exist; that is harmless. Rerun `bootstrap_reader.py`. It makes
+   a new password and overwrites the secret. (Proven locally with Secrets Manager
+   stubbed in-process and a forced commit failure; see `local-verification.md`.)
+3. **A row:** the commit landed server-side although the client saw an error. The
+   secret was written first, so it matches. Do not rerun (it refuses an existing
+   role). Verify the reader login, then stop if it fails and use a reviewed
+   rotation; never drop the role ad hoc:
+
+   ```sh
+   DB_SECRET='<registry-reader-secret-arn>' PYTHONPATH=AWS .venv/bin/python -c \
+     "from registry.db import connect_from_env as c; k=c().cursor(); k.execute('SELECT COUNT(*) FROM kilnwatch.candidates'); print(k.fetchone()[0])"
+   ```
 
 Validate all inputs before opening the write transaction. Any database failure rolls
 back the run/candidates/observations/evidence. Migration ledger locks and checksums
@@ -353,6 +422,207 @@ That test uses an offline URLProtocol body: it proves decoding/client compatibil
 not that the simulator itself contacted AWS. Live authenticated curl/image checks
 must be reported separately. Leave Today/route service unconfigured; do not invent
 a one-stop route. App registry fetching and evidence comparison/loading are Phase 3.
+
+## Deployment review (Integration 2A)
+
+Prepared 2026-10-09 with Terraform 1.16.5 and the locked `hashicorp/aws 6.68.0`.
+`fmt -check` and `validate` pass. A **read-only plan** ran against the S3 backend in
+the user's account (`ap-south-1`, profile `kilnwatch` = IAM user `aryaman`) with
+`create_registry_runner=true` and `bucket_name_prefix=kilnwatch`:
+**75 to add, 0 to change, 0 to destroy**, matching the source count below. Nothing
+was applied. The plan and its text stay private in ignored files.
+
+Plan review: RDS `publicly_accessible=false`, encrypted, deletion protection on,
+7-day backups, final snapshot `kilnwatch-hackathon-db-final`; RDS subnet group and
+the Secrets Manager endpoint use only the two private subnets (`10.40.11.0/24`,
+`10.40.12.0/24`, no public IPs); bucket policy references only `evidence/*.png` and
+the distribution's ARN; the Lambda role policy references only the reader secret;
+CloudFront `PriceClass_200`; no AgentCore, SageMaker, Amplify, ECS service or any
+execution resource. Region check (read-only, 2026-10-09): `ap-south-1` offers RDS
+PostgreSQL 17.5–17.11 on `db.t4g.micro` (default 17.9); AWS's extension table lists
+PostGIS 3.5.1 for 17.9 and 3.5.6 for 17.9 R2/17.10/17.11. The local proof used
+PostGIS 3.6. The name-collision check below found **no** existing objects.
+
+### Resource set from source (defaults, `alert_email=""`)
+
+`create_registry_runner=false` creates **70** managed resources; `true` adds **5**
+(runner IAM role, its SSM policy attachment and inline policy, instance profile, EC2
+instance) and one SSM parameter read for the AL2023 AMI.
+
+- **Network (15):** VPC, IGW, 2 public subnets (auto-assign public IPv4), 2 private
+  subnets, public route table (0.0.0.0/0 → IGW) and private route table (no NAT), 4
+  associations, SGs `ecs`, `lambda`, `db`.
+- **Storage (6):** `random_id`, data bucket `<prefix>-data-<hex>` (`force_destroy=false`),
+  public access block (all four on), SSE-S3, versioning; ECR `kilnwatch-inference`.
+- **Database (4):** RDS PostgreSQL 17 `kilnwatch-hackathon-db` (`db.t4g.micro`, 20→100
+  GB, encrypted, `publicly_accessible=false`, RDS-managed master secret), subnet group
+  over the two private subnets, parameter group `kilnwatch-registry-pg17`
+  (`rds.force_ssl=1`), empty reader secret `kilnwatch/hackathon/registry-reader`.
+  RDS also creates its own `rds!db-…` master secret outside Terraform's naming.
+- **Bridge (8):** CloudFront distribution + OAC `kilnwatch-evidence`, bucket policy,
+  SGs `registry-runner` and `secrets-endpoint` (always created, even without a
+  runner), two Lambda egress rules (5432 → db SG, 443 → endpoint SG), Secrets Manager
+  interface endpoint in both private subnets (two ENIs, private DNS).
+- **API (15):** Lambda `kilnwatch-api` (Python 3.12, x86_64, VPC), Cognito pool
+  `kilnwatch-users`, client, group `inspector`, HTTP API `kilnwatch-api`, JWT
+  authorizer, Lambda integration, 5 routes (`GET /kilns`, `GET /kilns/{id}`,
+  `POST /jobs`, public `GET /health`, public `GET /public/kilns`), `$default` stage,
+  access-log group `/aws/apigateway/kilnwatch` (14 days), invoke permission.
+- **IAM (10):** roles `kilnwatch-ecs-execution`, `kilnwatch-ecs-task`,
+  `kilnwatch-api-lambda`, `kilnwatch-step-functions` with their policies/attachments.
+- **Scaffolding, never started (9):** ECS cluster `kilnwatch-cluster`, task definition
+  `kilnwatch-inference` and log group `/aws/ecs/kilnwatch-inference`; Step Functions
+  `kilnwatch-inference-workflow`; ECR `kilnwatch-strands-agents` + lifecycle policy; IAM
+  role `kilnwatch-agentcore-runtime` with three inline policies (Bedrock invoke, ECR
+  pull, logs). Disabled options do **not** mean only registry resources exist.
+- **Alerting (3):** SNS `kilnwatch-alerts`, alarm `kilnwatch-api-lambda-errors`.
+
+Count-0 by default: AgentCore runtime and its Lambda invoke policy, SageMaker training
+role/job, Amplify app/branch, the demo ECS service, the SNS email subscription.
+Nothing starts inference, training or an agent. The ECS task role can write the whole
+data bucket, but nothing runs it.
+
+Not managed by Terraform: the Lambda log group `/aws/lambda/kilnwatch-api` is created on
+first invocation with **no retention limit**; Lambda's VPC ENIs.
+
+### Name collisions to check before planning (AWS teammate, read-only)
+
+Run 2026-10-09 in `ap-south-1` (account confirmed by the user): every name below was
+absent; the account has only one existing VPC.
+
+IAM role names are account-global; the rest are per region. CreateCluster, CreateTopic,
+PutMetricAlarm and task-definition registration **adopt or overwrite** an existing
+object of the same name instead of failing, so check those especially.
+
+```sh
+for r in kilnwatch-ecs-execution kilnwatch-ecs-task kilnwatch-api-lambda \
+         kilnwatch-step-functions kilnwatch-agentcore-runtime kilnwatch-registry-runner; do
+  aws iam get-role --role-name "$r" --query Role.Arn --output text 2>&1 | tail -1; done
+aws cognito-idp list-user-pools --max-results 60 --query "UserPools[?Name=='kilnwatch-users']"
+aws ecr describe-repositories --query "repositories[?starts_with(repositoryName,'kilnwatch-')].repositoryName"
+aws logs describe-log-groups --log-group-name-prefix /aws/ecs/kilnwatch --query 'logGroups[].logGroupName'
+aws logs describe-log-groups --log-group-name-prefix /aws/apigateway/kilnwatch --query 'logGroups[].logGroupName'
+aws logs describe-log-groups --log-group-name-prefix /aws/lambda/kilnwatch --query 'logGroups[].logGroupName'
+aws ecs describe-clusters --clusters kilnwatch-cluster --query 'clusters[].status'
+aws ecs list-task-definition-families --family-prefix kilnwatch-inference
+aws stepfunctions list-state-machines --query "stateMachines[?name=='kilnwatch-inference-workflow']"
+aws sns list-topics --query "Topics[?ends_with(TopicArn,':kilnwatch-alerts')]"
+aws cloudwatch describe-alarms --alarm-names kilnwatch-api-lambda-errors --query 'MetricAlarms[].AlarmName'
+aws lambda get-function --function-name kilnwatch-api --query Configuration.FunctionArn
+aws apigatewayv2 get-apis --query "Items[?Name=='kilnwatch-api'].ApiId"
+aws rds describe-db-instances --db-instance-identifier kilnwatch-hackathon-db
+aws rds describe-db-subnet-groups --db-subnet-group-name kilnwatch-db-subnets
+aws rds describe-db-parameter-groups --db-parameter-group-name kilnwatch-registry-pg17
+aws secretsmanager list-secrets --include-planned-deletion \
+  --query "SecretList[?Name=='kilnwatch/hackathon/registry-reader'].[Name,DeletedDate]"
+aws cloudfront list-origin-access-controls --query "OriginAccessControlList.Items[?Name=='kilnwatch-evidence']"
+aws rds describe-db-engine-versions --engine postgres --engine-version 17 \
+  --query 'DBEngineVersions[].EngineVersion'   # PostGIS availability is per minor version
+```
+
+A reader secret still in its 7-day deletion window blocks re-creation with that name.
+
+### Data retention (finding 11, decided by the AWS teammate)
+
+`database.tf` now sets `backup_retention_period=7`, `deletion_protection=true`,
+`skip_final_snapshot=false` with `final_snapshot_identifier=kilnwatch-hackathon-db-final`,
+and `copy_tags_to_snapshot=true` (`apply_immediately=true` is unchanged). `terraform
+destroy` will now **refuse to delete the database** until deletion protection is
+deliberately turned off in a reviewed change and applied. After that, destroy takes
+the final snapshot; that snapshot is kept, and billed as backup storage, until deleted
+by hand. Destroy still deletes the reader secret (7-day recovery window), Cognito pool
+and users, and log groups. It fails on the data bucket while it holds objects
+(`force_destroy=false`) and on ECR repositories that hold images. The state bucket
+is outside Terraform and is never destroyed by it.
+
+### Access paths, roles and secrets
+
+- RDS is private (two private subnets, no NAT, not publicly accessible); ingress 5432
+  only from the Lambda SG and the runner SG. Never open 5432 to a laptop.
+- Lambda egress: 5432 to the db SG, 443 to the Secrets Manager endpoint SG. Nothing else.
+- The Lambda role reads **only** the reader secret (`kilnwatch_api`, `kilnwatch_reader`,
+  SELECT-only, proven locally in Integration 2A). It never receives the master secret.
+- The runner role (if enabled) reads the master secret, writes only the reader secret
+  and reads `imports/*`. The endpoint policy allows only `GetSecretValue` on those two
+  secrets, and `PutSecretValue` on the reader secret for the runner role.
+- Importer logins (`kilnwatch_importer`) can insert and update observation times and
+  evidence, but not `status`, `review_state` or `assessment` (proven locally).
+
+### Public evidence scope and price class (finding 10, AWS teammate decides)
+
+The bucket policy grants CloudFront (that distribution's ARN only) `GetObject` on
+`evidence/*.png`. All other prefixes (`models/`, `imports/`, raw exports, field photos)
+stay private and the public access block stays on. The AWS teammate
+**approved publishing the two reviewed Copernicus PNGs** (recorded 2026-10-09; the
+upload happens in 2B). `bridge.tf` now uses `PriceClass_200`, which includes India
+edge locations (`PriceClass_100` has none). `PriceClass_All` is not used.
+
+### Expected runtime omissions
+
+`/routes/today`, rules, verdicts and agents are absent (no route). `POST /jobs` returns
+501; `/public/kilns` returns 503. `/health` returns 200 with
+`registry_readiness: not_checked`; it is **not** a readiness check. Registry outages
+become 503 inside the handler, so the Lambda `Errors` alarm cannot see them (finding
+12); an API Gateway 5xx alarm is later observability work.
+
+### Rollback and recovery
+
+- **Bad import:** `persist` is one transaction; any failure rolls back runs,
+  candidates, observations and evidence. Replays insert nothing new and never touch
+  human state.
+- **Evidence republication (finding 1):** a replay without the receipt keeps the
+  verified `published_url`. A replay that would change the bytes of a published side
+  is rejected and rolls back the whole batch; publish new bytes under their new
+  content-addressed key through a reviewed procedure instead.
+- **Bootstrap failure (finding 4):** follow the role-exists check in section 6.
+- **Infrastructure:** revert the Terraform change and plan again. Do not `destroy`
+  while the retention settings above are unchanged.
+
+### Temporary runner cleanup
+
+After preserving verification evidence, set `create_registry_runner=false` and apply a
+reviewed plan; it removes only the 5 runner resources. Delete the runner's
+`~/kilnwatch-proof` beforehand (it holds the CA bundle and inputs, no credentials).
+Remove `imports/integration-1/` objects once they are no longer needed. Do not destroy
+RDS or data.
+
+### Cost estimate (ap-south-1)
+
+Source: AWS Price List API (`aws pricing get-products`, read-only), queried
+2026-10-09, USD, on-demand, before free tier or credits. **Estimate only, under these
+assumptions:** a 730-hour month; Single-AZ `db.t4g.micro` with 20 GB storage (gp2 and
+gp3 are the same price here); backups stay inside the free allocation (equal to
+provisioned storage) because the database is a few MB; two Secrets Manager secrets
+(reader + RDS-managed master) both billed; low traffic (about 10,000 API requests a
+month, one `GetSecretValue` per request, 256 MB × 1 s per invocation, under 0.1 GB of
+logs); two small PNGs; the runner runs about 4 hours with an 8 GB gp3 root volume
+and one public IPv4 address. ECR repositories stay empty.
+
+| Service | Unit price | Monthly estimate |
+|---|---|---|
+| RDS `db.t4g.micro` | $0.021/hour | $15.33 |
+| RDS storage, 20 GB | $0.131/GB-month | $2.62 |
+| RDS backup storage | $0.095/GB-month beyond the free allocation | $0.00 |
+| Secrets Manager interface endpoint, 2 AZs | $0.013/AZ-hour; $0.01/GB processed | $18.98 |
+| Secrets Manager, 2 secrets + ~10k calls | $0.40/secret-month; $0.05/10k calls | $0.85 |
+| CloudWatch alarm | $0.10/alarm-month | $0.10 |
+| CloudWatch Logs | $0.67/GB ingested; $0.03/GB-month stored | ~$0.07 |
+| Lambda | $0.20/million requests; $0.0000166667/GB-second | ~$0.04 |
+| HTTP API | $1.05/million requests | ~$0.01 |
+| CloudFront (India) | $0.109/GB; $0.012/10k HTTPS requests | ~$0.00 |
+| S3 (data + state buckets) | $0.025/GB-month | ~$0.00 |
+| ECR (empty) | $0.10/GB-month | $0.00 |
+| **Always-on total** | | **≈ $38/month** |
+| Runner t3.micro, ~4 h (one-time) | $0.0112/hour | $0.05 |
+| Runner public IPv4, ~4 h | $0.005/hour | $0.02 |
+| Runner EBS 8 GB gp3, ~4 h | $0.0912/GB-month | <$0.01 |
+| **Temporary total** | | **≈ $0.07** |
+
+If the runner were left on for a full month it would add about $12.56 (instance
+$8.18, IPv4 $3.65, EBS $0.73). The interface endpoint and RDS make up about 90% of
+the always-on cost. Cognito (a handful of users) and KMS (AWS-managed keys) are
+assumed to cost nothing. The user should check the credit balance, its expiry and
+any excluded services under Billing → Credits.
 
 ## Stop and hand off
 

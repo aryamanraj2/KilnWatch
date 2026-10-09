@@ -28,8 +28,15 @@ def persist(connection, records, input_hash, model_hash, evidence_hash=None):
             for side in ('before','after'):
                 meta = p['evidence'].get(side+'_metadata')
                 if meta:
-                    cursor.execute('INSERT INTO kilnwatch.evidence VALUES (%s,%s,%s,%s,%s::jsonb) ON CONFLICT (observation_id,side) DO UPDATE SET sha256=EXCLUDED.sha256, object_key=EXCLUDED.object_key, metadata=EXCLUDED.metadata',
+                    # A replay without a receipt keeps a verified URL; published bytes are never swapped.
+                    cursor.execute('''INSERT INTO kilnwatch.evidence AS e VALUES (%s,%s,%s,%s,%s::jsonb) ON CONFLICT (observation_id,side) DO UPDATE
+SET sha256=EXCLUDED.sha256, object_key=EXCLUDED.object_key,
+ metadata=CASE WHEN EXCLUDED.metadata->>'published_url' IS NULL AND e.metadata->>'published_url' IS NOT NULL
+  THEN EXCLUDED.metadata||jsonb_build_object('published_url',e.metadata->'published_url') ELSE EXCLUDED.metadata END
+WHERE e.metadata->>'published_url' IS NULL OR e.sha256=EXCLUDED.sha256''',
                                    (key,side,meta['sha256'],meta['object_key'],canonical(meta)))
+                    if cursor.rowcount != 1:
+                        raise ValueError('published evidence differs; administrative review required')
         connection.commit()
         return counts
     except Exception:
