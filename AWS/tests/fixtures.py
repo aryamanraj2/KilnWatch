@@ -40,5 +40,11 @@ class MemoryRegistry:
         return {'kilns':rows[:limit],'next_cursor':rows[limit-1]['kiln_id'] if len(rows)>limit else None}
     def detail(self,kiln_id,district):
         return next((r for r in self.rows if r['kiln_id']==kiln_id and r['district']==district),None)
+    def public_near(self,lat,lon,radius_m):
+        # Distance is SQL-only (PostGIS test); the double returns flagged rows at a fixed distance.
+        return {'kilns':[{**r,'distance_m':0} for r in self.rows if r['status']=='flagged'],'next_cursor':None}
+    def public_list(self,district,cursor='',limit=100):return self.list(district,'flagged',cursor,limit)
+    def public_detail(self,kiln_id):
+        return next((r for r in self.rows if r['kiln_id']==kiln_id and r['status']=='flagged'),None)
     @contextmanager
     def factory(self): yield self

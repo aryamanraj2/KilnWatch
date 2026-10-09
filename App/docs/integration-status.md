@@ -47,6 +47,23 @@ Handoff: **ML team mate** supplies saved-run identity/evidence interpretation;
 and reviews the deployment plan before authorized cloud writes; **App** reviews the
 contract and waits for live proof before a separately requested Phase 3.
 
+## Integration 2C — public read API (2026-10-10)
+
+**The public, no-login read API is live:** `GET /public/kilns` (near a point or a
+district list) and `GET /public/kilns/{id}`. Flagged kilns only (enforced in SQL),
+allowlisted fields (no `review_state`, no `provenance`), `public, max-age=60`, stage
+throttling 10/s burst 20. Contract: `api-contract.md` (Integration 2C). Evidence:
+`AWS/docs/local-verification.md` (Integration 2C).
+
+- Live HTTPS: near Hapur town 1 kiln at r=2000 m and 22 at 5000 m; district paging 39
+  unique IDs in 4 pages; detail 200, unknown 404; bad input 400; `/kilns` still 401.
+  Swift decodes the live bodies without any Swift change.
+- **Ready for the resident portal** (AWS teammate, next) and for **Phase 3's demo data**.
+  The iOS app needs no sign-in for public reads. The protected inspector routes still
+  require Cognito, which arrives in Phase 5.
+- CloudFront is still pending AWS account verification; image URLs stay `null` until it
+  is applied and the evidence is published.
+
 ## Integration 2B — live deployment (2026-10-10)
 
 **AWS is deployed in `ap-south-1` (73/75 resources) with the 39 real Hapur records

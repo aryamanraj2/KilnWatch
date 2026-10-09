@@ -128,6 +128,30 @@ class PostGISTests(unittest.TestCase):
         self.assertEqual(len(registry.list('Hapur','flagged')['kilns']),4);self.assertEqual(len(registry.list('Meerut')['kilns']),2)
         self.assertEqual(registry.detail(ids[1],'Hapur')['status'],'confirmed')
         self.assertIsNone(registry.detail(meerut[0]['payload']['kiln_id'],'Hapur'))
+    def test_public_near_flagged_only_paging_and_detail(self):
+        # Footprints sit 0.01 degree (~975 m) apart in longitude; the point lies inside kiln 0.
+        hapur=many(5,'Hapur');persist(self.conn,hapur,'b'*64,'a'*64);persist(self.conn,many(2,'Meerut',shift=10),'b'*64,'a'*64)
+        # convert() orders by observation key, so order IDs west to east.
+        ids=[r['payload']['kiln_id'] for r in sorted(hapur,key=lambda r:r['payload']['footprint']['centroid']['longitude'])]
+        with closing(self.conn.cursor()) as cur:cur.execute("UPDATE kilnwatch.candidates SET status='confirmed' WHERE kiln_id=%s",(ids[1],))
+        self.conn.commit();registry=Registry(self.conn)
+        def near(radius):return registry.public_near(28.7305,77.7805,radius)['kilns']
+        self.assertEqual([(k['kiln_id'],k['distance_m']) for k in near(100)],[(ids[0],0)])
+        wide=near(5000);distances=[k['distance_m'] for k in wide]
+        self.assertEqual([k['kiln_id'] for k in wide],[ids[0],ids[2],ids[3],ids[4]])  # ids[1] confirmed, Meerut ~9.7 km
+        self.assertEqual(distances,sorted(distances));self.assertTrue(all(0<d<=5000 for d in distances[1:]))
+        self.assertTrue(all(k['status']=='flagged' for k in wide))
+        self.assertEqual([k['kiln_id'] for k in near(2000)],[ids[0],ids[2]])
+        self.assertEqual(registry.public_near(28.7305,77.7805,2000,limit=1)['kilns'][0]['kiln_id'],ids[0])
+        self.assertEqual(registry.public_near(28.0,77.0,5000)['kilns'],[])
+        seen=[];cursor=''
+        while True:
+            body=registry.public_list('Hapur',cursor,2);seen+=[k['kiln_id'] for k in body['kilns']]
+            if body['next_cursor'] is None:break
+            cursor=body['next_cursor']
+        self.assertEqual(seen,sorted(set(ids)-{ids[1]}))
+        self.assertEqual(registry.public_detail(ids[0])['kiln_id'],ids[0]);self.assertIsNone(registry.public_detail(ids[1]))
+        self.assertIsNone(registry.public_detail('KW-'+'0'*32));self.assertNotIn('distance_m',registry.public_detail(ids[0]))
     def test_importer_role_persists_but_cannot_decide(self):
         with closing(self.conn.cursor()) as c:c.execute("CREATE ROLE kilnwatch_test_importer LOGIN PASSWORD 'synthetic-importer' IN ROLE kilnwatch_importer")
         self.conn.commit();importer=connect('kilnwatch_test_importer','synthetic-importer')

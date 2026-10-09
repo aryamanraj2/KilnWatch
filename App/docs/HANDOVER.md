@@ -117,9 +117,19 @@ video with placeholder data and needs no sign-in; no Cognito test user or real-t
 checks. Budget alert USD 50/month is on. Always-on cost ≈ $38/month (2A estimate) plus
 the runner (~$0.42/day) until removed. Details: `AWS/docs/local-verification.md`.
 
+## Integration 2C public read API (2026-10-10)
+
+The no-login public read API is **live**: `GET /public/kilns?lat=&lon=&radius_m=` (sorted
+by `distance_m`, at most 50), `GET /public/kilns?district=&cursor=&limit=` and
+`GET /public/kilns/{id}`. Only flagged kilns (SQL), allowlisted fields, cached 60 s,
+throttled 10/s. It is ready for the resident portal (AWS teammate) and for Phase 3's demo
+data; the iOS app needs no sign-in for it. Inspector routes still require Cognito
+(Phase 5). The Lambda log group now has 14-day retention. CloudFront is still pending AWS
+verification. Details: `api-contract.md` and `AWS/docs/local-verification.md`.
+
 ## Known gaps and pending fixes
 
-Read `App/docs/integration-status.md` for the source inspection and first integration plan. AWS is deployed (Integration 2B, CloudFront pending). The user supplied and the builder verified the existing baseline `best.pt`, then matching `args.yaml`/`scores.json`; the saved Kaggle version identity remains missing. Weights and raw GeoJSON are intentionally excluded from Git. Phase 3 is on hold while the model-to-AWS record/evidence bridge is prepared.
+Read `App/docs/integration-status.md` for the source inspection and first integration plan. AWS is deployed (Integration 2B) with the public read API live (2C); CloudFront pending. The user supplied and the builder verified the existing baseline `best.pt`, then matching `args.yaml`/`scores.json`; the saved Kaggle version identity remains missing. Weights and raw GeoJSON are intentionally excluded from Git. Phase 3 is on hold while the model-to-AWS record/evidence bridge is prepared.
 
 1. The BeforeAfterComparator mock still uses an Apple snapshot. Pixelated 256 px imagery and the mini-map buffer ring belong to Phase 3.
 2. Live route verification needs the real endpoint/token and backend confirmation of access points, geometry/axis order, route timing and error semantics. The sample geometry is schematic, not verified road routing.
@@ -138,6 +148,6 @@ Read `App/docs/integration-status.md` for the source inspection and first integr
 ## Next steps (in order, one at a time)
 
 1. Phase 2 was committed and merged with model/AWS source into `main`. Live backend and successful road guidance remain unverified. Commit or push further work only on an explicit user request.
-2. Integrations 1, 2A and 2B are done, except CloudFront: after AWS account verification, finish evidence publication, the denial probe and runner removal (runbook "Deployed state").
-3. Phase 3 (real registry and evidence UI) is next, pending the user's request. The app needs no sign-in (demo video); Phase 3 inputs are the output names in the runbook's "Deployed state".
+2. Integrations 1, 2A, 2B and 2C are done, except CloudFront: after AWS account verification, finish evidence publication, the denial probe and runner removal (runbook "Deployed state" and "Integration 2C").
+3. Resident portal on the public API (AWS teammate) is next. Phase 3 (real registry and evidence UI) follows on the user's request and can read the public API with no sign-in; inputs are the output names in the runbook's "Deployed state".
 4. Phase 4: registry-backed Ask/agent stream and real route planning. Phase 5: verdict capture, outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.

@@ -27,7 +27,7 @@ The JWT comes from the Cognito user pool through the hosted UI (Phase 5). The ta
 
 | Principal | Allowed |
 |---|---|
-| Resident (or anonymous web) | Read public kiln fields only. Not used by this app. |
+| Resident (or anonymous web) | No login. Read public fields of flagged kilns only (`/public/kilns`, Integration 2C). |
 | Inspector | Read kilns, rules and their own route. `POST /verdicts` **only for kilns in `principal.district`**. |
 | Reviewer | Approves registry changes (review console). Not used by this app. |
 | Agent | **Forbidden** from `RecordVerdict`, whatever else is true. |
@@ -271,7 +271,7 @@ Lambda permission checks (`token_use=id`, matching `aud`, `sub`, `inspector` gro
 `custom:district`). District is immutable and omitted from client write attributes;
 only the AWS teammate provisions it. Missing claims deny access. This is a single
 district read proof; Verified Permissions and managed-login/PKCE are deferred.
-Anonymous `/public/kilns` returns 503 until a publication policy exists. Gateway
+Anonymous `/public/kilns` returned 503 until Integration 2C (below) added the public read. Gateway
 JWT failures happen before Lambda and use the gateway's own error body; the client
 retains all raw non-2xx bodies. Lambda errors use the nested error form above.
 
@@ -324,3 +324,53 @@ Representative JSON is generated through the importer and API serializer in
 It is explicitly synthetic, includes a high-score unverified type and missing facts,
 and is decoded through both `JSONDecoder.kilnWatch` and the existing URLSession client.
 Routes, measured rules, jobs, agents, verdicts and live app registry loading are deferred.
+
+## Integration 2C: public read API (live, no login)
+
+Two `GET` routes with **no `Authorization` header**. The resident portal and the iOS
+demo use them. The inspector routes (`/kilns`, `/kilns/{id}`) are unchanged and still
+require a Cognito ID token. Present every public record as
+"Flagged by satellite · pending inspection".
+
+**Publication policy:** only `status = flagged` is public, enforced in the SQL `WHERE`
+clause of every public query (not only in Python). A kiln that a person later marks
+`not_a_kiln`, `compliant`, `closed` or `confirmed` disappears from the public API until a
+separate publication policy covers those outcomes.
+
+**Projection (allowlist, `registry/contract.py` `public_view`):** `kiln_id`,
+`footprint`, `type`, `type_confidence`, `detection_confidence`, `type_verification`,
+`first_seen`, `last_seen`, `status`, `violations`, `rules_assessment`, `exposure`,
+`district`, `evidence` (`before`, `after` and their `*_metadata`: scene, attribution,
+grid and checksums are public), plus `distance_m` on near-point results. Everything else
+is dropped, including `review_state`, `provenance` (input hash, import time) and the raw
+assessment. New internal fields stay private by default. The body decodes into the
+existing `KilnList` / `Kiln` (`provenance` is optional; `distance_m` is ignored).
+
+### GET /public/kilns
+
+Exactly one of two query shapes:
+
+| Shape | Keys | Rules | Result |
+|---|---|---|---|
+| Near a point | `lat`, `lon`, optional `radius_m` | decimals, `lat` −90..90, `lon` −180..180; `radius_m` integer 100..5000, default 2000 | Flagged kilns whose footprint is within the radius, sorted by `distance_m` (integer metres from the point to the footprint, rounded up; 0 if the point is inside), at most 50, `next_cursor: null` |
+| District list | `district`, optional `cursor`, optional `limit` | same as the inspector list: limit 1..200, default 100; cursor is the last kiln ID | Flagged kilns of the district, keyset pages `{"kilns":[...],"next_cursor":null|string}` |
+
+Anything else is **400** `invalid_filter`: an empty query, mixed shapes, unknown keys
+(including `status`), out-of-range or non-decimal values (`nan`, `1e1`).
+
+### GET /public/kilns/{kiln_id}
+
+The public detail of a flagged kiln. **404** `not_found` with an identical body whether
+the ID is unknown or the kiln is not flagged. A malformed ID or any query is 400
+`invalid_id`.
+
+### Errors, caching, throttling
+
+- Database or secret failure: **503** `registry_unavailable`, never an empty list.
+- Successful public responses send `cache-control: public, max-age=60`; all errors send
+  `no-store`. Inspector responses stay `no-store`.
+- API Gateway stage throttling: public routes 10 requests/s with a burst of 20; other
+  routes 50/s, burst 100. Throttled requests get the gateway's own 429 body. No Lambda
+  reserved concurrency.
+- CORS is still the placeholder origin; the portal step sets the real `frontend_origin`.
+

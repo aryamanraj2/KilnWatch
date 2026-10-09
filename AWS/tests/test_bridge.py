@@ -10,7 +10,7 @@ import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'Model'/'scripts'))
 from fixtures import collection, records, event, MemoryRegistry, handle
-from registry.contract import convert, serialize, observation_key, timestamp
+from registry.contract import convert, serialize, observation_key, timestamp, public_view
 from registry.store import persist
 from registry.evidence import attach
 from prepare_evidence import patch
@@ -123,15 +123,56 @@ class APITests(unittest.TestCase):
         def failed():raise RuntimeError('password=do-not-expose')
         result=handle(event(),failed)
         self.assertEqual(result['statusCode'],503);self.assertNotIn('password',result['body']);self.assertIn('error',json.loads(result['body']))
-    def test_publication_disabled_no_private_fields(self):
-        result=handle(event('/public/kilns',claims=False),self.repo.factory)
-        self.assertEqual(result['statusCode'],503);self.assertNotIn('kiln_id',result['body']);self.assertNotIn('footprint',result['body'])
     def test_pagination(self):
         self.repo.rows.append(copy.deepcopy(self.repo.rows[0]));self.repo.rows[-1]['kiln_id']='KW-'+'f'*32
         body=json.loads(handle(event(query={'district':'Hapur','limit':'1'}),self.repo.factory)['body'])
         self.assertIsNotNone(body['next_cursor']);self.assertEqual(len(body['kilns']),1)
         last=json.loads(handle(event(query={'district':'Hapur','limit':'1','cursor':body['next_cursor']}),self.repo.factory)['body'])
         self.assertEqual(len(last['kilns']),1);self.assertIsNone(last['next_cursor'])
+
+
+class PublicAPITests(unittest.TestCase):
+    """No-login resident reads: no claims, flagged only, allowlisted fields."""
+    def setUp(self):self.repo=MemoryRegistry()
+    def get(self,path='/public/kilns',query=None):
+        e=event(path,query,claims=False);return handle(e,self.repo.factory)
+    def test_allowlist_drops_internal_fields_and_keeps_swift_fields(self):
+        p=records()[0]['payload'];p['evidence']['after_metadata']={'sha256':'d'*64,'scene_id':'SYNTHETIC-AFTER'};p['internal_note']='x'
+        view=public_view(serialize(p,'flagged','pending',{'rules_assessment':'not_evaluated'}))
+        for key in ('review_state','provenance','assessment','internal_note'):self.assertNotIn(key,view)
+        for key in ('kiln_id','footprint','type','type_confidence','detection_confidence','first_seen','last_seen','violations',
+                    'exposure','status','evidence','district','rules_assessment','type_verification'):self.assertIn(key,view)
+        self.assertEqual(view['evidence']['after_metadata']['sha256'],'d'*64)
+    def test_near_list_and_detail_need_no_claims(self):
+        kiln_id=self.repo.rows[0]['kiln_id']
+        for path,query in [('/public/kilns',{'lat':'28.73','lon':'77.78'}),('/public/kilns',{'lat':'-28','lon':'77.78','radius_m':'5000'}),
+                           ('/public/kilns',{'district':'Hapur','limit':'1'}),('/public/kilns/'+kiln_id,None)]:
+            with self.subTest(query=query):
+                result=self.get(path,query);body=result['body']
+                self.assertEqual(result['statusCode'],200);self.assertEqual(result['headers']['cache-control'],'public, max-age=60')
+                self.assertIn(kiln_id,body);self.assertNotIn('review_state',body);self.assertNotIn('provenance',body)
+        self.assertEqual(handle(event(claims=False),self.repo.factory)['statusCode'],401)
+    def test_invalid_queries(self):
+        for q in [{},{'lat':'28.73'},{'lat':'28.73','lon':'77.78','district':'Hapur'},{'district':'Hapur','status':'flagged'},
+                  {'lat':'28.73','lon':'77.78','status':'flagged'},{'lat':'999','lon':'77.78'},{'lat':'28.73','lon':'-181'},
+                  {'lat':'nan','lon':'77.78'},{'lat':'inf','lon':'77.78'},{'lat':'1e1','lon':'77.78'},{'lat':'28.73','lon':'77.78','radius_m':'99'},
+                  {'lat':'28.73','lon':'77.78','radius_m':'5001'},{'lat':'28.73','lon':'77.78','radius_m':'99999'},{'lat':'28.73','lon':'77.78','radius_m':'2000.5'},
+                  {'district':'Hapur','limit':'0'},{'district':'Hapur','limit':'201'},{'district':'Hapur','cursor':'x'},{'district':'1'},{'other':'x'}]:
+            with self.subTest(q=q):
+                result=self.get(query=q);self.assertEqual(result['statusCode'],400)
+                self.assertEqual(result['headers']['cache-control'],'no-store');self.assertIn('code',json.loads(result['body'])['error'])
+        self.assertEqual(self.get('/public/kilns/KW-x')['statusCode'],400)
+        self.assertEqual(self.get('/public/kilns/'+self.repo.rows[0]['kiln_id'],{'x':'1'})['statusCode'],400)
+    def test_non_flagged_hidden_like_unknown(self):
+        unknown=self.get('/public/kilns/KW-'+'0'*32)
+        self.repo.rows[0]['status']='confirmed';hidden=self.get('/public/kilns/'+self.repo.rows[0]['kiln_id'])
+        self.assertEqual(unknown['statusCode'],404);self.assertEqual((hidden['statusCode'],hidden['body']),(404,unknown['body']))
+        self.assertEqual(json.loads(self.get(query={'district':'Hapur'})['body'])['kilns'],[])
+    def test_database_failure_is_503(self):
+        def failed():raise RuntimeError('password=do-not-expose')
+        for path,query in [('/public/kilns',{'lat':'28.73','lon':'77.78'}),('/public/kilns',{'district':'Hapur'}),('/public/kilns/'+self.repo.rows[0]['kiln_id'],None)]:
+            result=handle(event(path,query,claims=False),failed)
+            self.assertEqual(result['statusCode'],503);self.assertNotIn('password',result['body']);self.assertEqual(result['headers']['cache-control'],'no-store')
 
 
 def synthetic_scene(directory,scene_id,acquired,shift=0,nodata=False):

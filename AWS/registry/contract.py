@@ -77,6 +77,18 @@ def serialize(payload, status='flagged', review_state='pending', assessment=None
     return record
 
 
+PUBLIC_KEYS = ('kiln_id', 'footprint', 'type', 'type_confidence', 'detection_confidence', 'type_verification',
+               'first_seen', 'last_seen', 'status', 'violations', 'rules_assessment', 'exposure', 'district', 'distance_m')
+PUBLIC_EVIDENCE = ('before', 'after', 'before_metadata', 'after_metadata')
+
+
+def public_view(record):
+    """Resident projection of a serialized record. Allowlist only: any new internal field stays private."""
+    view = {k: record[k] for k in PUBLIC_KEYS if k in record}
+    view['evidence'] = {k: record['evidence'][k] for k in PUBLIC_EVIDENCE if k in record['evidence']}
+    return view
+
+
 def convert(collection, district, input_sha256, imported_at):
     if not DISTRICT.fullmatch(district) or not HASH.fullmatch(input_sha256):
         raise ValueError('invalid district/input hash')

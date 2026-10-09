@@ -694,7 +694,24 @@ any excluded services under Billing → Credits.
   non-PNG `evidence/` path, missing `models/` key, direct S3 URL — all 403; delete probe);
   then runner cleanup (delete `~/kilnwatch-proof`, 5 destroy / 1 change, delete
   `imports/integration-1/operator-source.tgz`). The Lambda log group
-  `/aws/lambda/kilnwatch-api` now exists with no retention limit.
+  `/aws/lambda/kilnwatch-api` is now Terraform-managed with 14-day retention (2C).
 - **Phase 3 outputs** (values only in ignored `.local/integration-2b/outputs.json`):
   `api_base_url`, `cognito_user_pool_id`, `cognito_app_client_id`, `cognito_issuer`,
   `evidence_base_url` (absent until CloudFront exists).
+
+## Integration 2C — public read API (2026-10-10)
+
+- **Live:** `GET /public/kilns` (near a point, or a district list) and
+  `GET /public/kilns/{id}`, no login, flagged kilns only (SQL), allowlisted fields. Stage
+  throttling: public 10/s burst 20, default 50/s burst 100. Contract:
+  `App/docs/api-contract.md`; evidence: `local-verification.md` (Integration 2C).
+- **Deploy used `-target`** (Lambda, public detail route, stage, Lambda log group with an
+  `import` block, removed afterwards) because a full apply would retry CloudFront. The
+  untargeted plan now shows only the 2 CloudFront resources.
+- **CloudFront: pending** AWS account verification. When verified: untargeted plan
+  (expect 2 to add) and apply, then §7 publication + receipt re-import (0/0; URLs then
+  appear in protected and public detail), the denial probe and runner removal as listed
+  above. The opt-in Swift test `localRealDetectionContractDecodesThroughExistingClient`
+  expects null URLs; after publication, decode a body with URLs through the default
+  suite or update that expectation.
+

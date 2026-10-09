@@ -334,3 +334,80 @@ in a subshell (credentials stay in the environment, never printed or in argument
 **26 tests passed**, zero warnings, including
 `localRealDetectionContractDecodesThroughExistingClient`. Decoding proof only; the app
 did not contact AWS.
+
+# Integration 2C — public read API (2026-10-10)
+
+Sequential, no agents, `kilnwatch` profile (IAM user `aryaman`). No commits, pushes,
+Cognito users, inference, training, optional services, portal or Phase 3 work.
+
+## Status: public read API live; CloudFront still pending
+
+AWS has not yet verified the account (user, 2026-10-10), so CloudFront, evidence
+publication, the denial probe and runner removal (Part B) were **not run**. Public
+detail returns image metadata with `null` URLs until then.
+
+## Code
+
+- `registry/contract.py`: `public_view` allowlist projection (see `App/docs/api-contract.md`).
+- `registry/store.py`: `public_near`, `public_list`, `public_detail`. Each hard-codes
+  `c.status='flagged'` in SQL. Radius uses `ST_DWithin` on `geography` and
+  `CEIL(ST_Distance(...))::int` for `distance_m`, with a `ponytail:` note about the
+  skipped GiST index.
+- `lambda/api_handler.py`: public routes before the identity check; strict query shapes;
+  `public, max-age=60` on success, `no-store` on errors; shared 503 path.
+- `api.tf`: `GET /public/kilns/{id}` (no auth); `$default` stage throttling (public
+  routes 10/s burst 20, default 50/s burst 100); `aws_cloudwatch_log_group.api_lambda`
+  with 14-day retention (imported, then the `import` block was removed).
+
+## Tests
+
+- Unit (no database): **34 run, OK, 8 skipped** (the PostGIS tests). New
+  `PublicAPITests`: allowlist, no-claims reads with `/kilns` still 401, 21 invalid
+  queries, non-flagged 404 identical to unknown, 503 on failure.
+- Disposable cluster (recreated as in 2A under `.local/integration-2c/`: PostgreSQL
+  17.11 + PostGIS 3.6.4, `127.0.0.1:55432`, `kilnwatch_test`, TLS with a throwaway CA):
+  **35 run, OK, 0 skipped.** New `test_public_near_flagged_only_paging_and_detail`:
+  inside-footprint distance 0, radius inclusion/exclusion at 100/2000/5000 m, distance
+  ordering, a confirmed kiln excluded in SQL from near, list and detail, district paging,
+  detail. All nine PostGIS tests passed. Python 3.13's strict TLS checks needed the throwaway
+  CA to carry `keyUsage` and the server certificate an authority key identifier.
+- Real local data (39 Hapur records, SELECT-only `kilnwatch_api` over TLS, no claims):
+  near Hapur town r=2000 → 1 kiln (1,823 m); r=5000 → 22; near the evidence kiln → 0 m
+  first; district paging 4 pages / 39 unique; a simulated decision hid that kiln from
+  near, list (38) and detail (404, same body as unknown), then was reverted; 400s; wrong
+  port 503. Cluster stopped and its data directory removed.
+- Swift: `KILNWATCH_REAL_CONTRACT_LIST` with the local near-point and district bodies,
+  then with the live ones → **26 tests passed** each, zero warnings. No Swift change.
+
+## Package and deploy
+
+`AWS/build/api_handler.zip` SHA-256
+`f4fc23cb624f1a520d507ede70ffb1d8dbaabbf823542631c7a987ae75bcc8b6` (94 entries; packaged
+source files byte-identical to the repository; Python 3.12 import smoke test passed).
+Deployed `CodeSha256` matches.
+
+**Targeted plan/apply** (`-target` on `aws_lambda_function.api`,
+`aws_apigatewayv2_route.get_public_kiln`, `aws_apigatewayv2_stage.default`,
+`aws_cloudwatch_log_group.api_lambda`): **1 import, 1 add, 3 in-place, 0 destroy.**
+`-target` was used because an untargeted apply would retry the still-blocked CloudFront
+distribution and fail. After apply and removing the `import` block, the targeted plan
+shows no changes and the untargeted plan shows only the 2 CloudFront resources.
+`/aws/lambda/kilnwatch-api` retention is 14 days. No reserved concurrency.
+
+## Live HTTPS (`api_base_url`, no token)
+
+| Request | Result |
+|---|---|
+| `lat=28.73&lon=77.78&radius_m=2000` | 200, 1 kiln, `distance_m` 1,823, flagged, no `review_state`/`provenance`, `public, max-age=60` |
+| same, `radius_m=5000` | 200, 22 kilns, sorted, max 4,986 m |
+| near the evidence kiln (default radius) | 200, 4 kilns, `KW-6b3b38da…` first at 0 m |
+| `district=Hapur&limit=10` | 4 pages, 39 unique IDs, final `next_cursor` null |
+| `/public/kilns/KW-6b3b38da681850e5af46b024f3d3f78e` | 200, metadata present, URLs null |
+| unknown well-formed ID | 404 `not_found`, `no-store` |
+| `radius_m=99999`, `lat=999`, `district`+`lat`/`lon`, `status=flagged` | 400 `invalid_filter` each |
+| `/kilns` without token | 401 |
+| `/health` | 200 |
+
+Throttling confirmed read-only with `apigatewayv2 get-stage`: default 50/100, both public
+routes 10/20. No load test.
+
