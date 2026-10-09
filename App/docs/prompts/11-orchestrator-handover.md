@@ -82,8 +82,8 @@ Branch: `main`. Older `PortalAPP` references are history.
 | Orchestrator handover #1 | 06 | — |
 | Integration 2A local DB proof + preflight | 07 | Done, commit `990c3a4` |
 | Integration 2B deploy | 08 | Done except CloudFront, commit `db513dd` |
-| Integration 2C public read API | 09 | Done and live, **staged but NOT committed** |
-| Resident portal brief (for the AWS teammate) | 10 | Written, **untracked** |
+| Integration 2C public read API | 09 | Done and live, commit `4606776` |
+| Resident portal brief (for the AWS teammate) | 10 | Written, pushed |
 | This handover | 11 | — |
 
 ### Model facts (do not overclaim)
@@ -153,19 +153,14 @@ Branch: `main`. Older `PortalAPP` references are history.
 - **Portability:** a checklist with SHAs is in `local-verification.md`. Weights cannot be regenerated; only the ML team mate has the originals.
 
 ### Git state right now
-- `HEAD` is `db513dd` on `main` (pushed with 2B).
-- **2C is staged but not committed:**
-  - `AWS/api.tf`, `lambda/api_handler.py`, `registry/{contract,store}.py`, tests and docs;
-  - `App/docs/{HANDOVER,api-contract,integration-status}.md`;
-  - `App/docs/prompts/09-public-read.md`.
-- **Untracked:** prompts `08`, `10` and this `11`, plus `App/docs/screens/phase-2/*.log` (old Phase 2 logs; leave them alone).
-- **Recommended:** ask the user whether to commit and push 2C plus the prompts. The AWS teammate needs `api-contract.md` §2C and prompt 10 from GitHub. Commit only on an explicit request, and check that no identifiers are present first.
+- `main` is pushed to `origin/main`. It includes Integration 2C (`4606776`), prompts 08–11 (`d66c363`), and this handover plus prompt 12.
+- Only `App/docs/screens/phase-2/*.log` are untracked (old Phase 2 logs; leave them alone).
+- Commit or push only on an explicit request, and check for identifiers first.
 
 ## 5. Open items, by owner
 
 **User**
 - Submit or track the AWS Support case (CloudFront verification).
-- Decide on committing and pushing 2C and the prompts.
 - Create a separate IAM user with MFA for the AWS teammate (removed after the hackathon), and share privately with them: the API base URL, `backend.hcl` and `terraform.tfvars`.
 - Give the go for Phase 3.
 - Share the hackathon deadline. It is unknown to the orchestrator: **ask early**, because it changes how thorough each step should be.
@@ -188,6 +183,8 @@ Branch: `main`. Older `PortalAPP` references are history.
 - **Unanswered Phase 0 questions:** the flagged colour, whether the mini-map pans, free-text Ask, landscape support, the "Sample data" pill in TestFlight.
 
 ## 6. What's next (recommended order)
+
+> **2026-10-10 update:** the user authorized a one-time overnight run of Phase 3, with sub-agents allowed for that run only. Its prompt is `12-overnight-phase-3.md`. If that prompt has already run, review its `App/docs/screens/phase-3/overnight-report.md` first. The item 1 scope below is the basis prompt 12 was written from.
 
 1. **Phase 3: iOS app on real data, via the public API, with no sign-in.** This is the demo-visible priority. When the user says go, write prompt `12-phase-3-real-registry.md`. Its scope:
    - **API client.** `KilnWatchCore` gets public, token-free methods: `publicKilns(lat:lon:radiusM:)`, `publicKilns(district:cursor:limit:)` and `publicKiln(id:)`.
@@ -226,7 +223,6 @@ Branch: `main`. Older `PortalAPP` references are history.
 
 1. Confirm you've read this file, `HANDOVER.md` and `integration-status.md`, and checked the live `git status` and `log`.
 2. Ask, in one short message:
-   - commit and push 2C plus prompts 08–11 now? (the AWS teammate needs them);
    - the hackathon deadline;
    - is the AWS Support case resolved?
    - go for Phase 3, and for Today: real flagged kilns with no route, or another choice?
