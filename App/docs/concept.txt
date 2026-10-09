@@ -1,0 +1,601 @@
+=== PAGE 1 ===
+FCBK 0.91
+WEMAKEDEVS × AWS · BHARAT BUILDS TOUR · ENVIRONMENTAL HACKS · AIR TRACK
+ZIGZAG 0.77
+CFCBK 0.64
+KilnWatch
+FCBK 0.88
+FCBK 0.82
+Every space, a plan brick kiln checked someone around against can act Delhi, the on found law, and tomorrow.
+from
+turned into
+ZIGZAG 0.71
+FCBK 0.93
+FCBK 0.90
+FCBK 0.79
+CFCBK 0.58
+ZIGZAG 0.69
+FCBK 0.86
+FCBK 0.68
+FCBK 0.74
+Concept, model, agents and platform · October 2026
+~8%
+of Delhi's PM2.5 traced to brick
+kilns in a spring 2024
+source-apportionment study
+70%
+of kilns across five northern states
+break at least one siting rule
+30.66M
+people live within 800 m of a kiln,
+the legal minimum distance from
+homes
+Figures from IIT Gandhinagar, "Space to Policy" (arXiv 2412.04065). Sources are listed at the end of this document.
+KilnWatch Satellite kiln detection and compliance for NCR
+=== PAGE 2 ===
+OVERVIEW
+At a glance
+KilnWatch is a monitoring and enforcement system for brick kilns around Delhi. It starts from free satellite
+imagery, finds every kiln with a computer-vision model, checks each one against central and state siting rules, and
+estimates how many people live inside the legal buffer around it.
+AI agents turn that registry into work. They plan inspection routes, triage what changed when a new satellite pass
+arrives, and explain flagged kilns to residents in plain language. Inspectors make the final call on site. Their verdicts
+flow back into the model as new training labels, so the system improves as it is used.
+The system runs on AWS end to end. The imagery and population data are AWS open datasets, and the pipeline,
+model, agents and apps run on AWS services.
+The model finds. Code judges. Agents plan. People decide.
+Every layer of KilnWatch follows this split. It keeps every answer traceable to a measurement and a
+rule, and it keeps legal judgement with humans.
+In this document
+01 The idea
+Why kilns matter, what the law says, the enforcement gap, and how KilnWatch closes it.
+02 The model
+The dataset, the detector, the training plan, running it on fresh imagery, and how we measure it.
+03 The agents
+Three agents, the tools they use, and the guardrails that keep them honest.
+04 AWS
+Architecture, services, and the open data on AWS that the system is built on.
+05 Portal and app
+The inspector app, the resident portal, the review console, and the kiln record.
+A Sources
+Papers, datasets and regulations referenced in this document.
+KilnWatch Concept, model, agents and platform 2
+=== PAGE 3 ===
+SECTION 01
+The idea
+Brick kilns are a large and under-counted source of Delhi's air pollution. The rules to control
+them exist. What is missing is knowing where every kiln is, which ones break the rules, and
+which ones to inspect first.
+The problem
+Brick kilns are one of the biggest unorganised sources of air pollution in North India. Across the Indo-Gangetic
+Plain they contribute an estimated 8 to 14 percent of ambient air pollution. For Delhi specifically,
+source-apportionment modelling of the Delhi airshed for March and April 2024 attributed about 8 percent of
+PM2.5 to kilns.
+Most of these kilns sit outside the city, in the farmland of western Uttar Pradesh, Haryana and Rajasthan that rings
+the capital. They are small, often seasonal businesses spread across thousands of square kilometres. That makes
+them hard to count, hard to inspect and easy to miss.
+Kilns in brief
+A brick kiln fires moulded clay at high temperature, usually with coal or biomass. Three designs dominate the
+region, and each has a distinct footprint when seen from above.
+Type From above Why it matters
+FCBK
+Fixed Chimney Bull's
+Trench Kiln
+An elongated oval trench with a tall
+chimney
+The traditional design. Natural draught, incomplete
+combustion, heavy soot.
+CFCBK
+Circular FCBK
+The same design laid out as a circle Same emissions profile, different footprint.
+Zigzag A rectangular layout where air is
+pulled through the brick stack in a
+zigzag path
+Better combustion and less black carbon, with
+about 40 percent fuel savings over FCBK. Required
+near polluted cities.
+These shapes are large enough to resolve in 10 m satellite imagery, and distinct enough for a model to learn.
+Telling whether a kiln exists is easier than telling which type it is, and the system is designed around that
+difference.
+The enforcement gap
+Rules on where kilns may stand and how they must burn already exist, and so do the inspectors. CAQM, the
+Commission for Air Quality Management in NCR, runs Operation Clean Air inspection drives, including one
+covering industries in Hapur on 16 September 2026. What is missing is targeting.
+Research from IIT Gandhinagar found that 70 percent of kilns across five states break at least one distance rule,
+and that 30.66 million people live within 800 m of one. No team can visit every kiln. Inspectors need to know
+which ones matter most, and they need evidence before they leave the office.
+KilnWatch Concept, model, agents and platform 3
+=== PAGE 4 ===
+What the law says
+Two layers of rules apply. The Environment (Protection) Amendment Rules, 2022 set national siting distances and
+a technology mandate. States add their own siting criteria on top. KilnWatch stores each rule as data, with its
+threshold and its legal source.
+Rule ID Check Threshold Source
+C-HAB-800 Distance to habitation 800 m (UP: 1,000 m) Central 2022 rules; UP siting
+rules
+C-KILN-1K Distance to another kiln 1 km (UP: 800 m) Central 2022 rules; UP siting
+rules
+C-ORCH-800 Distance to an orchard 800 m Central 2022 rules
+UP/HR-SCH-1K Distance to a school 1 km UP and Haryana siting rules
+UP-NH-300 Distance to a national highway 300 m UP siting rules
+UP-RAIL-200 Distance to a railway line 200 m UP siting rules
+C-TECH-10K Within 10 km of a non-attainment
+city
+Must be zigzag, vertical
+shaft or gas
+Central 2022 rules
+Thresholds as compiled in the Space to Policy study. Each is checked against the gazette text before it is used.
+How KilnWatch works
+KilnWatch is a loop with five stages. Each stage is owned by the component best suited to it.
+INPUT
+Scene
+Sentinel-2, 10 m,
+every 5 days, free
+on AWS
+ML
+Detect
+Vision model finds
+every kiln as a
+rotated box
+CODE
+Check
+Rules engine
+measures
+distances, cites the
+law
+AGENTS
+Plan
+Routes, change
+triage,
+plain-language
+answers
+PEOPLE
+Verify
+Inspector records
+the verdict on site
+Learn: field verdicts become new training labels
+The five stages. The dashed line is the learning loop: every verdict becomes a training label.
+KilnWatch Concept, model, agents and platform 4
+=== PAGE 5 ===
+Stage Owner Output
+Detect Computer-vision model Every kiln as a rotated box, with a type and a confidence score
+Check Rules engine (plain code) Violations with measured distances and legal citations, plus people
+exposed
+Plan AI agents Ranked inspection routes, change alerts, plain-language explanations
+Verify Inspector on site Confirmed status, photos and notes
+Learn Training loop Verdicts become new labels for the next model version
+Two users
+KilnWatch has an operator and a beneficiary, and they are different people.
+The inspector
+A pollution board or CAQM inspector who needs to
+know which kilns to visit, why, and in what order, with
+evidence in hand before the drive.
+The resident
+Someone living near a kiln who wants to know whether
+it is allowed to be there, how close it is, and what they
+can do about it.
+What is new here
+This project stands on published research. IIT Gandhinagar's Sustainability Lab built SentinelKilnDB, the dataset we
+train on, and the Space to Policy study that established the compliance method. Their work is a study: detect once,
+analyse, publish.
+KilnWatch turns that method into an operating loop for enforcement. It runs on fresh 2026 imagery, checks rules
+with citations, plans inspections, records field verdicts, retrains on them, and gives residents a way in. We credit
+the dataset and the method openly.
+Scope
+The first deployment covers the Uttar Pradesh side of NCR: Hapur, Ghaziabad, Baghpat and Meerut. The area is
+dense with kilns and sits inside the Delhi airshed. The same pipeline extends to any district by changing the area of
+interest and adding that state's rules.
+KilnWatch Concept, model, agents and platform 5
+=== PAGE 6 ===
+SECTION 02
+The model
+Finding kilns is a computer-vision problem, not a language problem. This section covers the
+dataset, the detector, how we train it, how we run it on fresh imagery, and how we measure
+whether it works.
+The dataset: SentinelKilnDB
+SentinelKilnDB was published at NeurIPS 2025 in the Datasets and Benchmarks track by IIT Gandhinagar. It is the
+first large, hand-validated benchmark for kiln detection on free Sentinel-2 imagery, which means a model trained
+on it can run anywhere Sentinel-2 flies.
+Property Value
+Imagery Sentinel-2 surface reflectance, RGB (bands B4, B3, B2), 10 m per pixel
+Tiles 114,300 tiles of 128 × 128 pixels, each covering 1.28 km × 1.28 km
+Labels 97,648 oriented bounding boxes
+Classes CFCBK, FCBK, Zigzag
+Coverage 62,671 kilns across 2.8 million km² in India, Pakistan, Bangladesh and Afghanistan; 42,982 in India
+Season September 2023 to February 2024, the kiln firing season
+Split Train 71,856 · Validation 23,952 · Test 18,492 images
+Formats YOLO-OBB, DOTA, YOLO axis-aligned
+Licence CC BY-NC 4.0: non-commercial use with attribution
+Where Kaggle, rishabhsnip/sentinelkiln-dataset (about 4 GB)
+Why oriented boxes
+Kilns sit at every angle. A normal axis-aligned box drawn around a tilted oval includes a lot of empty field, and in
+dense clusters it overlaps neighbouring kilns. An oriented bounding box rotates with the object. It gives a tight
+footprint, the kiln's orientation and its true area. Area and aspect ratio also help separate an elongated FCBK from
+a circular CFCBK or a rectangular zigzag, and the footprint is what the rules engine measures distances from.
+KilnWatch Concept, model, agents and platform 6
+=== PAGE 7 ===
+The detector
+We use YOLO11 with an oriented-box head (YOLO11-OBB) from Ultralytics. It is a one-stage detector: a single
+forward pass predicts every box in a tile, which matters when an area of interest is thousands of tiles. It is also the
+configuration the dataset authors trained, so our numbers can be compared directly with theirs.
+Model (from the SentinelKilnDB
+benchmark)
+Boxes mAP50, any kiln CFCBK FCBK Zigzag
+YOLO11-L OBB Oriented 75.2 58.6 55.4 53.9
+RoI Transformer (Swin-T) Oriented 61.7 45.3 43.8 47.5
+RT-DETR (ResNet-101) Axis-aligned 87.5 63.0 68.6 64.3
+TerraMind (foundation model) Axis-aligned 86.9 69.0 70.5 75.6
+Galileo (foundation model) Axis-aligned 86.7 72.0 69.8 72.2
+How to read this. mAP50 is average precision when a predicted box counts as correct if it overlaps the true box by
+at least half. The first score ignores kiln type; the last three score each type. Scores across box types are not
+directly comparable. Two lessons follow. Finding a kiln is reliable, while naming its type is the hard part. And
+heavier models score higher, at the cost of speed and the rotated footprint. We start with YOLO11-OBB and keep
+RT-DETR as the fallback if recall on new imagery is too low.
+Training plan
+Run Configuration Purpose
+Baseline yolo11s-obb, image size 128, about 20 epochs A fast check that labels, paths and preprocessing
+are right
+Main yolo11l-obb, image size 128, 60 to 100 epochs,
+batch 16
+The authors' configuration. The target is to match
+their scores.
+Upscaled yolo11l-obb, image size 256 Upsampling can help small objects. Kept only if
+test mAP improves.
+Type head
+(optional)
+Small classifier on a wider crop around each
+detection
+Improves FCBK, CFCBK and Zigzag accuracy, the
+weakest part
+yolo obb train model=yolo11l-obb.pt data=sentinelkiln.yaml imgsz=128 epochs=100 batch=16
+Training runs as an Amazon SageMaker training job on a single GPU instance, and the weights are written to S3.
+New AWS accounts often start with no GPU quota, so the quota request goes in first. While it is pending, the same
+command runs on a free Kaggle GPU with the dataset attached, and the weights are uploaded to S3 afterwards.
+KilnWatch Concept, model, agents and platform 7
+=== PAGE 8 ===
+Running it on new imagery
+A model only works on data that looks like its training data. SentinelKilnDB tiles were built in a specific way, and
+inference repeats it exactly. Getting this wrong is the most likely reason a good model performs badly in the field.
+# Step What we do Why
+1 Select scenes Sentinel-2 L2A over the area, under 1% cloud,
+in kiln season
+Matches the training distribution
+2 Read bands Red, green, blue (B4, B3, B2) at 10 m Same channels in the same order
+3 Cut patches 128 × 128 px with a 30 px overlap (stride 98
+Same scale; overlap catches kilns on tile edges
+px)
+4 Normalise Min-max scale each patch and each band to 0
+to 255
+Same contrast; also cancels offsets between
+imagery providers
+5 Detect YOLO11-OBB on every patch Boxes, types and confidence scores
+6 Merge Rotated non-maximum suppression across
+overlaps
+One box per kiln
+7 Georeference Pixel corners to latitude and longitude via the
+scene transform
+Kilns as map polygons
+def norm(band): # per patch, per band, identical to SentinelKilnDB
+return ((band - band.min()) / (band.max() - band.min() + 1e-5) * 255).astype("uint8")
+For four districts this is several thousand patches, which runs in minutes on a CPU. Inference does not need a GPU.
+How we measure it
+Measure What it tells us
+Test mAP50 Accuracy on the held-out split, comparable with the published benchmark
+Field precision Fifty random detections in our area checked by hand against high-resolution basemaps. Reported
+as how many are real kilns.
+Change since 2024 Our area overlaps the dataset's labels, so we do not call this accuracy. We use it as change
+detection: kilns that appeared, disappeared or changed type between the 2023 to 2024 labels and
+October 2026 imagery.
+Known limits
+Ten-metre pixels miss small kilns. Kiln type is less reliable than presence, so technology violations are labelled as
+likely and always need a site check. The model cannot tell whether a kiln is firing; activity detection from thermal
+data is an experiment, not a feature. Haze from crop burning in October can degrade scenes, so we use the
+clearest date available.
+KilnWatch Concept, model, agents and platform 8
+=== PAGE 9 ===
+SECTION 03
+The agents
+Detection produces a registry and the rules engine marks what looks wrong. Neither is the job.
+The job is turning thousands of kilns into the right inspection tomorrow morning, keeping the
+registry current, and explaining it to the people who live nearby. That work is multi-step,
+tool-heavy and full of language. That is where agents belong.
+Agents plan, triage and explain. They never decide whether a kiln is illegal. Only an inspector's
+verdict changes a kiln's legal status.
+How they are built
+Each agent is written with the Strands Agents SDK, AWS's open-source agent framework, and calls a model on
+Amazon Bedrock. An agent is a model, a system prompt and a set of typed tools. The tools do the real work
+against the database. The model decides which tools to call, in what order, and how to present the result.
+from strands import Agent, tool
+from strands.models.bedrock import BedrockModel
+@tool
+def search_kilns(district: str, near_school: bool = False) -> list[dict]:
+"""Flagged kilns in a district with violations, exposure and evidence links."""
+return registry.flagged(district, near_school)
+planner = Agent(
+model=BedrockModel(model_id=PLANNER_MODEL_ID),
+tools=[search_kilns, get_evidence, plan_route, inspection_sheet, queue_for_review],
+system_prompt=PLANNER_RULES, # cite kiln_id and rule_id; never say "illegal"
+)
+Agent 1: Inspection planner
+Used by inspectors. A typical request is: "Plan tomorrow in Hapur. Leave the office at 9. Six hours. Schools first."
+The agent searches the registry, pulls evidence, orders the stops, and writes a brief for each one.
+Tool What it does Access
+search_kilns Flagged kilns with violations, exposure and evidence links, filtered by
+district and priority
+Read
+get_evidence Before and after imagery, the rule text and the measured distances for one
+Read
+kiln
+plan_route Visiting order within a time budget, from an Amazon Location Service
+distance matrix solved with OR-Tools
+Read
+inspection_sheet A one-page brief: rules flagged, people exposed, and what to verify on site Read
+queue_for_review Adds a note or concern to the human review queue Write, queue only
+KilnWatch Concept, model, agents and platform 9
+=== PAGE 10 ===
+The output is an ordered route and one sheet per stop. Each sheet lists the rules flagged, the measured distances,
+the people exposed, the imagery, and the specific things to check on the ground, such as chimney type, fuel on
+site and the distance to the nearest home.
+Agent 2: Change triage
+Runs automatically when a new Sentinel-2 scene has been processed. It compares the new detections with the
+registry and sorts every difference into one of four groups: a new kiln, a kiln no longer detected, a possible
+conversion to zigzag, or a low-confidence detection. Each item goes to the review queue with its reason and its
+before and after imagery. A reviewer approves or rejects it, and the registry changes only on approval.
+Agent 3: Resident assistant
+A resident enters an address or drops a pin, in Hindi or English. The assistant shows flagged kilns in range, explains
+each rule in plain language, shows the evidence, and drafts a complaint with that evidence attached. It always
+describes a kiln as flagged by satellite and pending inspection. It never calls a kiln illegal.
+Guardrails
+Three independent layers keep the agents inside their role. Each one would be enough on its own to stop an agent
+from changing a kiln's status.
+Layer How it works
+Tool permissions Every agent tool is read-only except queue_for_review. No tool can change a kiln's status.
+Role policies Amazon Verified Permissions, AWS's managed service for Cedar policies, decides who can do what.
+Residents read public fields. Inspectors record verdicts only in their own district. Reviewers
+approve registry changes. Agents are explicitly forbidden from recording verdicts.
+Citation check A deterministic validator reads every agent answer before it is shown. Any claim about a kiln must
+cite a kiln_id and a rule_id that exist in the registry. Answers that fail are rejected and regenerated.
+permit (principal in Role::"Inspector", action == Action::"RecordVerdict", resource)
+when { resource.district == principal.district };
+forbid (principal is Agent, action == Action::"RecordVerdict", resource);
+Why this design
+Language models are good at planning, summarising and explaining. They are not a source of truth about
+distances or the law. KilnWatch keeps the facts in code and data, and gives agents only the jobs where language
+helps. Every answer an agent gives can be traced to a measurement, a rule and an image.
+KilnWatch Concept, model, agents and platform 10
+=== PAGE 11 ===
+SECTION 04
+AWS
+KilnWatch is built on AWS from the first byte. The satellite imagery and population data are
+AWS open datasets. The pipeline, the model, the agents and the apps all run on AWS services.
+TRAINING
+once, offline
+SentinelKilnDB (Kaggle)
+114,300 labelled tiles
+SageMaker training
+YOLO11-OBB, 1 GPU
+best.pt
+STORE
+Amazon S3
+evidence, weights
+OPEN DATA ON AWS
+Sentinel-2 L2A
+COGs, us-west-2
+HRSL population
+Meta, us-east-1
+OpenStreetMap
+schools, rivers, roads
+Rules (JSON)
+versioned, cited
+PIPELINE
+SNS: new scene published
+Lambda: area + cloud filter
+Step Functions
+1 Fetch, tile, normalise
+2 Detect (YOLO11-OBB)
+3 Merge + georeference
+4 Rules engine
+5 Triage agent
+RDS + PostGIS
+kiln registry, queue
+Every write carries
+kiln_id + rule_id
+Kaggle GPU is the
+fallback while quota
+is pending
+SERVE
+API Gateway + Lambda
+REST + agent endpoints
+Cognito
+sign-in, roles
+Verified Permissions
+Cedar policies
+Bedrock + Strands
+three agents
+Location Service
+route distances
+CloudFront + Amplify
+imagery, portal
+CLIENTS
+Inspector app
+iOS, SwiftUI + MapKit
+Resident portal
+web, Amplify Hosting
+Review console
+web, reviewers only
+System architecture. Training happens once offline; everything below it runs on each new satellite scene.
+How data flows
+Ingestion. Earth Search publishes an SNS message for every new Sentinel-2 scene. A Lambda function keeps only
+scenes that cover our area with under 1 percent cloud, then starts a Step Functions workflow.
+Processing. The workflow reads the imagery straight from S3, cuts and normalises patches, runs the detector on a
+Fargate task or a SageMaker endpoint, merges overlapping boxes, converts them to map polygons, runs the rules
+engine, and finally calls the triage agent to queue any changes for review.
+Storage. Patches, evidence images and model weights live in S3. The kiln registry and the review queue live in RDS
+PostgreSQL with PostGIS, which answers distance questions such as "every school within 1 km of this kiln" in a
+single query.
+KilnWatch Concept, model, agents and platform 11
+=== PAGE 12 ===
+Serving. API Gateway and Lambda expose the registry and the agents. Cognito handles sign-in, Verified
+Permissions enforces roles, Bedrock runs the agent models, Location Service provides road distances for routing,
+and CloudFront and Amplify serve imagery and the web portal.
+Services
+Layer Service Role in KilnWatch
+Ingestion SNS, Lambda React to new satellite scenes and filter by area and cloud cover
+Orchestration Step Functions Run the five processing steps in order, with retries
+Model SageMaker Train the detector; optionally host it as an endpoint
+Compute Fargate Run detection and the rules engine as containers
+Storage S3; RDS PostgreSQL + PostGIS Imagery, evidence and weights; the kiln registry and review
+queue
+Agents Bedrock; Strands Agents SDK Models and the framework for the three agents
+Access Cognito; Verified Permissions Sign-in; Cedar policies for residents, inspectors, reviewers and
+agents
+Maps Location Service Road distance matrices for inspection routes
+Delivery API Gateway; CloudFront; Amplify
+Hosting
+APIs, evidence images and the resident portal
+Operations CloudWatch Logs, metrics and alarms for the pipeline
+Open data on AWS
+Dataset Location Notes
+Sentinel-2 L2A (Collection 1) s3://e84-earth-search-sentinel-data,
+us-west-2. STAC API:
+earth-search.aws.element84.com/v1,
+collection sentinel-2-c1-l2a
+Public, no account needed. An SNS topic
+announces new scenes.
+High Resolution Population
+Density (Meta, CIESIN)
+s3://dataforgood-fb-data/hrsl-cogs/, us-east-1 CC BY 4.0. Includes layers for children
+under 5 and adults over 60.
+OpenStreetMap, northern
+India
+Geofabrik extract, copied to our S3 ODbL. Schools, hospitals, rivers,
+railways, highways, orchards.
+Deployment notes
+Compute runs in us-west-2, next to the Sentinel-2 bucket, so imagery is read without cross-region transfer. The
+population layer lives in us-east-1, so we clip it to our area once and keep the clipped copy in our own bucket.
+Training needs a GPU for a few hours; inference, the rules engine and the API are CPU-only and fit comfortably in
+the free tier and starter credits.
+KilnWatch Concept, model, agents and platform 12
+=== PAGE 13 ===
+SECTION 05
+Portal and app
+Three surfaces sit on top of the same registry: an iOS app for inspectors, a public web portal for
+residents, and a review console for the people who approve changes.
+Inspector app (iOS)
+A native SwiftUI app with MapKit, built for a day in the field. It works from the route the planner agent produced,
+shows the evidence for each stop, and records the verdict with photos.
+Today · Hapur
+KW-0412 FCBK · 0.82
+Ask KilnWatch
+Plan tomorrow in
+Hapur. Six hours.
+Schools first.
+search_kilns 214 flagged
+get_evidence 9 kilns
+plan_route 9 stops
+inspection_sheet x9
+Nine stops ranked by
+people exposed. Four
+are within 1 km of a
+school. Sheets are
+ready for each stop.
+Record verdict
+KW-0412 · stop 1 of 9
+Confirmed violation
+Compliant
+Not a kiln
+Closed / not firing
+2 photos · geotagged
+5
+4
+2
+3
+1
+2024 Oct 2026
+Flagged rules
+C-HAB-800 410 m vs 800 m
+UP-SCH-1K 620 m vs 1,000 m
+1 KW-0412 6,240 people
+C-TECH-10K FCBK vs zigzag
+2 KW-0388 4,910 people
+3 KW-0451 3,120 people
+Start route
+Within 800 m
+6,240 people · 710 under 5
+Flagged by satellite,
+pending inspection
+Inspector app screens. Kiln IDs, distances and counts shown are illustrative.
+Ask about any kiln…
+Note: chimney fixed, coal on site
+Submit verdict
+Screen What it shows
+Today The day's route on a map with numbered stops, each ranked by people exposed and rules broken
+Kiln card Before and after imagery, kiln type and confidence, every flagged rule with measured distance
+against the threshold, and the people living within 800 m
+Ask A conversation with the planner agent, with each tool call shown so the inspector can see how an
+answer was built
+Record verdict Confirmed violation, compliant, not a kiln, or closed, with geotagged photos and a note. This is the
+only way a kiln's status changes.
+KilnWatch Concept, model, agents and platform 13
+=== PAGE 14 ===
+Resident portal (web)
+A public page, served from Amplify Hosting, that answers one question: is there a kiln near me that breaks the
+rules? No sign-in is needed to look. The resident assistant drafts a complaint from the same evidence.
+kilnwatch portal / check my area
+Kilns shown here are flagged by satellite and pending inspection. A flag is not a finding.
+Pilkhuwa, Hapur · drop a pin
+2 flagged kilns within 1 km
+800 m
+KW-0412 410 m from you
+Too close to homes (800 m rule)
+You
+KW-0433 760 m from you
+Too close to a school (1 km rule)
+Draft a complaint with evidence
+Resident portal. The dashed ring is the 800 m buffer from the resident's location. Data shown is illustrative.
+Every flagged kiln is labelled as flagged by satellite and pending inspection. The portal shows evidence and rules,
+never accusations.
+Review console (web)
+A small internal page for reviewers. It lists everything the triage agent has queued: new kilns, kilns no longer
+detected, possible conversions to zigzag and low-confidence detections. Each item shows before and after
+imagery and the agent's reason. Reviewers approve or reject; approved items update the registry, and rejected
+detections are saved as hard negatives for the next training run.
+KilnWatch Concept, model, agents and platform 14
+=== PAGE 15 ===
+The kiln record
+Every surface reads the same record. It is the contract between the model, the rules engine, the agents and the
+apps.
+Field Meaning
+kiln_id Stable identifier, for example KW-0412
+footprint Oriented polygon in latitude and longitude, plus centroid
+type, type_confidence FCBK, CFCBK or Zigzag, with the model's confidence in the type
+detection_confidence The model's confidence that a kiln exists here
+first_seen, last_seen Dates of the first and latest scenes with a detection
+violations[] rule_id, measured distance, threshold, legal source, evidence link
+exposure People within 800 m, children under 5, adults over 60
+status flagged, confirmed, compliant, not_a_kiln or closed. Changed only by a verdict or an
+approved review.
+evidence Links to before and after image patches on CloudFront
+KilnWatch Concept, model, agents and platform 15
+=== PAGE 16 ===
+APPENDIX
+Sources
+1 Mondal, Parab, Kubadia, Dubey, Junagade, Patel, Batra. SentinelKilnDB: A Large-Scale Dataset and Benchmark for OBB
+Brick Kiln Detection in South Asia Using Satellite Imagery. NeurIPS 2025, Datasets and Benchmarks Track.
+github.com/rishabh-mondal/SENTINELKILNDB_NeurIPS_2025
+2 IIT Gandhinagar Sustainability Lab. Space to Policy: Scalable Brick Kiln Detection and Automatic Compliance
+Monitoring with Geospatial Data. arXiv 2412.04065. Source of the 8 percent, 70 percent and 30.66 million figures and
+the compiled siting rules.
+3 Ministry of Environment, Forest and Climate Change. Environment (Protection) Amendment Rules, 2022, standards
+and siting criteria for brick kilns.
+4 Commission for Air Quality Management in NCR. Operation Clean Air special inspection drive of industries in Hapur,
+16 September 2026. caqm.nic.in
+5 Registry of Open Data on AWS. Sentinel-2 Cloud-Optimized GeoTIFFs and the Earth Search STAC API (Element 84).
+registry.opendata.aws/sentinel-2-l2a-cogs
+6 Registry of Open Data on AWS. High Resolution Population Density Maps and Demographic Estimates, Meta and
+CIESIN. registry.opendata.aws/dataforgood-fb-hrsl
+7 Ultralytics YOLO11, oriented bounding box detection. docs.ultralytics.com
+8 Strands Agents SDK. github.com/strands-agents
+9 Amazon Verified Permissions and the Cedar policy language. cedarpolicy.com
+SentinelKilnDB is licensed CC BY-NC 4.0. KilnWatch uses it for non-commercial work and credits its authors.
+KilnWatch Concept, model, agents and platform 16

@@ -1,0 +1,723 @@
+{
+  "kilns": [
+    {
+      "kiln_id": "KW-0412",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.715238,
+            "longitude": 77.655655
+          },
+          {
+            "latitude": 28.715905,
+            "longitude": 77.656871
+          },
+          {
+            "latitude": 28.716362,
+            "longitude": 77.656545
+          },
+          {
+            "latitude": 28.715695,
+            "longitude": 77.655329
+          }
+        ],
+        "centroid": {
+          "latitude": 28.7158,
+          "longitude": 77.6561
+        }
+      },
+      "type": "FCBK",
+      "type_confidence": 0.82,
+      "detection_confidence": 0.94,
+      "first_seen": "2023-11-14T05:21:39Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-HAB-800",
+          "measured_distance_m": 410,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0412/C-HAB-800.png",
+          "measured_to": {
+            "latitude": 28.718411441441443,
+            "longitude": 77.65871144144144
+          }
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "measured_distance_m": 620,
+          "threshold_m": 1000,
+          "source": "UP and Haryana siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0412/UP-SCH-1K.png",
+          "measured_to": {
+            "latitude": 28.711850990990992,
+            "longitude": 77.65215099099099
+          }
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "measured_distance_m": null,
+          "threshold_m": null,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0412/C-TECH-10K.png"
+        }
+      ],
+      "exposure": {
+        "people": 6240,
+        "children_under_five": 710,
+        "adults_over_sixty": 540
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0412/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0412/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0388",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.739771,
+            "longitude": 77.732108
+          },
+          {
+            "latitude": 28.740882,
+            "longitude": 77.731435
+          },
+          {
+            "latitude": 28.740629,
+            "longitude": 77.730892
+          },
+          {
+            "latitude": 28.739518,
+            "longitude": 77.731565
+          }
+        ],
+        "centroid": {
+          "latitude": 28.7402,
+          "longitude": 77.7315
+        }
+      },
+      "type": "FCBK",
+      "type_confidence": 0.88,
+      "detection_confidence": 0.96,
+      "first_seen": "2023-11-14T05:21:39Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-HAB-800",
+          "measured_distance_m": 520,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0388/C-HAB-800.png",
+          "measured_to": {
+            "latitude": 28.743512072072075,
+            "longitude": 77.73481207207207
+          }
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "measured_distance_m": 780,
+          "threshold_m": 1000,
+          "source": "UP and Haryana siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0388/UP-SCH-1K.png",
+          "measured_to": {
+            "latitude": 28.735231891891893,
+            "longitude": 77.7265318918919
+          }
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "measured_distance_m": null,
+          "threshold_m": null,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0388/C-TECH-10K.png"
+        }
+      ],
+      "exposure": {
+        "people": 4910,
+        "children_under_five": 560,
+        "adults_over_sixty": 430
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0388/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0388/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0451",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.761741,
+            "longitude": 77.77079
+          },
+          {
+            "latitude": 28.761741,
+            "longitude": 77.77161
+          },
+          {
+            "latitude": 28.762459,
+            "longitude": 77.77161
+          },
+          {
+            "latitude": 28.762459,
+            "longitude": 77.77079
+          }
+        ],
+        "centroid": {
+          "latitude": 28.7621,
+          "longitude": 77.7712
+        }
+      },
+      "type": "CFCBK",
+      "type_confidence": 0.64,
+      "detection_confidence": 0.89,
+      "first_seen": "2023-12-09T05:21:41Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-HAB-800",
+          "measured_distance_m": 690,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0451/C-HAB-800.png",
+          "measured_to": {
+            "latitude": 28.766494864864864,
+            "longitude": 77.77559486486486
+          }
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "measured_distance_m": 640,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0451/C-KILN-1K.png",
+          "measured_to": {
+            "latitude": 28.766176396396396,
+            "longitude": 77.7752763963964
+          }
+        }
+      ],
+      "exposure": {
+        "people": 3120,
+        "children_under_five": 350,
+        "adults_over_sixty": 280
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0451/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0451/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0433",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.704223,
+            "longitude": 77.668911
+          },
+          {
+            "latitude": 28.705438,
+            "longitude": 77.669282
+          },
+          {
+            "latitude": 28.705577,
+            "longitude": 77.668689
+          },
+          {
+            "latitude": 28.704362,
+            "longitude": 77.668318
+          }
+        ],
+        "centroid": {
+          "latitude": 28.7049,
+          "longitude": 77.6688
+        }
+      },
+      "type": "FCBK",
+      "type_confidence": 0.9,
+      "detection_confidence": 0.95,
+      "first_seen": "2023-11-14T05:21:39Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "UP-SCH-1K",
+          "measured_distance_m": 840,
+          "threshold_m": 1000,
+          "source": "UP and Haryana siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0433/UP-SCH-1K.png",
+          "measured_to": {
+            "latitude": 28.69954972972973,
+            "longitude": 77.66344972972973
+          }
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "measured_distance_m": null,
+          "threshold_m": null,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0433/C-TECH-10K.png"
+        }
+      ],
+      "exposure": {
+        "people": 2870,
+        "children_under_five": 320,
+        "adults_over_sixty": 250
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0433/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0433/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0467",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.728644,
+            "longitude": 77.789973
+          },
+          {
+            "latitude": 28.728923,
+            "longitude": 77.79116
+          },
+          {
+            "latitude": 28.729356,
+            "longitude": 77.791027
+          },
+          {
+            "latitude": 28.729077,
+            "longitude": 77.78984
+          }
+        ],
+        "centroid": {
+          "latitude": 28.729,
+          "longitude": 77.7905
+        }
+      },
+      "type": "Zigzag",
+      "type_confidence": 0.77,
+      "detection_confidence": 0.91,
+      "first_seen": "2024-01-23T05:22:01Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-HAB-800",
+          "measured_distance_m": 610,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0467/C-HAB-800.png",
+          "measured_to": {
+            "latitude": 28.732885315315315,
+            "longitude": 77.79438531531531
+          }
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "measured_distance_m": 240,
+          "threshold_m": 300,
+          "source": "UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0467/UP-NH-300.png",
+          "measured_to": {
+            "latitude": 28.730528648648647,
+            "longitude": 77.79202864864864
+          }
+        }
+      ],
+      "exposure": {
+        "people": 2310,
+        "children_under_five": 260,
+        "adults_over_sixty": 205
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0467/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0467/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0402",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.698302,
+            "longitude": 77.812747
+          },
+          {
+            "latitude": 28.699111,
+            "longitude": 77.811648
+          },
+          {
+            "latitude": 28.698698,
+            "longitude": 77.811253
+          },
+          {
+            "latitude": 28.697889,
+            "longitude": 77.812352
+          }
+        ],
+        "centroid": {
+          "latitude": 28.6985,
+          "longitude": 77.812
+        }
+      },
+      "type": "FCBK",
+      "type_confidence": 0.79,
+      "detection_confidence": 0.92,
+      "first_seen": "2023-11-14T05:21:39Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "UP-SCH-1K",
+          "measured_distance_m": 910,
+          "threshold_m": 1000,
+          "source": "UP and Haryana siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0402/UP-SCH-1K.png",
+          "measured_to": {
+            "latitude": 28.692703873873874,
+            "longitude": 77.80620387387387
+          }
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "measured_distance_m": 530,
+          "threshold_m": 800,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0402/C-ORCH-800.png",
+          "measured_to": {
+            "latitude": 28.701875765765767,
+            "longitude": 77.81537576576576
+          }
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "measured_distance_m": null,
+          "threshold_m": null,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0402/C-TECH-10K.png"
+        }
+      ],
+      "exposure": {
+        "people": 1980,
+        "children_under_five": 220,
+        "adults_over_sixty": 180
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0402/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0402/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0479",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.752724,
+            "longitude": 77.828681
+          },
+          {
+            "latitude": 28.75379,
+            "longitude": 77.829441
+          },
+          {
+            "latitude": 28.754076,
+            "longitude": 77.828919
+          },
+          {
+            "latitude": 28.75301,
+            "longitude": 77.828159
+          }
+        ],
+        "centroid": {
+          "latitude": 28.7534,
+          "longitude": 77.8288
+        }
+      },
+      "type": "FCBK",
+      "type_confidence": 0.86,
+      "detection_confidence": 0.93,
+      "first_seen": "2026-09-29T05:31:39Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-HAB-800",
+          "measured_distance_m": 730,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0479/C-HAB-800.png",
+          "measured_to": {
+            "latitude": 28.75804963963964,
+            "longitude": 77.83344963963964
+          }
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "measured_distance_m": 150,
+          "threshold_m": 200,
+          "source": "UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0479/UP-RAIL-200.png",
+          "measured_to": {
+            "latitude": 28.754355405405406,
+            "longitude": 77.82975540540541
+          }
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "measured_distance_m": null,
+          "threshold_m": null,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0479/C-TECH-10K.png"
+        }
+      ],
+      "exposure": {
+        "people": 1640,
+        "children_under_five": 190,
+        "adults_over_sixty": 150
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0479/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0479/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0395",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.780487,
+            "longitude": 77.754319
+          },
+          {
+            "latitude": 28.78156,
+            "longitude": 77.754191
+          },
+          {
+            "latitude": 28.781513,
+            "longitude": 77.753681
+          },
+          {
+            "latitude": 28.78044,
+            "longitude": 77.753809
+          }
+        ],
+        "centroid": {
+          "latitude": 28.781,
+          "longitude": 77.754
+        }
+      },
+      "type": "Zigzag",
+      "type_confidence": 0.71,
+      "detection_confidence": 0.88,
+      "first_seen": "2023-11-29T05:21:49Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-KILN-1K",
+          "measured_distance_m": 690,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0395/C-KILN-1K.png",
+          "measured_to": {
+            "latitude": 28.785394864864863,
+            "longitude": 77.75839486486487
+          }
+        }
+      ],
+      "exposure": {
+        "people": 1220,
+        "children_under_five": 140,
+        "adults_over_sixty": 110
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0395/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0395/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0420",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.710141,
+            "longitude": 77.84569
+          },
+          {
+            "latitude": 28.710141,
+            "longitude": 77.84651
+          },
+          {
+            "latitude": 28.710859,
+            "longitude": 77.84651
+          },
+          {
+            "latitude": 28.710859,
+            "longitude": 77.84569
+          }
+        ],
+        "centroid": {
+          "latitude": 28.7105,
+          "longitude": 77.8461
+        }
+      },
+      "type": "CFCBK",
+      "type_confidence": 0.58,
+      "detection_confidence": 0.81,
+      "first_seen": "2023-12-24T05:21:59Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-HAB-800",
+          "measured_distance_m": 760,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0420/C-HAB-800.png",
+          "measured_to": {
+            "latitude": 28.71534072072072,
+            "longitude": 77.85094072072073
+          }
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "measured_distance_m": null,
+          "threshold_m": null,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0420/C-TECH-10K.png"
+        }
+      ],
+      "exposure": {
+        "people": 860,
+        "children_under_five": 95,
+        "adults_over_sixty": 80
+      },
+      "status": "flagged",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0420/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0420/2026-10.png"
+      },
+      "district": "Hapur"
+    },
+    {
+      "kiln_id": "KW-0356",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.688369,
+            "longitude": 77.744698
+          },
+          {
+            "latitude": 28.689243,
+            "longitude": 77.745729
+          },
+          {
+            "latitude": 28.689631,
+            "longitude": 77.745302
+          },
+          {
+            "latitude": 28.688757,
+            "longitude": 77.744271
+          }
+        ],
+        "centroid": {
+          "latitude": 28.689,
+          "longitude": 77.745
+        }
+      },
+      "type": "FCBK",
+      "type_confidence": 0.93,
+      "detection_confidence": 0.97,
+      "first_seen": "2023-11-14T05:21:39Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [
+        {
+          "rule_id": "C-HAB-800",
+          "measured_distance_m": 450,
+          "threshold_m": 800,
+          "source": "Central 2022 rules; UP siting rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0356/C-HAB-800.png",
+          "measured_to": {
+            "latitude": 28.691866216216216,
+            "longitude": 77.74786621621622
+          }
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "measured_distance_m": null,
+          "threshold_m": null,
+          "source": "Central 2022 rules",
+          "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0356/C-TECH-10K.png"
+        }
+      ],
+      "exposure": {
+        "people": 3480,
+        "children_under_five": 395,
+        "adults_over_sixty": 300
+      },
+      "status": "confirmed",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0356/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0356/2026-10.png"
+      },
+      "district": "Ghaziabad"
+    },
+    {
+      "kiln_id": "KW-0371",
+      "footprint": {
+        "polygon": [
+          {
+            "latitude": 28.794538,
+            "longitude": 77.801407
+          },
+          {
+            "latitude": 28.795579,
+            "longitude": 77.801088
+          },
+          {
+            "latitude": 28.795462,
+            "longitude": 77.800593
+          },
+          {
+            "latitude": 28.794421,
+            "longitude": 77.800912
+          }
+        ],
+        "centroid": {
+          "latitude": 28.795,
+          "longitude": 77.801
+        }
+      },
+      "type": "Zigzag",
+      "type_confidence": 0.69,
+      "detection_confidence": 0.9,
+      "first_seen": "2023-11-14T05:21:39Z",
+      "last_seen": "2026-10-04T05:31:41Z",
+      "violations": [],
+      "exposure": {
+        "people": 640,
+        "children_under_five": 70,
+        "adults_over_sixty": 60
+      },
+      "status": "compliant",
+      "evidence": {
+        "before": "https://cdn.kilnwatch.example/evidence/KW-0371/2024-01.png",
+        "after": "https://cdn.kilnwatch.example/evidence/KW-0371/2026-10.png"
+      },
+      "district": "Meerut"
+    }
+  ]
+}
