@@ -74,8 +74,9 @@ def search(box, start, end, max_cloud):
         "query": {"eo:cloud_cover": {"lte": max_cloud}},
         "limit": 200,
     })
-    return sorted(items, key=lambda f: (f["properties"]["eo:cloud_cover"],
-                                        f["properties"]["s2:nodata_pixel_percentage"],
+    # Completeness first: a half-empty scene at a swath edge leaves a hole in the area.
+    return sorted(items, key=lambda f: (round(f["properties"]["s2:nodata_pixel_percentage"] / 5),
+                                        f["properties"]["eo:cloud_cover"],
                                         -datetime.fromisoformat(f["properties"]["datetime"]).timestamp()))
 
 
