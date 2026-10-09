@@ -58,19 +58,22 @@ os.environ.setdefault("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
 os.environ.setdefault("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", ".tif")
 
 
+def stac(body):
+    req = urllib.request.Request(STAC, data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json"})
+    return json.load(urllib.request.urlopen(req, timeout=60))["features"]
+
+
 def search(box, start, end, max_cloud):
     """STAC items over the box, clearest first."""
     lat_min, lat_max, lon_min, lon_max = box
-    body = {
+    items = stac({
         "collections": [COLLECTION],
         "bbox": [lon_min, lat_min, lon_max, lat_max],
         "datetime": f"{start}T00:00:00Z/{end}T23:59:59Z",
         "query": {"eo:cloud_cover": {"lte": max_cloud}},
         "limit": 200,
-    }
-    req = urllib.request.Request(STAC, data=json.dumps(body).encode(),
-                                 headers={"Content-Type": "application/json"})
-    items = json.load(urllib.request.urlopen(req, timeout=60))["features"]
+    })
     return sorted(items, key=lambda f: (f["properties"]["eo:cloud_cover"],
                                         f["properties"]["s2:nodata_pixel_percentage"],
                                         -datetime.fromisoformat(f["properties"]["datetime"]).timestamp()))
@@ -207,8 +210,7 @@ def main():
         box, aoi_name = AOI[args.aoi], args.aoi
 
     if args.scene:
-        items = [f for f in search(box, "2015-06-01", date.today().isoformat(), 100)
-                 if f["id"] in args.scene]
+        items = stac({"collections": [COLLECTION], "ids": args.scene, "limit": len(args.scene)})
         missing = set(args.scene) - {f["id"] for f in items}
         if missing:
             raise SystemExit(f"scenes not found over the area: {sorted(missing)}")
