@@ -1,6 +1,6 @@
 # Prompt 10: KilnWatch Resident Portal — complete build brief
 
-This document is for the **AWS teammate**, who builds the resident web portal, and for any Claude Code builder session they run. It is self-contained. Read it fully before writing code. The user (Aryaman, owner of the AWS account and the iOS app) and the orchestrator review each milestone report.
+This document is for the **AWS teammate**, who builds the resident web portal, and for any AI coding session they run (Claude Code or Codex). It is self-contained. Read it fully before writing code. The user (Aryaman, owner of the AWS account and the iOS app) and the orchestrator review each milestone report.
 
 Work **one milestone at a time** (R0 → R7). Each milestone ends with a short report: what changed, what was tested and its exact results, what is unproven, and the next step. Do not run parallel agents. Do not deploy outside the authorized scope of the current milestone. Do not commit to `main` directly: work on a `portal` branch and open a PR when the user asks.
 
@@ -365,7 +365,7 @@ Put the code under **`Portal/`** at the repo root, with its own `package.json`, 
 - Do not add analytics, ads or trackers.
 - Do not commit secrets, `.env` values, `terraform.tfvars`, `backend.hcl`, plans, tokens, account IDs or email addresses. **The repository is public.**
 
-## 9. Starting prompt for your Claude Code session
+## 9. Starting prompt for your coding-agent session (Claude Code or Codex)
 
 ```
 You are the KilnWatch resident-portal builder. Read App/docs/prompts/10-resident-portal.md completely, then App/docs/api-contract.md (Integration 2C), App/docs/DESIGN.md, App/docs/concept.txt pages 2, 10, 14, 15, and AWS/docs/first-record-runbook.md. Work on branch `portal`, one milestone at a time, starting with R0. Ask me for decisions and private values (API base URL, backend.hcl, tfvars); never ask for passwords or keys in chat. No AWS writes without showing me the plan first. Stop after each milestone report.
