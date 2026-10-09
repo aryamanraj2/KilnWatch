@@ -1,0 +1,37 @@
+{
+  "model": "yolo11s-obb.pt",
+  "data": "/tmp/kilns/kilns_full.yaml",
+  "epochs": 20,
+  "imgsz": 128,
+  "batch": 64,
+  "fraction": 1.0,
+  "train_minutes": 96.5,
+  "dataset": "SentinelKilnDB (Kaggle rishabhsnip/sentinelkiln-dataset), CC BY-NC 4.0",
+  "ultralytics": "8.4.174",
+  "test": {
+    "full": {
+      "mAP50": 0.6848490246521598,
+      "mAP50-95": 0.4353601684371355,
+      "precision": 0.6775814852269771,
+      "recall": 0.6695449845069968,
+      "per_type_AP50": {
+        "CFCBK": 0.6471054079794318,
+        "FCBK": 0.6731571386846847,
+        "Zigzag": 0.7342845272923629
+      },
+      "any_kiln_AP50": 0.8622148686015731
+    },
+    "strict": {
+      "mAP50": 0.37931650557426105,
+      "mAP50-95": 0.24789083621295907,
+      "precision": 0.6859405542592188,
+      "recall": 0.42177998894416807,
+      "per_type_AP50": {
+        "CFCBK": 0.0,
+        "FCBK": 0.25725278729001927,
+        "Zigzag": 0.8806967294327638
+      },
+      "any_kiln_AP50": 0.8749884302063926
+    }
+  }
+}
