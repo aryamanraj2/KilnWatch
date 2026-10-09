@@ -31,7 +31,7 @@ extension JSONEncoder {
 }
 
 /// Response envelopes. Objects, not bare arrays, so fields like a pagination cursor can be added later.
-struct KilnList: Codable { let kilns: [Kiln] }
+struct KilnList: Codable { let kilns: [Kiln]; let nextCursor: String? }
 struct RuleList: Codable { let rules: [Rule] }
 
 /// The JSON fixtures, which are also the examples in docs/api-contract.md. For previews and tests.

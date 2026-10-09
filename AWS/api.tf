@@ -1,16 +1,11 @@
-data "archive_file" "api_lambda" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/api_handler.py"
-  output_path = "${path.module}/build/api_handler.zip"
-}
-
 resource "aws_lambda_function" "api" {
   function_name    = "${var.project_name}-api"
   role             = aws_iam_role.api_lambda.arn
   runtime          = "python3.12"
+  architectures    = ["x86_64"]
   handler          = "api_handler.handler"
-  filename         = data.archive_file.api_lambda.output_path
-  source_code_hash = data.archive_file.api_lambda.output_base64sha256
+  filename         = "${path.module}/build/api_handler.zip"
+  source_code_hash = filebase64sha256("${path.module}/build/api_handler.zip")
   timeout          = 15
   memory_size      = 256
 
@@ -24,22 +19,34 @@ resource "aws_lambda_function" "api" {
       DB_HOST     = aws_db_instance.main.address
       DB_PORT     = tostring(aws_db_instance.main.port)
       DB_NAME     = var.db_name
-      DB_USER     = var.db_username
-      DB_SECRET   = aws_db_instance.main.master_user_secret[0].secret_arn
-      DATA_BUCKET = aws_s3_bucket.data.bucket
+      DB_CA_BUNDLE = "/var/task/rds-ca.pem"
+      COGNITO_CLIENT_ID = aws_cognito_user_pool_client.web_mobile.id
+      DB_SECRET   = aws_secretsmanager_secret.registry_reader.arn
     }
   }
 
   depends_on = [
     aws_iam_role_policy_attachment.api_lambda_logs,
     aws_iam_role_policy_attachment.api_lambda_vpc,
-    aws_iam_role_policy.api_lambda_secrets
+    aws_iam_role_policy.api_lambda_secrets,
+    aws_vpc_endpoint.secrets,
+    aws_vpc_security_group_egress_rule.lambda_secrets,
+    aws_vpc_security_group_egress_rule.lambda_postgres
   ]
 }
 
 resource "aws_cognito_user_pool" "main" {
   name                     = "${var.project_name}-users"
   auto_verified_attributes = ["email"]
+  admin_create_user_config { allow_admin_create_user_only = true }
+  schema {
+    name = "district"
+    attribute_data_type = "String"
+    mutable = false
+    required = false
+    string_attribute_constraints { min_length = 1
+      max_length = 64 }
+  }
   password_policy {
     minimum_length                   = 12
     require_lowercase                = true
@@ -54,6 +61,8 @@ resource "aws_cognito_user_pool_client" "web_mobile" {
   name                          = "${var.project_name}-web-mobile"
   user_pool_id                  = aws_cognito_user_pool.main.id
   generate_secret               = false
+  read_attributes = ["email", "email_verified", "custom:district"]
+  write_attributes = ["email"]
   explicit_auth_flows           = ["ALLOW_USER_SRP_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
   prevent_user_existence_errors = "ENABLED"
   access_token_validity         = 60
@@ -173,4 +182,10 @@ resource "aws_iam_role_policy" "api_lambda_invoke_agentcore" {
       Resource = [aws_bedrockagentcore_agent_runtime.kilnwatch[0].agent_runtime_arn]
     }]
   })
+}
+
+resource "aws_cognito_user_group" "inspector" {
+  name = "inspector"
+  user_pool_id = aws_cognito_user_pool.main.id
+  description = "District-scoped registry reads; membership assigned by an administrator."
 }

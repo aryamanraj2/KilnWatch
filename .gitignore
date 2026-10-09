@@ -3,3 +3,18 @@ xcuserdata/
 .build/
 .swiftpm/
 DerivedData/
+
+# Local model/integration artifacts and credentials
+*.pt
+*.geojson
+.venv*/
+.local/
+.env
+*.tfvars
+!terraform.tfvars.example
+
+/args.yaml
+/scores.json
+
+__pycache__/
+*.pyc

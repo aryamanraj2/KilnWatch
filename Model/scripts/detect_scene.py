@@ -1,6 +1,6 @@
 """Find kilns in fresh Sentinel-2 imagery and write them as map polygons.
 
-    python scripts/detect_scene.py --aoi hapur_test --weights best.pt --out kilns.geojson
+    python Model/scripts/detect_scene.py --aoi hapur_test --weights best.pt --out kilns.geojson
 
 Steps (PDF section 02, "Running it on new imagery"), each mirroring how
 SentinelKilnDB tiles were made, because a model only works on data that looks
@@ -25,6 +25,7 @@ type until a separate any-kiln score exists.
 import argparse
 from datetime import date, datetime, timedelta, timezone
 import json
+import hashlib
 import math
 import os
 from pathlib import Path
@@ -193,6 +194,7 @@ def main():
     ap.add_argument("--days", type=int, default=45, help="search window before --end")
     ap.add_argument("--max-cloud", type=float, default=1.0, help="scene cloud cover, percent")
     ap.add_argument("--scene", nargs="+", help="use these STAC item ids instead of searching")
+    ap.add_argument("--artifact-manifest", type=Path, help="verified checkpoint manifest, required with --weights")
     ap.add_argument("--weights", help="trained best.pt; omit to only cut patches")
     ap.add_argument("--conf", type=float, default=0.25)
     ap.add_argument("--iou", type=float, default=0.3, help="merge: IoU above which boxes are one kiln")
@@ -225,7 +227,14 @@ def main():
     model = None
     if args.weights:
         from ultralytics import YOLO
+        if not args.artifact_manifest:
+            raise SystemExit("--artifact-manifest is required with --weights")
+        artifact = json.loads(args.artifact_manifest.read_text())
+        if hashlib.sha256(Path(args.weights).read_bytes()).hexdigest() != artifact["sha256"]:
+            raise SystemExit("checkpoint hash differs from verified manifest")
         model = YOLO(args.weights)
+        if model.task != "obb" or {str(k): v for k, v in model.names.items()} != artifact["classes"]:
+            raise SystemExit("checkpoint task/classes differ from verified manifest")
     if args.save_patches:
         args.save_patches.mkdir(parents=True, exist_ok=True)
         from PIL import Image
@@ -245,7 +254,7 @@ def main():
 
         cut = list(patches(rgb, args.max_nodata))
         print(f"  {rgb.shape[1]} x {rgb.shape[0]} px -> {len(cut)} patches")
-        scenes.append({"id": item["id"], "date": p["datetime"][:10],
+        scenes.append({"id": item["id"], "date": p["datetime"][:10], "acquired_at": p["datetime"],
                        "cloud_cover": p["eo:cloud_cover"], "patches": len(cut)})
 
         if args.save_patches:
@@ -262,7 +271,7 @@ def main():
                     xs, ys = transform * (corners[:, 0] + c, corners[:, 1] + r)
                     wx, wy = to_work[crs].transform(xs, ys)
                     dets.append({"poly": Polygon(zip(wx, wy)), "cls": int(cls), "conf": float(conf),
-                                 "scene": item["id"], "date": p["datetime"][:10]})
+                                 "scene": item["id"], "date": p["datetime"][:10], "acquired_at": p["datetime"]})
         print(f"  {len(dets)} raw detections so far")
 
     if not scenes:
@@ -290,6 +299,7 @@ def main():
                 "type_confidence": round(d["conf"], 3),
                 "scene_id": d["scene"],
                 "scene_date": d["date"],
+                "acquired_at": d["acquired_at"],
                 "centroid": [round(clon, 6), round(clat, 6)],
                 "area_m2": round(d["poly"].area),
                 "length_m": round(length),
@@ -307,11 +317,16 @@ def main():
                     "lon_min": box[2], "lon_max": box[3]},
             "scenes": scenes,
             "model": Path(args.weights).name,
+            "model_sha256": artifact["sha256"],
+            "model_version": artifact["model_version"],
+            "confidence_semantics": "predicted_class_score_shared",
             "params": {"conf": args.conf, "iou": args.iou, "ios": args.ios,
                        "patch": PATCH, "stride": STRIDE, "max_nodata": args.max_nodata},
         },
     }
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(out, indent=1))
+    args.out.with_suffix(".scenes.json").write_text(json.dumps({"type": "FeatureCollection", "features": items}, indent=1))
     types = {}
     for f in features:
         types[f["properties"]["type"]] = types.get(f["properties"]["type"], 0) + 1

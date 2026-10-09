@@ -3,7 +3,7 @@
 If boxes don't sit on kilns, or colours (classes) look wrong, fix the labels
 before training -- most "bad model" bugs are label bugs.
 
-    python scripts/show_labels.py D:/ncr/train --n 20 --out labels_check.png
+    python Model/scripts/show_labels.py D:/ncr/train --n 20 --out labels_check.png
 """
 
 import argparse

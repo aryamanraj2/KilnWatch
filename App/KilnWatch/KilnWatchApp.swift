@@ -101,6 +101,9 @@ final class AppModel {
     }
 
     func kiln(_ id: String) -> Kiln? { kilns[id] }
+    func usesIllustrativeEvidence(for kiln: Kiln) -> Bool {
+        api == nil && Fixtures.kilns.contains(kiln)
+    }
     func status(for kiln: Kiln) -> KilnStatus { verdictOverrides[kiln.kilnId] ?? kiln.status }
     func stopNumber(for id: String) -> Int? { stops.first { $0.kilnId == id }?.order }
     func recordVerdict(_ status: KilnStatus, for id: String) {

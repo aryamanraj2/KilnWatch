@@ -8,4 +8,4 @@ Start by reading `App/docs/HANDOVER.md`, which has the current state, the open d
 - Test the core package with `cd App/Packages/KilnWatchCore && swift test`.
 - The phase prompts in `App/docs/prompts/` mention "Axiom skills" and "Firecrawl". Those are Claude Code tools. If they aren't available, use Apple's developer documentation and normal web search instead.
 - Never use the word "illegal" in the app. Until an inspector records a verdict, a kiln is "Flagged by satellite · pending inspection".
-- Commit or push only when the user asks. The working branch is `PortalAPP`.
+- Commit or push only when the user asks. The working branch is `main`; the app, AWS foundation and model code have been merged there.

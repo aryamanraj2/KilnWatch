@@ -3,12 +3,13 @@ import SwiftUI
 
 /// People inside the 800 m buffer: one large figure, vulnerable groups below.
 struct ExposureBlock: View {
-    let exposure: Exposure
+    let exposure: Exposure?
 
     @State private var appeared = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        if let exposure {
         let people = appeared ? exposure.people : 0
         VStack(alignment: .leading, spacing: Space.xxs) {
             ViewThatFits(in: .horizontal) {
@@ -27,6 +28,11 @@ struct ExposureBlock: View {
         .accessibilityLabel(
             "\(exposure.people.grouped) people within 800 metres, including \(exposure.childrenUnderFive.grouped) children under 5 and \(exposure.adultsOverSixty.grouped) adults over 60."
         )
+        } else {
+            Text("Population exposure not assessed")
+                .font(.body)
+                .foregroundStyle(.inkSecondary)
+        }
     }
 
     @ViewBuilder private func figure(_ people: Int) -> some View {

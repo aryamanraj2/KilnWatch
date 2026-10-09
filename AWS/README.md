@@ -1,78 +1,70 @@
-# KilnWatch AWS infrastructure (staged foundation)
+# KilnWatch AWS foundation and Integration 1 bridge
 
-This Terraform root is aligned with the KilnWatch model scripts and architecture described in the project README and concept PDF. It provisions the shared foundation for the current hackathon work. It is not yet a complete production deployment: the repository currently contains dataset preparation, training and scene detection scripts, but no application frontend, API contract, database migrations, or deployable inference container.
+**Source prepared; AWS is not deployed.** The iOS app/core live in `App/`; the
+model scripts live in `Model/`. Integration 1 adds a local evidence/import path,
+PostgreSQL/PostGIS migrations and authenticated registry reads. It does not start
+training, inference automation, agents, route planning or verdict submission.
 
-## Current deployment scope
+Read [the first-record runbook](docs/first-record-runbook.md) before any deployment.
+It contains prerequisites, account/state decisions, private database access,
+operator commands and the separate deployment authorization gate. Verified local
+results and unrun checks are in [local-verification.md](docs/local-verification.md).
 
-- Primary AWS region: `us-west-2`, matching the Sentinel-2 public data location and the model repository's training example.
-- Private, versioned S3 bucket for model artefacts, imagery and evidence; ECR repository, ECS/Fargate, Step Functions, API Gateway, Lambda, Cognito, private PostgreSQL, and basic alarms/logging are included.
-- The DB master password is generated and managed by RDS in Secrets Manager. It is not supplied in Terraform variables.
-- API Gateway has authenticated inspector routes and a read-only public resident route. The Lambda implementation is still a stub and returns empty/example responses; it does not query RDS or launch the workflow yet.
-- Amplify and SageMaker training are disabled. SageMaker IAM roles/policies are also omitted unless training is explicitly enabled.
-- The ECS task definition points at the KilnWatch inference ECR repository's `bootstrap` image tag. Push a compatible container before starting inference jobs; until then the state machine cannot successfully run inference.
-
-The README in the application repository describes the target experience and staged model/app tracks. The infrastructure deliberately leaves those unfinished integration points visible instead of claiming the app is deployed.
-
-## Initial setup
-
-1. Use Terraform 1.6 or newer and AWS credentials for the target account. Confirm `us-west-2` is enabled and review the charges for RDS, NAT-free VPC networking, Fargate and other resources before applying.
-2. Copy `terraform.tfvars.example` to `terraform.tfvars`. Set a globally unique lowercase `bucket_name_prefix`. Keep the local `.tfvars`, Terraform state, plans and AWS credentials private.
-3. Run:
-
-   ```sh
-   terraform init
-   terraform fmt -recursive
-   terraform validate
-   terraform plan
-   ```
-
-4. Review the plan and apply only after confirming the account, region, resource names and expected costs.
-
-Terraform state contains infrastructure metadata and the RDS-managed secret reference. Use a private encrypted remote backend with locking before sharing this state with a team. Do not commit state.
-
-## Model artefact path
-
-The repository's `scripts/train.py` uploads run artefacts below the S3 prefix passed with `--s3`, followed by the run name. For example:
+## Local preparation (repository root)
 
 ```sh
-python scripts/train.py --data /path/to/kilns/kilns_full.yaml --name baseline \
-  --s3 s3://YOUR_BUCKET/models
+python3 -m venv .venv-integration
+.venv-integration/bin/python -m pip install -r Model/requirements-integration.txt -r AWS/requirements-operator.txt
+.venv-integration/bin/python AWS/scripts/package_api.py
+PYTHONPATH=AWS .venv-integration/bin/python -m unittest discover -s AWS/tests -v
+PYTHONPATH=AWS .venv-integration/bin/python AWS/tests/generate_contract.py
 ```
 
-This produces keys such as `models/baseline/weights/best.pt`. The ECS task receives `DATA_BUCKET` and `MODEL_S3_PREFIX=models/`; the future inference container must select the desired run/version and implement the input/output S3 contract. The current `scripts/detect_scene.py` produces local GeoJSON and does not yet upload scene results or integrate with the API workflow.
+The Lambda archive must exist before Terraform validation/plan. It packages pinned
+pure-Python pg8000 dependencies for Python 3.12/x86_64, registry read modules and
+an RDS CA bundle; the old single-file archive is removed. Terraform/AWS CLI and a
+local PostGIS/Docker runtime were unavailable in the builder's environment, so
+cloud, Terraform and actual database integration checks remain unrun.
 
-## API and application integration still required
+`registry.cli validate` performs a complete dry run without opening a database.
+`registry.cli migrate` and `import` are explicit write operations for the future
+approved private runner. Core schema has runs, candidates, observations, evidence
+and migration checksums; no assessment engine or review/verdict product is added.
+The shared [app contract](../App/docs/api-contract.md) uses optional exposure/images,
+unassessed rules and explicit unverified baseline type. Missing facts are never zero.
 
-- Implement Lambda persistence and queries against PostGIS; add schema migrations for the kiln registry, rule evidence, review queue, inspections and audit history.
-- Implement `POST /jobs` to validate input and start Step Functions. The current response is explicitly `501`.
-- Implement public data filtering on `GET /public/kilns`; expose only the approved resident fields and continue labelling detections as pending inspection.
-- Add role/district authorization for review and inspector writes. Cognito JWT authentication alone is not the full authorization policy described in the design.
-- Package a PostgreSQL driver with Lambda and add private network access to Secrets Manager and Step Functions (VPC endpoints or an approved egress design). The private subnets have no NAT gateway.
-- Build and push the inference image to the Terraform output `ecr_repository_url` using the `bootstrap` tag, then update the task's job input/output handling. The workflow currently invokes the task without a real job payload contract.
-- Build the iOS and web clients against the final API response contract. No frontend source or Amplify repository settings are present in the provided GitHub repository at this time.
+## Prepared deployment behavior
 
-The public route and Cognito configuration are scaffolding only until those handlers are implemented. Keep `frontend_origin` set to the exact deployed site origin before browser-based release; for local development, set it to the actual dev-server origin.
+- Private encrypted/versioned S3 with public access blocked; CloudFront OAC can read
+  only content-addressed satellite `evidence/*.png`, not models/imports/field photos.
+  URLs remain null until a read-only publication checksum proof supplies a receipt.
+- Private RDS PostgreSQL 17/PostGIS, forced TLS, separate SELECT-only runtime secret.
+  Lambda cannot read the master secret, start Step Functions or read/write S3.
+- Private Secrets Manager interface endpoint and restricted Lambda egress to that
+  endpoint and PostgreSQL. The handler needs no S3 network path.
+- Optional temporary SSM EC2 runner for the reviewed migration/import path. Off by
+  default; no inbound ports. Approve its outbound network, credentials and cost
+  separately. RDS is never opened to the internet.
+- HTTP API root paths `GET /kilns?district=Hapur[&status=flagged]` and `GET /kilns/{id}`.
+  Nested Lambda errors; pages default 100/max 200, with `next_cursor`. The core client
+  follows pages. The API checks the Cognito-authorized ID token's subject, client,
+  token type, inspector group and immutable admin-provisioned district. Missing
+  permissions deny access; unknown/other-district details are hidden with 404.
+- `/public/kilns` stays unavailable (503), `/jobs` remains 501, `/health` reports the
+  process only. Routes/rules/verdicts/agents are deferred; no fabricated Today route.
+- Admin-only account provisioning and an inspector group are prepared. Managed
+  login/PKCE, multi-district policy and Verified Permissions remain future work.
 
-## Deferred services
+Use `AWS/terraform.tfvars.example` for redacted configuration. Select the account,
+profile, region and encrypted locked state owner before `terraform init`/plan.
+No plan/apply was executed. Do not upgrade the existing provider lock unnecessarily.
+Keep local tfvars/state/plan, model weights, raw imagery/exports and tokens out of Git.
 
-Keep `enable_amplify = false` until the web repository/branch and build command/output directory are known. Keep `enable_sagemaker_training_job = false` while training is underway. The checked-in training script is a local/Kaggle-style Ultralytics script, not a SageMaker training container; enabling the Terraform SageMaker job requires a compatible container and explicit input/output contract. `enable_agentcore` also remains false until the agent container and API integration are ready.
+AgentCore, SageMaker training, Amplify and the optional long-running ECS service
+remain disabled by default. Existing ECS/Step Functions scaffolding is unfinished;
+its image/input contracts are not implemented. Do not launch it for this bridge.
+The model script's optional artifact upload uses `models/<run>/...`; local detection
+is `python Model/scripts/detect_scene.py`, not the old root `scripts/` path.
 
-## Important operational notes
-
-- RDS is private. Its master credential is managed by RDS/Secrets Manager; no database password is included in this folder.
-- There is no NAT gateway. Private Lambda code cannot reach public endpoints. Add only the private service endpoints or egress that the completed API actually needs; AgentCore invocation also needs a supported connectivity path.
-- RDS deletion protection is disabled and final snapshots are skipped for prototype cleanup. Change both before production and protect any data that must be retained.
-- The S3 bucket blocks public access, enables encryption and versioning, and does not auto-delete objects.
-- The model dataset is CC BY-NC 4.0; retain attribution and check the license before commercial use or redistribution.
-- A model flag or rule-distance calculation is not a legal finding. Only an inspector verdict or approved human review should change a kiln's status.
-
-## Outputs
-
-```sh
-terraform output
-terraform output -raw api_base_url
-terraform output -raw data_bucket_name
-terraform output -raw ecr_repository_url
-```
-
-Do not run `terraform destroy` unless you intend to remove all managed resources and have preserved any data you need.
+Prototype RDS deletion protection remains disabled and final snapshots skipped.
+Review these before retaining important data. No monthly price estimate is claimed.

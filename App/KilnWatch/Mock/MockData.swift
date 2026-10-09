@@ -15,7 +15,7 @@ extension Coordinate {
 
 extension Kiln {
     var coordinate: CLLocationCoordinate2D { footprint.centroid.clLocation }
-    var typeIsCertain: Bool { typeConfidence >= 0.7 }
+    var typeIsCertain: Bool { typeMayBePresentedAsCertain }
     var topViolation: Violation? {
         violations.min { lhs, rhs in
             func severity(_ v: Violation) -> Double {

@@ -107,7 +107,7 @@ resource "aws_iam_role_policy" "api_lambda_secrets" {
     Statement = [{
       Effect   = "Allow",
       Action   = ["secretsmanager:GetSecretValue"],
-      Resource = [aws_db_instance.main.master_user_secret[0].secret_arn]
+      Resource = [aws_secretsmanager_secret.registry_reader.arn]
     }]
   })
 }

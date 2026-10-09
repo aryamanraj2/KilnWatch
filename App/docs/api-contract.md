@@ -6,7 +6,7 @@ The examples come from the fixtures in `Packages/KilnWatchCore/Sources/KilnWatch
 
 ## Conventions
 
-- **Base URL:** `https://api.kilnwatch.example/v1` (API Gateway + Lambda). All paths below are relative to it.
+- **Base URL:** `https://api.kilnwatch.example` (API Gateway + Lambda). All paths below are relative to it.
 - **JSON keys:** `snake_case`.
 - **Dates:** RFC 3339 / ISO 8601 date-time **with an offset** (`Z` or `+05:30`), with `T` as the separator. Fractional seconds are optional and may vary inside one payload. PostgreSQL `to_json(timestamptz)` already emits this. Please don't use Python `str(datetime)` (space separator) or `timestamp without time zone` (no offset): the client rejects both.
 - **Distances:** metres, as numbers. Keys end in `_m`.
@@ -23,7 +23,7 @@ Every request except the presigned photo upload carries:
 Authorization: Bearer <Cognito JWT>
 ```
 
-The JWT comes from the Cognito user pool through the hosted UI (Phase 5). Amazon Verified Permissions authorises each call (concept p.10):
+The JWT comes from the Cognito user pool through the hosted UI (Phase 5). The target architecture proposes Amazon Verified Permissions (concept p.10), which is not provisioned. Integration 1 enforces read permissions in Lambda; the eventual roles are:
 
 | Principal | Allowed |
 |---|---|
@@ -65,7 +65,7 @@ The outbox never deletes a verdict the server has not accepted.
 
 ### GET /kilns?district={district}&status={status}
 
-Lists the kilns in a district. `district` is required (for example `Hapur`). `status` is optional and takes one of `flagged`, `confirmed`, `compliant`, `not_a_kiln` or `closed`. No pagination in v1, because a district holds a few hundred kilns.
+Lists the kilns in a district. `district` is required (for example `Hapur`). `status` is optional and takes one of `flagged`, `confirmed`, `compliant`, `not_a_kiln` or `closed`. Integration 1 uses keyset pagination; see the implemented extension below.
 
 `200`: `{"kilns": [Kiln, ...]}`. Full example: `kilns.json`.
 
@@ -262,3 +262,65 @@ Response: `201` on first receipt, `200` on a replay.
 
 8. **Routing additions:** confirm road access points/notes, per-leg GeoJSON shape and `[longitude, latitude]` order, destination linking, departure/ETA time zone and drive/service-duration meanings. The Phase 2 sample is illustrative.
 9. **Configuration:** confirm the real API endpoint, route endpoint/error semantics and token provider/type; no live backend was configured for Phase 2 verification.
+
+## Integration 1: model-only candidate (implemented locally, deployment pending)
+
+The initial HTTP API uses root paths: use the `api_base_url` output without `/v1`.
+The source proof uses Cognito **ID tokens**, with HTTP API JWT validation and
+Lambda permission checks (`token_use=id`, matching `aud`, `sub`, `inspector` group,
+`custom:district`). District is immutable and omitted from client write attributes;
+only the AWS teammate provisions it. Missing claims deny access. This is a single
+district read proof; Verified Permissions and managed-login/PKCE are deferred.
+Anonymous `/public/kilns` returns 503 until a publication policy exists. Gateway
+JWT failures happen before Lambda and use the gateway's own error body; the client
+retains all raw non-2xx bodies. Lambda errors use the nested error form above.
+
+The existing Kiln shape extends as follows. Legacy fixtures still decode; older
+clients must adopt these optionals before consuming candidate records.
+
+| Field | Candidate semantics |
+|---|---|
+| `exposure` | `null` when not assessed; when supplied, all three counts remain required integers |
+| `rules_assessment` | `not_evaluated`; legacy absence means assessment state unknown, never passed |
+| `violations` | Empty for an unassessed candidate; never a compliance conclusion |
+| `type_verification` | `unverified` for model candidates regardless of class score; no C-TECH-10K finding |
+| `evidence.before`, `.after` | Optional URL strings, preserving legacy shape; null until an object is actually published |
+| `evidence.before_metadata`, `.after_metadata` | Optional scene/grid/image metadata even when URL is unavailable |
+| `provenance` | Model hash/version, scene ID, exact acquisition timestamp, input SHA-256 and import timestamp |
+| `first_seen`, `last_seen` | Earliest/latest **observed acquisition**, not construction/appearance dates |
+
+Image metadata: `scene_id`, `acquired_at` (RFC 3339), `patch_px=256`, `gsd_m=10`,
+`crs`, GDAL-order `geotransform=[x0,10,0,y0,0,-10]`, `footprint_px` (four `[x,y]`
+corner pairs, top-left pixel-edge origin), `centroid_px`, `sha256`, `object_key`,
+`attribution`, `nodata_fraction`, `rendering`. Historical imagery has no historical
+kiln outline without a separate observed detection: `footprint_px=null` on before.
+Both dates share the same grid and fixed RGB reflectance rendering. Null before
+means unavailable, not proof the kiln appeared after that date. URLs are materialized
+only from a verified publication receipt and the configured evidence distribution.
+
+`provenance.confidence_semantics=predicted_class_score_shared` means the current
+YOLO score is copied into both confidence fields; these are not independently
+calibrated existence/type probabilities. `type_verification` is a verification state,
+not a confidence threshold. Unknown raw kiln types/statuses remain preserved.
+
+Imports validate the complete batch before writing. Site keys use canonical corner
+order plus scene ID/model SHA, not feature order or file name. Exact/reordered retries
+keep IDs; raw input checksum/import identity remain separate. Cross-scene/model
+site matching is deferred: IDs are not claimed stable under changed footprints.
+Human status/review and assessment fields are never overwritten by an import.
+The district argument must be an AWS teammate-approved district for the run's AOI;
+it is an administrative assignment, not an inferred boundary result.
+
+GET /kilns requires `district` and optionally `status`; keyset pages contain
+`{"kilns":[...],"next_cursor":null|string}`. Default limit 100, max 200; `cursor`
+is the last kiln ID and is always combined with the authorized district. The shared
+client follows pages, detects repeated cursors, and returns the whole result. Detail
+reads use the same serializer and authorized district. Unknown or other-district IDs
+return 404 to avoid disclosing their existence. Invalid filters return 400; denied
+district/role returns 403; registry/secret failures return 503, never an empty list.
+
+Representative JSON is generated through the importer and API serializer in
+`AWS/tests/generate_contract.py`, saved under the core test target's `BridgeFixtures`.
+It is explicitly synthetic, includes a high-score unverified type and missing facts,
+and is decoded through both `JSONDecoder.kilnWatch` and the existing URLSession client.
+Routes, measured rules, jobs, agents, verdicts and live app registry loading are deferred.

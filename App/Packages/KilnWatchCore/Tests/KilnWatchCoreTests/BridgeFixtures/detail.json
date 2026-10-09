@@ -1,0 +1,96 @@
+{
+  "detection_confidence": 0.95,
+  "district": "Hapur",
+  "evidence": {
+    "after": null,
+    "after_metadata": {
+      "acquired_at": "2026-10-05T05:41:03.148000Z",
+      "attribution": "Contains modified Copernicus Sentinel data 2026",
+      "centroid_px": [
+        128.774514,
+        128.288399
+      ],
+      "crs": "EPSG:32643",
+      "footprint_px": [
+        [
+          124.018203,
+          133.945333
+        ],
+        [
+          133.78963,
+          133.717213
+        ],
+        [
+          133.530776,
+          122.631443
+        ],
+        [
+          123.759443,
+          122.859567
+        ]
+      ],
+      "geotransform": [
+        770290.0,
+        10.0,
+        0.0,
+        3182580.0,
+        0.0,
+        -10.0
+      ],
+      "grid_code": "SYNTHETIC-GRID",
+      "gsd_m": 10,
+      "nodata_fraction": 0.0,
+      "object_key": "evidence/06620b9c21fc3d4a46521e10858446bfa7b847dd271828b779b5c14de2588c0a.png",
+      "patch_px": 256,
+      "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+      "scene_cloud_pct": null,
+      "scene_id": "SYNTHETIC-AFTER",
+      "sha256": "06620b9c21fc3d4a46521e10858446bfa7b847dd271828b779b5c14de2588c0a"
+    },
+    "before": null
+  },
+  "exposure": null,
+  "first_seen": "2026-10-05T05:41:03.148000Z",
+  "footprint": {
+    "centroid": {
+      "latitude": 28.7305,
+      "longitude": 77.7805
+    },
+    "polygon": [
+      {
+        "latitude": 28.73,
+        "longitude": 77.78
+      },
+      {
+        "latitude": 28.73,
+        "longitude": 77.781
+      },
+      {
+        "latitude": 28.731,
+        "longitude": 77.781
+      },
+      {
+        "latitude": 28.731,
+        "longitude": 77.78
+      }
+    ]
+  },
+  "kiln_id": "KW-58a39f5f2efa54e891c7ee83009b1077",
+  "last_seen": "2026-10-05T05:41:03.148000Z",
+  "provenance": {
+    "acquired_at": "2026-10-05T05:41:03.148000Z",
+    "confidence_semantics": "predicted_class_score_shared",
+    "imported_at": "2026-10-09T15:00:00Z",
+    "input_sha256": "d14f87353d2c6c59b8b3ca9439a8fe199bbcae81b228bc43cb7af26a2e4e5611",
+    "model_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "model_version": "synthetic-unit-test",
+    "scene_id": "SYNTHETIC-AFTER"
+  },
+  "rules_assessment": "not_evaluated",
+  "type": "FCBK",
+  "type_confidence": 0.95,
+  "type_verification": "unverified",
+  "violations": [],
+  "status": "flagged",
+  "review_state": "pending"
+}

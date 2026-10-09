@@ -1,6 +1,6 @@
 """Train a YOLO11-OBB kiln detector, then score it on the test sets that matter.
 
-    python scripts/train.py --data /tmp/kilns/kilns_full.yaml --model yolo11s-obb.pt --epochs 20 --name baseline
+    python Model/scripts/train.py --data /tmp/kilns/kilns_full.yaml --model yolo11s-obb.pt --epochs 20 --name baseline
 
 Scores land in <project>/<name>/scores.json, one entry per --eval yaml (default:
 kilns_full.yaml and kilns_strict.yaml next to --data):

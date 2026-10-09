@@ -106,7 +106,7 @@ private struct KilnRow: View {
             if !typeSize.isAccessibilitySize { Spacer(minLength: Space.xs) }
             VStack(alignment: typeSize.isAccessibilitySize ? .leading : .trailing, spacing: Space.xxs) {
                 StatusBadge(status: model.status(for: kiln))
-                Text("\(kiln.exposure.people.grouped) people")
+                Text(kiln.exposure.map { "\($0.people.grouped) people" } ?? "Exposure not assessed")
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.inkSecondary)
             }

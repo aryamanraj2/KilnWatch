@@ -1,0 +1,3 @@
+-r lambda/requirements.txt
+boto3==1.42.73
+pyproj==3.7.2

@@ -18,7 +18,7 @@ func fixtureDecodes(name: String) throws {
 @Test func fixturesMatchTheConcept() throws {
     let kiln = try #require(Fixtures.kilns.first { $0.kilnId == "KW-0412" })
     #expect(kiln.type == .fcbk && kiln.typeConfidence == 0.82)
-    #expect(kiln.exposure.people == 6240 && kiln.exposure.childrenUnderFive == 710)
+    #expect(kiln.exposure?.people == 6240 && kiln.exposure?.childrenUnderFive == 710)
     #expect(kiln.violations.map(\.ruleId) == ["C-HAB-800", "UP-SCH-1K", "C-TECH-10K"])
     #expect(kiln.violations[0].measuredDistanceM == 410 && kiln.violations[2].measuredDistanceM == nil)
     #expect(Fixtures.route.stops.map(\.order) == Array(1...9))
@@ -365,4 +365,77 @@ func failedRefreshPreservesValidCacheWithoutSampleFallback(code: Int) async thro
     #expect(saved.kilns[0].status == .unknown("under_review"))
     #expect(saved.kilns[0].type == .unknown("Hoffmann"))
     #expect(saved.mapsURL(startingAt: "missing-id") == nil)
+}
+
+// MARK: - Integration 1 Python producer contract (explicitly synthetic)
+private func bridgeData(_ name: String) throws -> Data {
+    let url = try #require(Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "BridgeFixtures"))
+    return try Data(contentsOf: url)
+}
+
+@Test func pythonCandidateContractPreservesUnknownFactsAndProvenance() throws {
+    let list = try JSONDecoder.kilnWatch.decode(KilnList.self, from: bridgeData("list"))
+    #expect(list.kilns.count == 2)
+    for kiln in list.kilns {
+        #expect(kiln.exposure == nil)
+        #expect(kiln.violations.isEmpty && kiln.rulesAssessment == "not_evaluated")
+        #expect(kiln.typeConfidence == 0.95 && !kiln.typeMayBePresentedAsCertain)
+        #expect(kiln.typeVerification == "unverified" && kiln.status == .flagged)
+        #expect(kiln.evidence.before == nil && kiln.evidence.after == nil)
+        #expect(kiln.provenance?.confidenceSemantics == "predicted_class_score_shared")
+        #expect(kiln.provenance?.acquiredAt == kiln.lastSeen)
+        let roundTrip = try JSONDecoder.kilnWatch.decode(Kiln.self, from: JSONEncoder.kilnWatch.encode(kiln))
+        #expect(roundTrip == kiln)
+    }
+    #expect(list.kilns.contains { $0.type == .unknown("Hoffmann") })
+    let detail = try JSONDecoder.kilnWatch.decode(Kiln.self, from: bridgeData("detail"))
+    let meta = try #require(detail.evidence.afterMetadata)
+    #expect(meta.patchPx == 256 && meta.gsdM == 10 && meta.footprintPx?.count == 4)
+    #expect(meta.acquiredAt == detail.lastSeen && detail.evidence.beforeMetadata == nil)
+}
+
+@Test func apiDecodesPythonEnvelopeDetailAndEveryPage() async throws {
+    let list = try bridgeData("list"), detail = try bridgeData("detail")
+    let page1 = try bridgeData("page1"), page2 = try bridgeData("page2")
+    let expected = try JSONDecoder.kilnWatch.decode(KilnList.self, from: list).kilns
+    let expectedDetail = try JSONDecoder.kilnWatch.decode(Kiln.self, from: detail)
+    let stub = Stub { request in
+        #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer test-token")
+        if request.url?.path.hasSuffix("/kilns/\(expectedDetail.kilnId)") == true { return (200, detail) }
+        let hasCursor = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?.contains { $0.name == "cursor" } == true
+        return (200, hasCursor ? page2 : page1)
+    }
+    #expect(try await stub.api.kilns(district: "Hapur", status: .flagged) == expected)
+    #expect(try await stub.api.kiln(id: expectedDetail.kilnId) == expectedDetail)
+}
+
+@Test func repeatedPaginationCursorFailsInsteadOfReturningPartialRegistry() async throws {
+    let page = try bridgeData("page1")
+    let stub = Stub { _ in (200, page) }
+    do {
+        _ = try await stub.api.kilns(district: "Hapur")
+        Issue.record("Expected repeated-cursor failure")
+    } catch {
+        guard case .invalidPagination = error else { Issue.record("Unexpected error: \(error)"); return }
+    }
+}
+
+@Test func incompleteExposureCountsRemainMalformed() throws {
+    var object = try #require(JSONSerialization.jsonObject(with: bridgeData("detail")) as? [String: Any])
+    object["exposure"] = ["people": 0]
+    let data = try JSONSerialization.data(withJSONObject: object)
+    #expect(throws: DecodingError.self) { try JSONDecoder.kilnWatch.decode(Kiln.self, from: data) }
+}
+
+@Test(.enabled(if: ProcessInfo.processInfo.environment["KILNWATCH_REAL_CONTRACT_LIST"] != nil))
+func localRealDetectionContractDecodesThroughExistingClient() async throws {
+    let path = try #require(ProcessInfo.processInfo.environment["KILNWATCH_REAL_CONTRACT_LIST"])
+    let data = try Data(contentsOf: URL(fileURLWithPath: path))
+    let records = try JSONDecoder.kilnWatch.decode(KilnList.self, from: data).kilns
+    #expect(!records.isEmpty)
+    #expect(records.allSatisfy { $0.status == .flagged && $0.exposure == nil && $0.rulesAssessment == "not_evaluated" && !$0.typeMayBePresentedAsCertain })
+    #expect(records.allSatisfy { $0.evidence.before == nil && $0.evidence.after == nil }) // local, unpublished
+    #expect(records.contains { $0.evidence.afterMetadata?.patchPx == 256 && $0.evidence.beforeMetadata != nil })
+    let client = Stub { _ in (200, data) }
+    #expect(try await client.api.kilns(district: "Hapur") == records)
 }

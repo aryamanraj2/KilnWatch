@@ -182,3 +182,9 @@ variable "inference_image_tag" {
   type        = string
   default     = "bootstrap"
 }
+
+variable "create_registry_runner" {
+  description = "Optional temporary SSM runner for private DB migration/import; review before enabling. No inbound ports."
+  type = bool
+  default = false
+}

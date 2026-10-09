@@ -21,8 +21,8 @@ Tile filenames are "<lat>_<lon>.png", so geography is a string parse. --src can 
 the extracted folder (Kaggle: /kaggle/input/...) or the downloaded .zip, read in place.
 List files hold absolute paths, so prepare the data where you train.
 
-    python scripts/prepare_data.py --src /kaggle/input/sentinelkiln-dataset --dst /tmp/kilns --link
-    python scripts/prepare_data.py --src "dataset for KilnWatch.zip" --dst kilns --dry-run
+    python Model/scripts/prepare_data.py --src /kaggle/input/sentinelkiln-dataset --dst /tmp/kilns --link
+    python Model/scripts/prepare_data.py --src "dataset for KilnWatch.zip" --dst kilns --dry-run
 """
 
 import argparse

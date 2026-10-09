@@ -10,20 +10,30 @@ public struct Kiln: Codable, Hashable, Sendable, Identifiable {
     public let kilnId: String
     public let footprint: Footprint
     public let type: KilnType
-    /// The model's confidence in `type`, 0...1.
+    /// Predicted class score, 0...1; see provenance for calibration semantics.
     public let typeConfidence: Double
-    /// The model's confidence that a kiln exists here, 0...1.
+    /// May share the class score; not an independently calibrated existence probability.
     public let detectionConfidence: Double
     /// Scene time of the first and latest detections.
     public let firstSeen: Date
     public let lastSeen: Date
     public let violations: [Violation]
-    public let exposure: Exposure
+    public let exposure: Exposure?
     /// Changed only by an inspector's verdict or an approved review.
     public let status: KilnStatus
     public let evidence: Evidence
     /// Optional in older records; never an authorization claim.
     public let district: String?
+    public let rulesAssessment: String?
+    public let typeVerification: String?
+    public let provenance: DetectionProvenance?
+
+    /// Legacy records retain their former presentation; explicit model state overrides score.
+    public var typeMayBePresentedAsCertain: Bool {
+        if let typeVerification { return typeVerification == "verified" }
+        if provenance != nil { return false }
+        return typeConfidence >= 0.7
+    }
 
     public var id: String { kilnId }
 }
@@ -66,8 +76,36 @@ public struct Exposure: Codable, Hashable, Sendable {
 
 /// Before and after image patches on CloudFront.
 public struct Evidence: Codable, Hashable, Sendable {
-    public let before: URL
-    public let after: URL
+    public let before: URL?
+    public let after: URL?
+    public let beforeMetadata: EvidenceMetadata?
+    public let afterMetadata: EvidenceMetadata?
+}
+
+public struct DetectionProvenance: Codable, Hashable, Sendable {
+    public let sceneId: String
+    public let acquiredAt: Date
+    public let modelSha256: String
+    public let modelVersion: String
+    public let inputSha256: String
+    public let importedAt: Date
+    public let confidenceSemantics: String
+}
+
+public struct EvidenceMetadata: Codable, Hashable, Sendable {
+    public let sceneId: String
+    public let acquiredAt: Date
+    public let patchPx: Int
+    public let gsdM: Double
+    public let crs: String
+    public let geotransform: [Double]
+    public let footprintPx: [[Double]]?
+    public let centroidPx: [Double]
+    public let sha256: String
+    public let objectKey: String
+    public let attribution: String
+    public let nodataFraction: Double
+    public let rendering: String
 }
 
 // MARK: - Open enums: an unknown server value decodes to `.unknown(raw)` and re-encodes unchanged.

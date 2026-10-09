@@ -2,6 +2,18 @@
 
 Researched 2026-10-09. I queried the Earth Search STAC live for Hapur (28.73° N, 77.78° E).
 
+## Integration 1 implementation note
+
+The implemented contract preserves legacy `before`/`after` URL strings and adds
+`before_metadata`/`after_metadata`; the object-valued proposal below is superseded
+by `api-contract.md` for this bridge. Unpublished/unavailable URL sides are null.
+The preparer uses RGB source bands with each scene's STAC scale/offset and a fixed
+0–0.3 reflectance stretch, rather than the `visual` asset. This deliberate choice
+keeps the same explicit rendering across dates without per-patch normalization.
+The real pair is 2023-12-05 / 2026-10-05 on one native EPSG:32643 grid; no historical
+kiln outline, precise co-registration or change conclusion is asserted. Public
+CloudFront source is prepared, not deployed, and PNGs are still local/unpublished.
+
 ## Recommendation
 
 For each kiln, the backend cuts **two 256 × 256 px PNGs (2.56 km square, 10 m/px)** centred on the kiln centroid. Both come from the same Sentinel-2 MGRS tile and the **same UTM pixel grid**: "before" is the clearest 2023–24 kiln-season scene, and "after" is the October 2026 scene the detector ran on. Use the 8-bit `visual` (true-colour) asset for both, so they share one fixed stretch. Do not use the model's per-patch min-max normalisation, which changes contrast from patch to patch and invents "change". Serve the PNGs from **public CloudFront with immutable, content-hashed keys** and S3 behind Origin Access Control; do not use signed URLs. The app upscales with **`.interpolation(.none)` at an integer device-pixel factor**: honest square pixels suit a measuring instrument, and smoothing implies detail that 10 m data does not have. The backend sends the **footprint in patch pixel coordinates** alongside lat/lon, so the overlay never depends on map projection maths on the phone.

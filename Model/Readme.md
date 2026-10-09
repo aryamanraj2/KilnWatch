@@ -83,6 +83,26 @@ KilnWatch serves three users from the same registry:
 
 All public-facing results are described as **“flagged by satellite, pending inspection.”**
 
+## Integration 1 local bridge (2026-10-09)
+
+The supplied baseline `best.pt` loads as kiln-trained OBB; its identity/configuration
+are recorded in `results/checkpoint-manifest.json`. Matching `args.yaml`/`scores.json`
+were supplied; saved Kaggle version/weight-to-score linkage remains unverified.
+No training was run. The fixed Hapur local run produced 39 model-only candidates,
+with one aligned before/after evidence pair; these are pending inspection.
+
+From the repository root use `python Model/scripts/verify_checkpoint.py`,
+`python Model/scripts/detect_scene.py` and `python Model/scripts/prepare_evidence.py`.
+Integration dependencies are pinned in `Model/requirements-integration.txt`.
+Notebook paths now point to `KilnWatch/Model/scripts/`; the main run retains its
+9-hour time cap, without a claim of completion or guaranteed duration.
+
+Registry conversion/read API and the deployment sequence for review live in
+[`AWS/docs/first-record-runbook.md`](../AWS/docs/first-record-runbook.md).
+Raw imagery/GeoJSON, weights and local credentials stay ignored. **AWS has not
+been deployed; Phase 3 has not begun.** Type remains unverified at every score;
+model-only records contain no measured rules or population counts.
+
 ## Current priority
 
 We are deliberately building two tracks in parallel.

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "artifact": "best.pt",
+  "sha256": "<computed SHA-256>",
+  "task": "obb",
+  "classes": {"0": "CFCBK", "1": "FCBK", "2": "Zigzag"},
+  "model_version": "<run-name>:<hash-prefix>",
+  "checkpoint_ultralytics": "<embedded version>",
+  "checkpoint_saved_at": "<embedded timestamp>",
+  "external_run_identity": "<saved Kaggle version URL or local run identity>",
+  "supplied_args_sha256": "<computed SHA-256>",
+  "supplied_scores_sha256": "<computed SHA-256>",
+  "evaluation_linkage": "Config agreement is not cryptographic weight-to-score linkage."
+}

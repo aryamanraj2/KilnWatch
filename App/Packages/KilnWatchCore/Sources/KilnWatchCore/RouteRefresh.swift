@@ -34,7 +34,7 @@ public enum RouteRefresh: Sendable {
                 return .failure("Route access could not be verified. Check your account and retry.")
             case .status(let code, _):
                 return .failure("The route service returned \(code). Try again.")
-            case .decoding:
+            case .decoding, .invalidPagination:
                 return .failure("The route response could not be read. Your saved route has been preserved.")
             }
         }

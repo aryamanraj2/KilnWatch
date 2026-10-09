@@ -74,20 +74,21 @@ resource "aws_security_group" "ecs" {
 
 resource "aws_security_group" "lambda" {
   name        = "${var.project_name}-lambda-sg"
-  description = "Lambda to RDS only; egress restricted to VPC CIDR"
+  description = "Registry API: PostgreSQL and private Secrets Manager endpoint only"
   vpc_id      = aws_vpc.main.id
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [var.vpc_cidr]
-  }
 }
 
 resource "aws_security_group" "db" {
   name        = "${var.project_name}-db-sg"
-  description = "PostgreSQL accessible only from Lambda security group"
+  description = "Private PostgreSQL: API and optional controlled registry runner"
   vpc_id      = aws_vpc.main.id
+  ingress {
+    description = "PostgreSQL from controlled registry runner"
+    from_port = 5432
+    to_port = 5432
+    protocol = "tcp"
+    security_groups = [aws_security_group.registry_runner.id]
+  }
   ingress {
     description     = "PostgreSQL from Lambda"
     from_port       = 5432

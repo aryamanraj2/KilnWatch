@@ -53,15 +53,4 @@ resource "aws_cloudwatch_metric_alarm" "api_errors" {
 }
 
 
-resource "aws_iam_role_policy" "api_lambda_start_workflow" {
-  name = "${var.project_name}-start-workflow"
-  role = aws_iam_role.api_lambda.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = ["states:StartExecution"],
-      Resource = [aws_sfn_state_machine.inference.arn]
-    }]
-  })
-}
+# API read proof has no StartExecution permission; jobs remain 501.

@@ -1,6 +1,7 @@
 import Foundation
 
 public enum APIError: Error {
+    case invalidPagination
     /// No HTTP response: offline, timeout, TLS, cancelled.
     case transport(any Error)
     /// The token provider failed; the user probably needs to sign in again.
@@ -15,7 +16,7 @@ public enum APIError: Error {
         switch self {
         case .transport, .token: true
         case .status(let code, _): code >= 500 || [401, 408, 429].contains(code)
-        case .decoding: false
+        case .decoding, .invalidPagination: false
         }
     }
 }
@@ -36,7 +37,16 @@ public struct KilnWatchAPI: Sendable {
     public func kilns(district: String, status: KilnStatus? = nil) async throws(APIError) -> [Kiln] {
         var query = [URLQueryItem(name: "district", value: district)]
         if let status { query.append(URLQueryItem(name: "status", value: status.rawValue)) }
-        return try await send(URLRequest(url: baseURL.appending(path: "kilns").appending(queryItems: query)), as: KilnList.self).kilns
+        var result: [Kiln] = []
+        var seen: Set<String> = []
+        while true {
+            let page = try await send(URLRequest(url: baseURL.appending(path: "kilns").appending(queryItems: query)), as: KilnList.self)
+            result.append(contentsOf: page.kilns)
+            guard let cursor = page.nextCursor else { return result }
+            guard !cursor.isEmpty, !page.kilns.isEmpty, seen.insert(cursor).inserted else { throw .invalidPagination }
+            query.removeAll { $0.name == "cursor" }
+            query.append(URLQueryItem(name: "cursor", value: cursor))
+        }
     }
 
     public func kiln(id: String) async throws(APIError) -> Kiln {

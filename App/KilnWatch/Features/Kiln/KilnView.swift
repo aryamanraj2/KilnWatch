@@ -25,10 +25,17 @@ private struct KilnDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Space.xl) {
                 header
-                BeforeAfterComparator(kiln: kiln)
-                    .card()
+                if model.usesIllustrativeEvidence(for: kiln) {
+                    BeforeAfterComparator(kiln: kiln).card()
+                } else {
+                    Text(kiln.evidence.after == nil ? "Satellite imagery unavailable" : "Satellite evidence display pending integration")
+                        .font(.body).foregroundStyle(.inkSecondary).card()
+                }
                 section("Flagged rules", id: "rules") {
                     VStack(alignment: .leading, spacing: Space.l) {
+                        if kiln.rulesAssessment == "not_evaluated" || (kiln.rulesAssessment == nil && kiln.violations.isEmpty) {
+                            Text("Rules not evaluated").font(.body).foregroundStyle(.inkSecondary)
+                        }
                         ForEach(kiln.violations, id: \.ruleId) { violation in
                             RuleDistanceBar(violation: violation, kiln: kiln, color: model.status(for: kiln).color)
                         }
@@ -232,7 +239,7 @@ private struct SiteChecklist: View {
             ("Fuel on site", "Note coal, biomass or other fuel stocked at the kiln.", "shippingbox"),
             ("Distance to the nearest home",
              home.map { "Measured \(Int($0.measuredDistanceM ?? 0).grouped) m. Rule requires \(Int($0.thresholdM ?? 0).grouped) m." }
-                ?? "Confirm no homes within 800 m.",
+                ?? "Distance not measured. Identify the nearest home on site.",
              "ruler"),
         ]
     }

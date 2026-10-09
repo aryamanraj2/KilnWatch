@@ -4,7 +4,7 @@ Read this first in a new chat. Then read `App/docs/build-plan.md` and `App/docs/
 
 ## What this is
 
-KilnWatch is a satellite brick-kiln compliance system for NCR, built for the WeMakeDevs × AWS hack. This repo holds only the **iOS Inspector app**. The resident portal and the review console are web projects that live elsewhere. The concept PDF's text is in `App/docs/concept.txt`.
+KilnWatch is a satellite brick-kiln compliance system for NCR, built for the WeMakeDevs × AWS hack. The iOS Inspector app, AWS foundation and model pipeline have been merged into `main`, under `App/`, `AWS/` and `Model/`. The resident portal and review console are not implemented here. The concept PDF's text is in `App/docs/concept.txt`.
 
 ## How we work (user's rules)
 
@@ -12,7 +12,8 @@ KilnWatch is a satellite brick-kiln compliance system for NCR, built for the WeM
 - The orchestrator writes a phase prompt in `App/docs/prompts/NN-*.md`. The user runs it in a fresh chat and pastes the report back.
 - Top priority: polished, professional, soft UI with good SwiftUI animation and no AI-looking slop. `DESIGN.md` is binding.
 - Builder agents load the Axiom iOS skills. For research, use WebSearch first and Firecrawl when a page is gated.
-- Commit or push only when the user asks. The current branch is `PortalAPP`.
+- Commit or push only when the user asks. The current working branch is `main`.
+- Call the infrastructure/backend owner **AWS teammate**, and the model/training owner **ML team mate**.
 
 ## Repo layout
 
@@ -22,6 +23,8 @@ App/KilnWatch/                SwiftUI app (Design/, Design/Components/, Features
 App/Packages/KilnWatchCore/   Swift package: models, API client, offline outbox, tests
 App/docs/                     DESIGN.md, build-plan.md, api-contract.md, concept.txt,
                               prompts/, research/, screens/ (light, dark, ax3, video)
+AWS/                          Terraform foundation, placeholder Lambda API, agent container
+Model/                        preparation, training, scene detection, notebooks and baseline scores
 ```
 
 **Xcode gotcha:** never drag `KilnWatch.xcodeproj` into Xcode's file navigator. Doing that added a reference from the project to itself and caused the "NSPOSIXErrorDomain 22 Invalid argument" error on open. The fix was to remove the `projectReferences` and self file-ref entries from the pbxproj. Build with:
@@ -62,7 +65,38 @@ App/docs/                     DESIGN.md, build-plan.md, api-contract.md, concept
 - `evidence-imagery.md`: 256×256 PNGs shown with `.interpolation(.none)`, plus `footprint_px`. Re-cut the "before" images from Earth Search, because the dataset tiles are unusable (non-commercial licence, misaligned grid).
 - `routing.md`: the server sends stop order, access points and leg geometry. Hand off to Apple Maps one leg at a time, with a multi-waypoint Maps URL as a secondary option.
 
+## Integration 1 local bridge (2026-10-09)
+
+Prepared on `main`, sequentially, with no agents, deployment, training, commit/push
+or Phase 3 work. Verified supplied baseline OBB checkpoint (SHA prefix `3bcbcd0af696`),
+matching args/score configuration; saved Kaggle version/weight-to-score linkage still
+unverified. One fixed real Hapur run produced 39 candidates (55 raw / 120 patches).
+One real 256 px before/after pair is cut on a matched grid and inspected, still local
+and unpublished; no precise registration/change/field accuracy claim.
+
+Code now includes strict model/evidence conversion, idempotent transactional registry
+import/migrations, authenticated district read API, dependency packaging and minimum
+Terraform source for private secret access/credentials and evidence-only delivery.
+Core gains honest missing exposure/images, unassessed rules, unverified high-score type,
+provenance/image metadata and paginated list reads. Minimal presentation safeguards
+retain the binding design and stop real records using mock evidence. Live app registry
+fetching/image loading remain deferred.
+
+Verification: **22 Python tests passed; 2 actual PostGIS tests skipped** because local
+PostGIS/Docker is unavailable. **26 core tests passed**, including synthetic producer
+contract and the real local 39-record body; **root iPhone 17 build passed**; both Swift
+checks had **zero warnings**. Lambda ZIP/import/CA and notebook syntax/path checks
+passed. Terraform/AWS CLI unavailable, no plan/account or live AWS checks.
+
+Review [`AWS/docs/first-record-runbook.md`](../../AWS/docs/first-record-runbook.md)
+and [`AWS/docs/local-verification.md`](../../AWS/docs/local-verification.md). The
+**AWS teammate** must confirm account/state/district/publication/private runner and
+complete DB/plan/live proof after deployment authorization. The **ML team mate**
+still supplies saved-run identity and evidence interpretation. Phase 3 stays on hold.
+
 ## Known gaps and pending fixes
+
+Read `App/docs/integration-status.md` for the source inspection and first integration plan. The user confirms AWS is **not deployed yet**. The user supplied and the builder verified the existing baseline `best.pt`, then matching `args.yaml`/`scores.json`; the saved Kaggle version identity remains missing. Weights and raw GeoJSON are intentionally excluded from Git. Phase 3 is on hold while the model-to-AWS record/evidence bridge is prepared.
 
 1. The BeforeAfterComparator mock still uses an Apple snapshot. Pixelated 256 px imagery and the mini-map buffer ring belong to Phase 3.
 2. Live route verification needs the real endpoint/token and backend confirmation of access points, geometry/axis order, route timing and error semantics. The sample geometry is schematic, not verified road routing.
@@ -80,6 +114,7 @@ App/docs/                     DESIGN.md, build-plan.md, api-contract.md, concept
 
 ## Next steps (in order, one at a time)
 
-1. Phase 2 completion and verification evidence are recorded; its implementation remains uncommitted on `PortalAPP`. Commit or push only on an explicit user request. Live backend and successful road guidance remain unverified.
-2. Await the user's go for the Phase 3 prompt: Kiln card and evidence imagery, using the pixelated comparator and mini-map buffer ring. Do not begin implementation automatically.
-3. Phase 4: Ask with the agent stream. Phase 5: verdict capture, outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.
+1. Phase 2 was committed and merged with model/AWS source into `main`. Live backend and successful road guidance remain unverified. Commit or push further work only on an explicit user request.
+2. Integration 1 local implementation/contract proof is prepared from `App/docs/prompts/05-model-aws-bridge.md`. Review its runbook and remaining inputs with the **AWS teammate** and **ML team mate**; real PostGIS persistence and live deployment verification remain unrun. No live deployment is authorized by that prompt.
+3. Review the source/tests and deployment plan, then authorize and verify the first real record through AWS. Resume Phase 3 evidence UI after the contract and required images are available; do not begin automatically.
+4. Phase 4: registry-backed Ask/agent stream and real route planning. Phase 5: verdict capture, outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.
