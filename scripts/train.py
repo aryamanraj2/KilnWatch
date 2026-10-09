@@ -70,6 +70,9 @@ def main():
                     help="'ram' caches all tiles in memory (~4 GB for the full set)")
     ap.add_argument("--fraction", type=float, default=1.0,
                     help="train on this share of the train set -- for smoke tests")
+    ap.add_argument("--hours", type=float,
+                    help="stop after this many hours, with the learning-rate schedule fitted "
+                         "to it (overrides --epochs) -- keeps a run inside Kaggle's 12 h limit")
     ap.add_argument("--eval", action="append", metavar="NAME=YAML",
                     help="test sets to score; default full and strict next to --data")
     ap.add_argument("--s3", help="s3://bucket/prefix to upload the run to")
@@ -83,14 +86,15 @@ def main():
     model = YOLO(args.model)
     model.train(data=str(args.data), epochs=args.epochs, imgsz=args.imgsz, batch=args.batch,
                 project=args.project, name=args.name, exist_ok=True, cache=args.cache,
-                fraction=args.fraction, seed=0)
+                fraction=args.fraction, seed=0, time=args.hours)
     run_dir = Path(model.trainer.save_dir)
     minutes = (time.time() - start) / 60
 
     best = YOLO(run_dir / "weights" / "best.pt")
     scores = {
         "model": args.model, "data": str(args.data), "epochs": args.epochs,
-        "imgsz": args.imgsz, "batch": args.batch, "fraction": args.fraction,
+        "imgsz": args.imgsz, "batch": args.batch, "fraction": args.fraction, "hours": args.hours,
+        "epochs_run": model.trainer.epoch + 1,
         "train_minutes": round(minutes, 1),
         "dataset": "SentinelKilnDB (Kaggle rishabhsnip/sentinelkiln-dataset), CC BY-NC 4.0",
         "ultralytics": ultralytics.__version__,
