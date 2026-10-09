@@ -1,6 +1,6 @@
 # KilnWatch: model, AWS and app integration status
 
-Inspected 2026-10-09 on `main`, starting at `eb78715`. This is a source inspection, not a deployment or runtime audit. The user confirms **AWS is not deployed yet**. AWS CLI and Terraform were not available on this chat's shell PATH; no account inventory, cloud writes, training or deployment was performed.
+Inspected 2026-10-09 on `main`, starting at `eb78715`. This is a source inspection, not a deployment or runtime audit. (Historical: at inspection time AWS was not deployed; it was deployed in Integration 2B.) AWS CLI and Terraform were not available on this chat's shell PATH; no account inventory, cloud writes, training or deployment was performed.
 
 ## Integration 1 builder results (2026-10-09)
 
@@ -46,6 +46,23 @@ Handoff: **ML team mate** supplies saved-run identity/evidence interpretation;
 **AWS teammate** confirms account/state/district/publication, completes real DB tests
 and reviews the deployment plan before authorized cloud writes; **App** reviews the
 contract and waits for live proof before a separately requested Phase 3.
+
+## Integration 2B — live deployment (2026-10-10)
+
+**AWS is deployed in `ap-south-1` (73/75 resources) with the 39 real Hapur records
+live behind the API.** Evidence: `AWS/docs/local-verification.md` (Integration 2B) and
+the runbook's "Deployed state (Integration 2B)".
+
+- Apply created everything except CloudFront + its bucket policy: AWS requires account
+  verification first (Support case in progress). Image publication waits on it; the
+  detail record has image metadata and null URLs.
+- Private runner: migrate, reader bootstrap, import 39/39, replay 0/0; reader SELECT 39,
+  INSERT `42501`.
+- Live: gateway 401 without/with a malformed token, `/public/kilns` 503, health 200.
+  Direct Lambda invokes (synthetic claims): list 39, 4 pages of 10, detail 200, 403/404/
+  400/501/503 refusals. Swift decodes the live body (26 tests pass).
+- **Decision (user):** the iOS app is a demo video with placeholder data; no sign-in and
+  no Cognito test inspector. Real-token checks were not run.
 
 ## Integration 2A — local database proof and deployment preflight (2026-10-09)
 

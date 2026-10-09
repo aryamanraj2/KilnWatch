@@ -105,9 +105,21 @@ only AWS write is the state bucket `kilnwatch-tfstate-<account-id>-ap-south-1`. 
 read-only plan shows 75 resources to add; estimated ≈ $38/month always-on before
 credits. **No apply.** Integration 2B (deployment) needs explicit authorization.
 
+## Integration 2B live deployment (2026-10-10)
+
+AWS is **deployed** in `ap-south-1`: 73 of 75 planned resources, with the 39 real Hapur
+candidates migrated/imported into private RDS (replay 0/0) and served by the live
+Lambda. CloudFront (evidence delivery) is blocked until AWS verifies the account; the
+user opened a Support case. After that: apply the 2-resource remainder, publish the two
+PNGs, re-import with the receipt, run the CloudFront denial probe, then remove the
+temporary runner (5 destroy / 1 change). **User decision:** the app is shown in a demo
+video with placeholder data and needs no sign-in; no Cognito test user or real-token
+checks. Budget alert USD 50/month is on. Always-on cost ≈ $38/month (2A estimate) plus
+the runner (~$0.42/day) until removed. Details: `AWS/docs/local-verification.md`.
+
 ## Known gaps and pending fixes
 
-Read `App/docs/integration-status.md` for the source inspection and first integration plan. The user confirms AWS is **not deployed yet**. The user supplied and the builder verified the existing baseline `best.pt`, then matching `args.yaml`/`scores.json`; the saved Kaggle version identity remains missing. Weights and raw GeoJSON are intentionally excluded from Git. Phase 3 is on hold while the model-to-AWS record/evidence bridge is prepared.
+Read `App/docs/integration-status.md` for the source inspection and first integration plan. AWS is deployed (Integration 2B, CloudFront pending). The user supplied and the builder verified the existing baseline `best.pt`, then matching `args.yaml`/`scores.json`; the saved Kaggle version identity remains missing. Weights and raw GeoJSON are intentionally excluded from Git. Phase 3 is on hold while the model-to-AWS record/evidence bridge is prepared.
 
 1. The BeforeAfterComparator mock still uses an Apple snapshot. Pixelated 256 px imagery and the mini-map buffer ring belong to Phase 3.
 2. Live route verification needs the real endpoint/token and backend confirmation of access points, geometry/axis order, route timing and error semantics. The sample geometry is schematic, not verified road routing.
@@ -126,6 +138,6 @@ Read `App/docs/integration-status.md` for the source inspection and first integr
 ## Next steps (in order, one at a time)
 
 1. Phase 2 was committed and merged with model/AWS source into `main`. Live backend and successful road guidance remain unverified. Commit or push further work only on an explicit user request.
-2. Integration 1 (committed `6092cf8`) and Integration 2A preflight are done. The orchestrator reviews the 2A report, plan and cost estimate; then the user authorizes Integration 2B: apply, private migration/import/bootstrap, evidence publication, an inspector account and live smoke tests.
-3. Review the source/tests and deployment plan, then authorize and verify the first real record through AWS. Resume Phase 3 evidence UI after the contract and required images are available; do not begin automatically.
+2. Integrations 1, 2A and 2B are done, except CloudFront: after AWS account verification, finish evidence publication, the denial probe and runner removal (runbook "Deployed state").
+3. Phase 3 (real registry and evidence UI) is next, pending the user's request. The app needs no sign-in (demo video); Phase 3 inputs are the output names in the runbook's "Deployed state".
 4. Phase 4: registry-backed Ask/agent stream and real route planning. Phase 5: verdict capture, outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.

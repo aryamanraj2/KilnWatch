@@ -1,9 +1,10 @@
-# Integration 1 first-record deployment runbook — REVIEW ONLY
+# Integration 1 first-record deployment runbook
 
-Prepared 2026-10-09 on main. **AWS is not deployed. No commands that mutate AWS,
-publish objects, migrate/import RDS, train, commit or push were executed.**
-Phase 3 remains on hold. A later explicit deployment request authorizes live writes.
-The commands below are a concrete review sequence, not an instruction to deploy now.
+Prepared 2026-10-09 on main; **executed in Integration 2B (2026-10-10)**. Current state:
+73 of 75 resources deployed in `ap-south-1`, migration/bootstrap/import done (39
+records live behind the API). CloudFront is blocked by an AWS account-verification gate,
+so §7 publication is pending. See "Deployed state (Integration 2B)" at the end and
+`local-verification.md`. Commands below now include the corrections found in 2B.
 
 ## Verified local inputs and checks
 
@@ -261,17 +262,27 @@ tar --exclude=__pycache__ -czf .local/integration-1/operator-source.tgz \
 # Upload only the required inputs, never previews or real list/detail JSON:
 aws s3 cp .local/integration-1/hapur.geojson 's3://<data-bucket>/imports/integration-1/hapur.geojson'
 aws s3 cp .local/integration-1/operator-source.tgz 's3://<data-bucket>/imports/integration-1/operator-source.tgz'
-aws s3 cp .local/integration-1/evidence/ 's3://<data-bucket>/imports/integration-1/evidence/' --recursive
+for f in manifest.json <before-sha>.png <after-sha>.png; do
+  aws s3 cp ".local/integration-1/evidence/$f" "s3://<data-bucket>/imports/integration-1/evidence/$f"; done
 # The publication receipt follows separately in section 7.
-aws ssm start-session --target '<registry-runner-id>'
+# Run the runner steps below with non-interactive SSM (correction 2), e.g.
+#   aws ssm send-command --instance-ids '<registry-runner-id>' --document-name AWS-RunShellScript \
+#     --parameters file://<script-params.json>
+#   aws ssm get-command-invocation --command-id <id> --instance-id '<registry-runner-id>'
+# after `aws ssm describe-instance-information` shows the runner Online.
 ```
 
 On the approved SSM runner, using its instance role (no copied AWS access keys):
 
 ```sh
-sudo dnf install -y python3.12 python3.12-pip
-mkdir -p ~/kilnwatch-proof && cd ~/kilnwatch-proof
-aws s3 cp 's3://<data-bucket>/imports/integration-1/' input/ --recursive
+# Verified 2026-10-10 on AL2023 2023.12 (system Python 3.9): gives 3.12.14 / pip 23.2.1.
+dnf install -y python3.12 python3.12-pip      # SSM runs as root; HOME may be unset
+export HOME=/root; mkdir -p ~/kilnwatch-proof && cd ~/kilnwatch-proof
+# Correction 1: the runner may only GetObject on imports/*, not list it. Fetch exact keys.
+P='s3://<data-bucket>/imports/integration-1'
+for k in hapur.geojson operator-source.tgz evidence/manifest.json \
+         evidence/<before-sha>.png evidence/<after-sha>.png; do
+  aws s3 cp "$P/$k" "input/$k"; done
 tar -xzf input/operator-source.tgz
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r AWS/requirements-operator.txt
@@ -318,9 +329,12 @@ these checks, not guesswork:
    role). Verify the reader login, then stop if it fails and use a reviewed
    rotation; never drop the role ad hoc:
 
+   The runner role cannot read the reader secret (it may only write it), so verify as
+   admin in a rolled-back transaction instead (used in 2B):
+
    ```sh
-   DB_SECRET='<registry-reader-secret-arn>' PYTHONPATH=AWS .venv/bin/python -c \
-     "from registry.db import connect_from_env as c; k=c().cursor(); k.execute('SELECT COUNT(*) FROM kilnwatch.candidates'); print(k.fetchone()[0])"
+   PYTHONPATH=AWS .venv/bin/python -c "from registry.db import connect_from_env as c; n=c(); k=n.cursor(); \
+     k.execute('SET LOCAL ROLE kilnwatch_api'); k.execute('SELECT COUNT(*) FROM kilnwatch.candidates'); print(k.fetchone()[0]); n.rollback()"
    ```
 
 Validate all inputs before opening the write transaction. Any database failure rolls
@@ -581,7 +595,9 @@ become 503 inside the handler, so the Lambda `Errors` alarm cannot see them (fin
 ### Temporary runner cleanup
 
 After preserving verification evidence, set `create_registry_runner=false` and apply a
-reviewed plan; it removes only the 5 runner resources. Delete the runner's
+reviewed plan. Correction 3: expect **5 to destroy and 1 to change** — the Secrets
+Manager endpoint policy is updated in place to drop the runner's `PutSecretValue`
+statement. Delete the runner's
 `~/kilnwatch-proof` beforehand (it holds the CA bundle and inputs, no credentials).
 Remove `imports/integration-1/` objects once they are no longer needed. Do not destroy
 RDS or data.
@@ -650,3 +666,35 @@ any excluded services under Billing → Credits.
 - [PostGIS ST_GeomFromGeoJSON](https://postgis.net/docs/ST_GeomFromGeoJSON.html) and
   [ST_IsValid](https://postgis.net/docs/ST_IsValid.html) — geometry construction/validity.
 - [Ultralytics OBB](https://docs.ultralytics.com/tasks/obb/) — custom weights/task/class interface.
+
+## Deployed state (Integration 2B, 2026-10-10)
+
+- **Live:** 73/75 resources (network, private RDS 17.9 + PostGIS 3.5.6, Secrets Manager
+  endpoint, Lambda/HTTP API/Cognito pool, data bucket, scaffolding, alarm). Schema
+  migrated, reader `kilnwatch_api` bootstrapped, 39 Hapur candidates imported (replay
+  0/0). Runner still running (kept until publication finishes). Budget alert on.
+- **Blocked:** `aws_cloudfront_distribution.evidence` and `aws_s3_bucket_policy.evidence`.
+  CloudFront returned `AccessDenied: Your account must be verified before you can add new
+  CloudFront resources`. Fix: AWS Support case (Account and billing). Then
+  `terraform plan` (expect 2 to add, 0 change, 0 destroy), apply, and continue at §7.
+- **Fixed during 2B:** `rds.force_ssl` now pins `apply_method = "pending-reboot"`
+  (static parameter; avoids a perpetual diff RDS would reject).
+- **Ordering note:** the runner's inline policy waits for the RDS master-secret ARN, so
+  runner S3/secret access starts only after RDS is created.
+- **Skipped by user decision:** Cognito test inspector and real-token checks (the app is
+  a demo video with placeholders and will not sign in). `scripts/id_token.py` is ready if
+  that changes. Unauthenticated gateway refusals and direct Lambda invokes with synthetic
+  claims were verified instead (see `local-verification.md`).
+- **Workstation boto3 scripts** (`upload_evidence.py`, `verify_publication.py`,
+  `id_token.py`) with an `aws login` profile: run inside
+  `( eval "$(aws configure export-credentials --profile kilnwatch --region ap-south-1 --format env)"; … )`
+  rather than adding `botocore[crt]`.
+- **Remaining after verification:** §7 upload + `verify_publication.py` + receipt
+  re-import; CloudFront denial probe (`imports/integration-2b/cloudfront-denial-probe.txt`,
+  non-PNG `evidence/` path, missing `models/` key, direct S3 URL — all 403; delete probe);
+  then runner cleanup (delete `~/kilnwatch-proof`, 5 destroy / 1 change, delete
+  `imports/integration-1/operator-source.tgz`). The Lambda log group
+  `/aws/lambda/kilnwatch-api` now exists with no retention limit.
+- **Phase 3 outputs** (values only in ignored `.local/integration-2b/outputs.json`):
+  `api_base_url`, `cognito_user_pool_id`, `cognito_app_client_id`, `cognito_issuer`,
+  `evidence_base_url` (absent until CloudFront exists).

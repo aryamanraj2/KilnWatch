@@ -220,3 +220,117 @@ Regenerable: `.venv-integration/` (from the requirements files), `AWS/build/`
 (`package_api.py`), previews and real list/detail JSON (from the inputs above).
 **Not regenerable:** the weights `best.pt`; without them the 39 candidates cannot be
 reproduced.
+
+# Integration 2B — live deployment (2026-10-10)
+
+Sequential, no agents, `kilnwatch` profile (IAM user `aryaman`, account matched
+`backend.hcl`). No commits, pushes, inference, training, optional services or Phase 3.
+Identifiers and Terraform outputs are kept only in ignored
+`.local/integration-2b/outputs.json`; this document refers to output names.
+
+## Status: deployed except CloudFront
+
+- **73 of 75 planned resources are live in `ap-south-1`.** CloudFront refused
+  `CreateDistributionWithTags` with `AccessDenied: Your account must be verified before
+  you can add new CloudFront resources` (an AWS account-level gate, not a code or IAM
+  issue). The user is opening an AWS Support case. A fresh plan shows exactly the
+  reviewed remainder: **2 to add** (`aws_cloudfront_distribution.evidence`,
+  `aws_s3_bucket_policy.evidence`), 0 change, 0 destroy. Saved privately as
+  `2b-remainder.tfplan`; apply it after AWS confirms verification.
+- Evidence publication, the receipt re-import and the CloudFront denial proof are
+  therefore **not run**. The detail record carries image metadata and `null` URLs.
+- **Auth decision (user, 2026-10-10):** the iOS app is for a demo video with
+  placeholder data and will not sign in. No Cognito test inspector was created and no
+  real ID token was used. `AWS/scripts/id_token.py` exists for later use and is unrun.
+
+## Preflight
+
+- Lock file byte-identical (`3238e308…`) after `init -backend-config=backend.hcl
+  -lockfile=readonly`. Lambda ZIP unchanged: SHA-256 `beeec4f9…ee661b9`; packaged files
+  equal current source; deployed `CodeSha256` matches.
+- Python suite without a database: 30 run, OK, 8 skipped.
+- Plan: 75 to add, 0 change, 0 destroy; resource set identical to the 2A plan.
+- AWS Budget `kilnwatch-monthly-50` created (USD 50/month; email at 80% actual and
+  100% forecast).
+
+## Apply and post-apply checks
+
+Apply ran 19:15–19:27 UTC (RDS 7 m 58 s), then failed on CloudFront as above. No
+destroy. Read-only checks:
+
+- RDS: `PubliclyAccessible=false`, `StorageEncrypted=true`, `DeletionProtection=true`,
+  `BackupRetentionPeriod=7`, PostgreSQL 17.9, parameter group `in-sync`.
+- Parameters: `rds.force_ssl=1`, `log_statement=none` (catalogue and live `SHOW`).
+- Plan drift fixed: the provider defaulted `apply_method=immediate` on the static
+  `rds.force_ssl`, while RDS reports `pending-reboot`; the next plan showed a perpetual
+  in-place change that RDS would reject. `database.tf` now pins
+  `apply_method = "pending-reboot"`. Value and security unchanged.
+- Lambda: `python3.12`, `x86_64`, two private subnets, one SG; inline policy names only
+  the reader secret (no master secret).
+- Data bucket: all four public access blocks on.
+- `GET /health` → 200, `registry_readiness: not_checked`.
+
+## Runner (SSM, non-interactive)
+
+- AL2023 2023.12 ships Python 3.9. `dnf install -y python3.12 python3.12-pip` gave
+  Python 3.12.14 / pip 23.2.1. Venv from `requirements-operator.txt`: pg8000 1.31.5,
+  boto3 1.42.73, pyproj 3.7.2. RDS CA bundle: 111 certificates.
+- The first exact-key download returned 403: the runner's inline policy references the
+  RDS master-secret ARN, so Terraform creates it only after RDS finishes. It worked once
+  apply reached that point. Inputs verified by SHA-256 on the runner.
+- `migrate` → applied `001_registry.sql`. Server: PostgreSQL 17.9, PostGIS 3.5.6, TLSv1.3.
+- `bootstrap_reader.py` → reader login provisioned (first run, no recovery needed).
+- `validate` → 39 records; input SHA `b1e9d177…`, evidence manifest SHA `7432c03d…`.
+- `import` → 39 candidates / 39 observations; replay → **0 / 0** (same run ID).
+- **Reader:** the runner role cannot *read* the reader secret (by design it may only
+  write it), so `connect_from_env` with that secret is not possible there; IAM was not
+  widened. As admin in a rolled-back transaction, `SET LOCAL ROLE kilnwatch_api`:
+  `SELECT COUNT(*) FROM kilnwatch.candidates` = 39; `INSERT` → `42501`.
+  `has_table_privilege`: SELECT true; INSERT/UPDATE/DELETE false. The reader secret
+  itself was exercised by the live Lambda (below).
+
+## Live API
+
+Two kinds of evidence, reported separately:
+
+**Through API Gateway (real HTTPS, no token):**
+
+| Request | Result |
+|---|---|
+| `GET /kilns?district=Hapur`, no token | 401 |
+| Same, malformed bearer | 401 |
+| `GET /kilns/{id}`, no token | 401 |
+| `POST /jobs`, no token | 401 |
+| `GET /public/kilns` | 503 `publication_unavailable`, no private fields |
+| `GET /health` | 200 `not_checked` |
+
+**Direct `lambda:Invoke` by the operator with synthetic Hapur inspector claims**
+(correct `aud`; bypasses API Gateway and Cognito, so it is *not* proof of the JWT
+authorizer accepting a real token). This exercises the deployed Lambda → private
+Secrets Manager endpoint → reader secret → RDS TLS path:
+
+| Request | Result |
+|---|---|
+| `GET /kilns?district=Hapur` | 200, 39 records, all `flagged`/`pending`, `type_verification=unverified`, `rules_assessment=not_evaluated`, exposure null |
+| `limit=10` paging | 4 pages, 39 unique IDs, final `next_cursor` null |
+| `GET /kilns/KW-6b3b38da681850e5af46b024f3d3f78e` | 200; before/after metadata SHAs present; URLs null (not published) |
+| `district=Meerut` | 403 `forbidden_district` |
+| Unknown well-formed ID | 404 |
+| `status=bad`, `limit=0` | 400 `invalid_filter` |
+| `POST /jobs` | 501 |
+| `/public/kilns` | 503 |
+
+Not run: Cognito user, real ID-token requests, image HTTPS/checksum checks, database
+outage test (proven locally in 2A; not to be run live).
+
+Workstation note: `aws login` sessions need `botocore[crt]` for boto3 scripts. Instead of
+adding a dependency, run them with
+`eval "$(aws configure export-credentials --profile kilnwatch --region ap-south-1 --format env)"`
+in a subshell (credentials stay in the environment, never printed or in arguments).
+
+## Swift
+
+`KILNWATCH_REAL_CONTRACT_LIST=<abs>/.local/integration-2b/live-list.json swift test` →
+**26 tests passed**, zero warnings, including
+`localRealDetectionContractDecodesThroughExistingClient`. Decoding proof only; the app
+did not contact AWS.
