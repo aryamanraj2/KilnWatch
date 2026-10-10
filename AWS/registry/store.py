@@ -46,7 +46,7 @@ WHERE e.metadata->>'published_url' IS NULL OR e.sha256=EXCLUDED.sha256''',
         cursor.close()
 
 
-# Replaces only the rules keys, so exposure or later assessment fields written elsewhere survive.
+# Replaces the rule keys; exposure is overwritten only when the batch supplies it (jsonb || merge).
 ASSESS = 'UPDATE kilnwatch.candidates SET assessment=(assessment' + ''.join(f" - '{k}'" for k in RULE_KEYS) + ')||%s::jsonb WHERE kiln_id=%s'
 
 

@@ -166,6 +166,13 @@ Read `App/docs/integration-status.md` for the source inspection and first integr
 - **Swift build and tests have not run** (no Xcode here). Run the prescribed `xcodebuild` and `swift test` on the Mac.
 - Nothing was migrated or written to RDS.
 
+**Population exposure (2026-10-10):**
+- `AWS/rules/exposure.py` sums Meta/CIESIN HRSL v1.5.2 (pinned tiles, CC BY 4.0) within 800 m of each footprint edge: all people, children under 5 and adults over 60.
+- It is fetched once to `.local/rules/hapur_hrsl.tif`. `apply-assessment` writes `exposure` with its provenance.
+- Hapur: all 39 kilns assessed, median 4,228 people (range 60 to 25,701). An independent rasterised-mask cross-check agreed to within 0.14%.
+- Python: 55 tests, OK, 10 skipped.
+- Optional Swift follow-up: label real records' exposure "Within 800 m". The radius is fixed at 800 m but not yet shown, because `KilnView` passes `bufferRadiusM: nil` for non-fixture kilns.
+
 ## Phase 3 (overnight run) — 2026-10-10
 
 **Partly done:** the no-login iOS app now loads 39 real Hapur kilns from the configured public API, with on-demand detail, honest missing evidence/rules/exposure, unverified type/model score, recoverable network states and a real Today map without fabricated routes. Fixture routing remains. Final core checks report 34 functions (33 passed, one existing opt-in skip; 55 executed cases); prescribed root iPhone 17 build and core checks have zero warnings. Light/dark, AX3/AX5 and Reduce Motion were verified. After three fix cycles, the detail marker still obscures its small footprint; navigation immediately after active search remains unverified. Published remote imagery awaits CloudFront; spoken VoiceOver, physical device and actual missing-config build remain unrun. No staging, commit, push, cloud or later-phase work; protected files and existing Phase 2 logs are preserved. See [morning report](screens/phase-3/overnight-report.md) and [file inventory](screens/phase-3/changed-files.md). The one-run agent exception has ended; normal no-agents rules resume.

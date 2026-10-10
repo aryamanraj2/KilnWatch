@@ -4,8 +4,11 @@ import unittest
 from pyproj import Geod
 from shapely.geometry import box, mapping
 
+import numpy as np
+from rasterio.transform import from_origin
+
 from registry.contract import assessment_patches, public_view, serialize
-from rules import engine, osm
+from rules import engine, exposure, osm
 
 GEOD = Geod(ellps='WGS84')
 LAT, LON = 28.73, 77.78                      # Hapur
@@ -149,6 +152,35 @@ class OsmTests(unittest.TestCase):
         self.assertEqual(self.layers_of(rel), [('orchards', 'MultiPolygon')])
 
 
+class ExposureTests(unittest.TestCase):
+    CELL = 1 / 3600                                     # HRSL's 1 arc-second grid
+
+    def grid(self, people=0.0, n=240, hot=()):
+        """n x n cells centred on Hapur; hot = [(east_m, north_m, people)] single cells."""
+        west, north = LON - n / 2 * self.CELL, LAT + n / 2 * self.CELL
+        t = from_origin(west, north, self.CELL, self.CELL)
+        bands = [np.full((n, n), people, dtype='float32') for _ in exposure.LAYERS]
+        for east_m, north_m, value in hot:
+            col, row = ~t * offset(LON, LAT, east_m, north_m)
+            for b, share in zip(bands, (1, 0.1, 0.06)):
+                b[int(row), int(col)] = value * share
+        return exposure.Grid(bands, t)
+
+    def test_cells_inside_ring_count_and_outside_do_not(self):
+        g = self.grid(hot=[(0, 700, 100), (0, -900, 1000)])   # 700 m and 900 m from the centre
+        self.assertEqual(exposure.assess([kiln('KW-1')], g)[0], {'people': 100, 'children_under_five': 10, 'adults_over_sixty': 6})
+
+    def test_uniform_density_matches_ring_area(self):
+        counted = exposure.assess([kiln('KW-1')], self.grid(people=1.0))[0]['people']
+        ring_m2 = 80 ** 2 + 4 * 80 * 800 + np.pi * 800 ** 2           # 80 m square buffered by 800 m
+        _, _, dx = GEOD.inv(LON, LAT, LON + self.CELL, LAT)
+        _, _, dy = GEOD.inv(LON, LAT, LON, LAT + self.CELL)
+        self.assertAlmostEqual(counted, ring_m2 / (dx * dy), delta=0.02 * counted)
+
+    def test_ring_outside_grid_is_unassessed(self):
+        self.assertIsNone(exposure.assess([kiln('KW-1')], self.grid(people=1.0, n=40))[0])
+
+
 class RegistryWriteTests(unittest.TestCase):
     """The registry side: what apply-assessment accepts and what readers then see."""
     def body(self, ids=('KW-' + 'a' * 32,)):
@@ -176,6 +208,20 @@ class RegistryWriteTests(unittest.TestCase):
         b = self.body(); b['assessments'][0]['violations'][0]['note'] = 'extra'
         with self.assertRaises(ValueError):
             assessment_patches(b)
+
+    def test_exposure_needs_counts_and_provenance(self):
+        b = self.body()
+        b['assessments'][0]['exposure'] = {'people': 4225, 'children_under_five': 430, 'adults_over_sixty': 294}
+        with self.assertRaises(ValueError):
+            assessment_patches(b)                       # no population provenance
+        b['inputs'].update(population_source='HRSL v1.5.2', population_sha256='p', exposure_radius_m=800)
+        (_, patch), = assessment_patches(b)
+        self.assertEqual(patch['exposure']['people'], 4225)
+        self.assertEqual(patch['exposure_inputs']['exposure_radius_m'], 800)
+        for bad in ({'people': 1.5, 'children_under_five': 0, 'adults_over_sixty': 0}, {'people': 1}, {'people': -1, 'children_under_five': 0, 'adults_over_sixty': 0}):
+            b['assessments'][0]['exposure'] = bad
+            with self.assertRaises(ValueError):
+                assessment_patches(b)
 
     def test_readers_see_flags_but_not_internal_results(self):
         (_, patch), = assessment_patches(self.body())

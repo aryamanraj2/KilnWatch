@@ -281,7 +281,7 @@ clients must adopt these optionals before consuming candidate records.
 
 | Field | Candidate semantics |
 |---|---|
-| `exposure` | `null` when not assessed; when supplied, all three counts remain required integers |
+| `exposure` | `null` when not assessed; when supplied, all three counts remain required integers. Rules engine: HRSL v1.5.2 cells whose centre lies within 800 m of the footprint edge (`AWS/rules/exposure.py`) |
 | `rules_assessment` | `not_evaluated` until the rules engine runs, then `evaluated` or `partially_evaluated` (some rules lacked data; see `AWS/rules/README.md`); legacy absence means assessment state unknown, never passed |
 | `violations` | Empty for an unassessed candidate; after assessment, the rules measured inside their threshold. Never a compliance conclusion, and an empty list after `partially_evaluated` is not a clean result |
 | `type_verification` | `unverified` for model candidates regardless of class score; no C-TECH-10K finding |

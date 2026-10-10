@@ -147,11 +147,12 @@ def convert(collection, district, input_sha256, imported_at):
 RULE_KEYS = ('violations', 'rules_assessment', 'rules_results', 'rules_version', 'rules_inputs')
 RULE_STATUSES = ('within_threshold', 'beyond_threshold', 'inconclusive', 'not_evaluated', 'not_applicable')
 VIOLATION_KEYS = {'rule_id', 'measured_distance_m', 'threshold_m', 'source', 'evidence_url', 'measured_to'}
+EXPOSURE_KEYS = {'people', 'children_under_five', 'adults_over_sixty'}
 
 
 def assessment_patches(body):
     """Rules-engine output (AWS/rules) -> [(kiln_id, assessment keys)]. Validates the whole
-    batch before anything is written; only the rule keys are ever replaced."""
+    batch before anything is written; only the rule keys, and exposure when supplied, are replaced."""
     if not isinstance(body.get('rules_version'), str) or not isinstance(body.get('assessments'), list):
         raise ValueError('expected rules engine output')
     inputs = {k: body['inputs'].get(k) for k in ('kilns_sha256', 'layers_sha256', 'osm_base')}
@@ -180,7 +181,15 @@ def assessment_patches(body):
         flagged = sorted(r['rule_id'] for r in a['rules_results'] if r['status'] == 'within_threshold')
         if flagged != sorted(v['rule_id'] for v in a['violations']):
             raise ValueError('violations disagree with rule results')
-        out.append((a['kiln_id'], {'violations': a['violations'], 'rules_assessment': a['rules_assessment'],
-                                   'rules_results': a['rules_results'], 'rules_version': a['rules_version'],
-                                   'rules_inputs': inputs}))
+        patch = {'violations': a['violations'], 'rules_assessment': a['rules_assessment'],
+                 'rules_results': a['rules_results'], 'rules_version': a['rules_version'], 'rules_inputs': inputs}
+        if 'exposure' in a:
+            e = a['exposure']
+            if not isinstance(e, dict) or set(e) != EXPOSURE_KEYS or any(isinstance(v, bool) or not isinstance(v, int) or v < 0 for v in e.values()):
+                raise ValueError('exposure needs three non-negative integer counts')
+            if not body['inputs'].get('population_source') or not body['inputs'].get('exposure_radius_m'):
+                raise ValueError('exposure without population provenance')
+            patch['exposure'] = e
+            patch['exposure_inputs'] = {k: body['inputs'][k] for k in ('population_source', 'population_sha256', 'exposure_radius_m')}
+        out.append((a['kiln_id'], patch))
     return out

@@ -1,7 +1,8 @@
 """python -m rules.cli {fetch,assess}: local siting checks; never writes to the registry.
 
   fetch   OSM layers around the kilns  -> layers GeoJSON (ODbL, keep under .local/)
-  assess  kilns + layers + rules       -> per-kiln assessment JSON
+          and, with --population, HRSL population -> GeoTIFF (CC BY 4.0, keep under .local/)
+  assess  kilns + layers + rules       -> per-kiln assessment JSON, with exposure if --population
 Kilns come from a public API list URL, a registry JSON body ({"kilns": [...]}) or a
 detect_scene.py GeoJSON (registry IDs need --district; older files also --artifact-manifest/--acquired-at)."""
 import argparse
@@ -17,7 +18,7 @@ import urllib.request
 
 from shapely.geometry import box
 
-from . import engine, osm
+from . import engine, exposure, osm
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from registry.contract import canonical, convert  # noqa: E402
@@ -116,6 +117,7 @@ def main():
     ap.add_argument('--state', default='UP')
     ap.add_argument('--layers', type=Path, help='OSM layers GeoJSON (fetch writes it, assess reads it)')
     ap.add_argument('--out', type=Path, help='assessment JSON (assess)')
+    ap.add_argument('--population', type=Path, help='HRSL GeoTIFF (fetch writes it, assess reads it)')
     a = ap.parse_args()
 
     kilns, scanned, note, kilns_sha = load_kilns(a.kilns, a.district, a.artifact_manifest, a.acquired_at)
@@ -133,14 +135,24 @@ def main():
         for f in layers['features']:
             counts[f['properties']['layer']] += 1
         print(json.dumps({'layers': str(a.layers), 'osm_base': layers['kilnwatch']['osm_base'], 'features': counts}))
+        if a.population:
+            totals = exposure.fetch(area_around(kilns, exposure.RADIUS_M + 200), a.population)
+            print(json.dumps({'population': str(a.population), 'source': exposure.VERSION, 'area_totals': totals}))
         return
 
     layers, layer_meta = load_layers(a.layers)
     results = engine.assess(kilns, layers, a.state, rules, scanned)
+    if a.population:
+        for r, counts in zip(results, exposure.assess(kilns, exposure.Grid.load(a.population))):
+            if counts is not None:
+                r['exposure'] = counts
     body = {'rules_version': rules['version'], 'state': a.state, 'kiln_ids': note,
             'inputs': {'kilns_sha256': kilns_sha,
                        'layers_sha256': hashlib.sha256(a.layers.read_bytes()).hexdigest(),
-                       'osm_base': layer_meta.get('osm_base'), 'scanned_area': list(scanned.bounds) if scanned else None},
+                       'osm_base': layer_meta.get('osm_base'), 'scanned_area': list(scanned.bounds) if scanned else None,
+                       **({'population_sha256': hashlib.sha256(a.population.read_bytes()).hexdigest(),
+                           'population_source': exposure.VERSION, 'exposure_radius_m': exposure.RADIUS_M}
+                          if a.population else {})},
             'assessed_at': datetime.now(timezone.utc).isoformat(timespec='seconds'), 'assessments': results}
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(body, indent=1) + '\n')
@@ -148,8 +160,10 @@ def main():
     for r in results:
         for v in r['violations']:
             flagged[v['rule_id']] += 1
+    people = [r['exposure']['people'] for r in results if 'exposure' in r]
     print(json.dumps({'kilns': len(results), 'with_any_flag': sum(bool(r['violations']) for r in results),
-                      'flags_by_rule': flagged, 'out': str(a.out)}))
+                      'flags_by_rule': flagged, 'with_exposure': len(people),
+                      'people_median': sorted(people)[len(people) // 2] if people else None, 'out': str(a.out)}))
 
 
 if __name__ == '__main__':
