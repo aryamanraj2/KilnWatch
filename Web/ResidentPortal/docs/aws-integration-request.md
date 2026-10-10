@@ -29,4 +29,4 @@ Faithful independent Hindi copy review and verified/owner-reviewed official fili
 
 ## Stop boundary
 
-No R2 connection until the user gives the go and the public backend is approved/ready. R3 and R4 each have their own go; deployment requires explicit authorization. Keep missing inputs distinct from implementation defects and failed tests.
+The user gave the go for continuation, then confirmed the backend is not ready and requested local preparation. [Frontend preparation](R2-local-preparation.md) is implemented/tested against intercepted HTTP. No actual R2 connection until the public backend/projection is approved and ready. R3 and R4 each have their own go; deployment requires explicit authorization. Keep missing inputs distinct from implementation defects and failed tests.

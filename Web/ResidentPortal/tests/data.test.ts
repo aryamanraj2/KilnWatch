@@ -3,7 +3,7 @@ import { kilnSchema, pageSchema, safeImage, safeSource, assessed, type Page } fr
 import { CENTER, kilns } from '../src/data/fixtures';
 import { destination, distance, parseCoordinate, ring, validateSearch } from '../src/data/geo';
 import { makeClient, mergePages, type Config } from '../src/data/client';
-import { exportText, makeDraft, missingFacts } from '../src/features/complaint/draft';
+import { describe as explainRecord, exportText, makeDraft, missingFacts } from '../src/features/complaint/draft';
 
 const fixture: Config = { mode: 'fixture', base: '', imageHosts: [], scenario: '' };
 const live: Config = { mode: 'live', base: 'https://public.example.test', imageHosts: [], scenario: '' };
@@ -98,5 +98,17 @@ describe('inspection drafting', () => {
   });
   it('does not generate a rule conclusion from missing measurements', () => {
     const draft = makeDraft([kilns[3]], fields, 'en', null, 'http://localhost', true); expect(draft).not.toContain('threshold 800'); expect(missingFacts(kilns[3], 'en')).toContain('Exposure estimate not available.');
+  });
+  it.each(['en', 'hi'] as const)('keeps published %s explanations and exports distinct from sample copy', lang => {
+    const published = { ...kilns[0], id: 'PUBLIC-TEST-1' };
+    const explanation = explainRecord(published, lang, false);
+    const draft = makeDraft([published], fields, lang, null, 'https://portal.example.test', false);
+    expect(explanation).not.toMatch(/sample|नमूना/i);
+    expect(draft).not.toMatch(/sample|नमूना/i);
+    expect(draft).toContain('https://portal.example.test/kilns/PUBLIC-TEST-1');
+    expect(draft).not.toContain('/samples/');
+    expect(draft).toContain(lang === 'hi' ? 'आकलित दूरी' : 'Assessed distance');
+    expect(exportText(draft, lang, false)).toContain(lang === 'hi' ? 'किसी प्राधिकरण को भेजा नहीं गया' : 'Not submitted to any authority');
+    expect(explainRecord(published, lang, true)).toMatch(/sample|नमूना/i);
   });
 });

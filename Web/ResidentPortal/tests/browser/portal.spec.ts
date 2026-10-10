@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { mkdir, readFile } from 'node:fs/promises';
-const artifacts = 'docs/screens';
+const artifacts = process.env.KW_ARTIFACT_DIR || 'docs/screens';
 async function sampleSearch(page: Page) {
   await page.getByRole('button', { name: 'Pilkhuwa · sample area' }).click();
   await page.getByRole('button', { name: 'Confirm area & search' }).click();

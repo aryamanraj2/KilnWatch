@@ -11,6 +11,11 @@ import { Status } from '../src/components/shared';
 import { AreaPage } from '../src/features/area/AreaPage';
 afterEach(() => { vi.restoreAllMocks(); localStorage.clear(); });
 const page = (index: number): Page => ({ items: [{ kiln: kilns[index], distance_m: 300 }], next_cursor: null, complete: true, revision: 'sample-1', coverage: 'known', updated_at: UPDATED, distance_basis: 'centroid' });
+function loadImage(image: HTMLElement, size = 256) {
+  // jsdom does not decode images; supply the decoder result before its load event.
+  Object.defineProperties(image, { naturalWidth: { value: size }, naturalHeight: { value: size } });
+  fireEvent.load(image);
+}
 
 describe('resident interactions', () => {
   it('does not show a human finding without authoritative human-review metadata', () => {
@@ -20,14 +25,23 @@ describe('resident interactions', () => {
   it('lets a working image survive failure of the other comparison side', () => {
     render(<LocaleProvider><Evidence kiln={kilns[0]} /></LocaleProvider>);
     expect(screen.getByRole('slider')).toBeDisabled();
-    fireEvent.load(screen.getByAltText('Earlier synthetic scene for this sample record'));
+    loadImage(screen.getByAltText('Earlier synthetic scene for this sample record'));
     fireEvent.error(screen.getByAltText('Later synthetic scene for this sample record'));
     expect(screen.queryByRole('slider')).toBeNull(); expect(screen.getByAltText('Earlier synthetic scene for this sample record')).toBeVisible(); expect(screen.getByText('This image could not be loaded.')).toBeVisible();
   });
   it('provides keyboard-independent comparison buttons once the images load', () => {
     render(<LocaleProvider><Evidence kiln={kilns[0]} /></LocaleProvider>);
-    for (const image of screen.getAllByRole('img')) fireEvent.load(image);
+    for (const image of screen.getAllByRole('img')) loadImage(image);
     expect(screen.getByRole('slider')).toBeEnabled(); fireEvent.click(screen.getByText('Show before')); expect(screen.getByRole('slider')).toHaveValue('0'); fireEvent.click(screen.getByText('Show after')); expect(screen.getByRole('slider')).toHaveValue('100');
+  });
+  it('rejects a decoded image whose size contradicts the supplied outline grid', () => {
+    render(<LocaleProvider><Evidence kiln={kilns[0]} /></LocaleProvider>);
+    loadImage(screen.getByAltText('Earlier synthetic scene for this sample record'));
+    loadImage(screen.getByAltText('Later synthetic scene for this sample record'), 128);
+    expect(screen.queryByRole('slider')).toBeNull();
+    expect(screen.queryByAltText('Later synthetic scene for this sample record')).toBeNull();
+    expect(screen.getByAltText('Earlier synthetic scene for this sample record')).toBeVisible();
+    expect(screen.getByText('This image could not be loaded.')).toBeVisible();
   });
   it('ignores an old response even when the transport ignores cancellation', async () => {
     let first: (p: Page) => void = () => {}, second: (p: Page) => void = () => {};

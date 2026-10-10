@@ -2,6 +2,8 @@
 
 Phase R1: a local English/Hindi resident experience using explicit sample data. No account, live AWS connection, submission service, or deployment is required. The private inspector app and backend are unchanged.
 
+R2 frontend preparation is now locally implemented. The user confirmed the public backend is not ready; default data remains fictional. See [local R2 preparation](docs/R2-local-preparation.md) for the tested path and service inputs still needed.
+
 ## Run locally
 
 Use **Node 24.21.0 LTS**, recorded in `.node-version` and `.nvmrc`, and npm. From the repository root:
@@ -26,9 +28,13 @@ npm run build
 npx playwright install chromium webkit
 npm run test:e2e -- --project=chromium
 npm run test:e2e -- --project=webkit
+npm run test:e2e:live -- --project=chromium
+npm run test:e2e:live -- --project=webkit
 ```
 
 Browser checks use one worker, no retries, and a local Vite server. Engines are run sequentially. On this workstation browsers were downloaded to the ignored `.cache/ms-playwright`; set `PLAYWRIGHT_BROWSERS_PATH=.cache/ms-playwright` when running tests. Do not install a second cache unnecessarily. The browser suite creates a small set of review artifacts under `docs/screens/`; failure traces and reports are ignored under `test-results/`.
+
+`test:e2e:live` starts a separate Vite server on port 5174 in live mode and intercepts every test API/image request with fictional contract responses and generated 256-pixel PNGs. It does not contact AWS, change `.env`, or establish public publication approval. Set `KW_ARTIFACT_DIR=test-results/sample-review` on sample-suite runs to keep regenerated review files separate from the previously reviewed `docs/screens/` artifacts.
 
 `npm run preview` serves the production `dist/` build locally. No script deploys, commits, or pushes. Tests use fictional personal details only. The production build has no source maps and no development fault controls.
 
@@ -43,7 +49,7 @@ The default is `fixture`. To make it explicit, copy `.env.example` to ignored `.
 | `VITE_PUBLIC_IMAGE_HOSTS` | Comma-separated exact HTTPS evidence hosts, no wildcard. Empty in R1. |
 | `VITE_FIXTURE_SCENARIO` | Optional development-only failure case, listed below. |
 
-Live configuration is a tested read-client boundary, **not completed R2 integration**. R1 exercises it with mock HTTP in unit tests only. It never falls back to fixtures. Do not configure a real endpoint until the public projection is approved and the user authorizes R2.
+Live configuration is exercised by unit tests and local browser journeys, **not completed R2 integration**. It never falls back to fixtures. The user authorized local preparation; do not configure a real endpoint until the public projection and service are approved/ready.
 
 For local failure review, start in development mode at one of these URLs, then choose a sample area and search:
 

@@ -47,3 +47,15 @@ The performance check also exercises CSS `zoom: 2` reflow. That approximates lay
 4. **Later phases:** approved real basemap/geocoder, real evidence alignment, server-side public projection, public-service failure behavior and live assistant grounding require their authorized phases. See the separate [integration request](aws-integration-request.md).
 
 No deployment, commit, push, retraining or R2 connection was performed. The user controls the next phase gate.
+
+## Continuation: local R2 preparation (10 October 2026)
+
+User authorization: continue building; public backend “Not ready — prepare locally.” Current checks pass under Node 24.21.0:
+
+- **35 unit/behavior tests**, including bilingual published-mode draft wording and image-dimension mismatch rejection. jsdom image tests supply decoded dimensions explicitly; browser tests decode actual generated PNGs.
+- **14 sample-mode browser journeys**: seven Chromium, then seven WebKit, preserving the original flows, downloads, privacy assertions, automated accessibility checks and print-action coverage.
+- **10 live-mode browser journeys**: five Chromium, then five WebKit, with fictional intercepted API responses and generated 256-pixel PNGs. Query/paging/selection/Back, bilingual evidence/explanations/rules/downloads, failures/partial pages, image retry, dimension mismatch and unapproved image-host refusal pass.
+- Strict TypeScript and production build pass. Default fixture build: main JS 433.80 kB / 129.86 kB gzip; no source maps or build warnings. Browser runner retains the existing environment-only NO_COLOR/FORCE_COLOR warning.
+- `git diff --check` passes; changes remain confined to `Web/ResidentPortal/`. No dependencies added. New test output uses ignored paths; the original reviewed artifacts above are preserved.
+
+The original PDF visual review and performance sample above remain historical evidence; no fresh visual PDF review, native browser zoom or spoken screen-reader proof is claimed for this continuation. Mock browser refusals do not prove the backend publication boundary. Real records, evidence delivery, public CORS and deployed negative-access checks remain pending. See [R2 local preparation](R2-local-preparation.md).

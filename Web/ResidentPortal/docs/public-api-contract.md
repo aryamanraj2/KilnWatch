@@ -1,6 +1,6 @@
 # Public API contract — proposal
 
-**Not agreed with the AWS teammate. Not a description of the deployed public API.** The current `/public/kilns` handler returns `503 publication_unavailable`. This document and the locally tested read client prepare R1 only. No public backend or publication policy was changed.
+**Not agreed with the AWS teammate. Not a description of the deployed public API.** The repository handler still returns `503 publication_unavailable` for `/public/kilns`; no newer live report has been supplied. The read client now has unit and intercepted browser coverage for local R2 preparation. No public backend or publication policy was changed.
 
 ## Public boundary
 
@@ -27,7 +27,7 @@ Runtime types/validators are in `src/data/model.ts`. Minimum public record:
 | `assessments[]` | `rule_id`, `state` assessed/not_evaluated, nullable `measured_distance_m`, nullable `threshold_m`, nullable approved `source_url`. An assessed comparison needs all relevant facts and verified applicability. |
 | `exposure` | Nullable `{people, radius_m, source:{en,hi}, estimated_at}`. A count is not measured emissions or a diagnosis. |
 
-Images propose `url`, nullable `acquired_at`, `source:{en,hi}`, nullable `resolution_m`, `width=256`, `height=256`, and nullable `outline_px` of four pixel-edge `[x,y]` pairs in image bounds. These are reduced public fields; no S3 key, secret URL-fetch capability, or internal import metadata. A historical outline requires actual historical evidence. Each side has its own metadata. URLs must be HTTPS on agreed exact evidence hosts, with correct content type and CORS. Current local samples use restricted `/samples/*.svg` paths; that is not the production image contract.
+Images propose `url`, nullable `acquired_at`, `source:{en,hi}`, nullable `resolution_m`, `width=256`, `height=256`, and nullable `outline_px` of four pixel-edge `[x,y]` pairs in image bounds. These are reduced public fields; no S3 key, secret URL-fetch capability, or internal import metadata. A historical outline requires actual historical evidence. Each side has its own metadata. URLs must be HTTPS on agreed exact evidence hosts, with correct content type and CORS. The viewer checks decoded dimensions against metadata and sends no referrer with image requests. Current local samples use restricted `/samples/*.svg` paths; that is not the production image contract.
 
 The client currently allows official rule sources only on `mpcb.gov.in`/`www.mpcb.gov.in`. Additional authoritative sources require an explicit reviewed allowlist update; do not solve missing sources with wildcard acceptance.
 

@@ -1,6 +1,6 @@
 # Resident portal handover
 
-Updated 10 October 2026. **R1 is locally implemented with synthetic data. R2 is not started.** The acceptance gate remains open for the manual checks in [verification](verification.md). Work sequentially; no parallel agents.
+Updated 10 October 2026. **R1 is locally implemented with synthetic data. R2 frontend preparation is locally implemented; no live connection.** The user asked to continue, then confirmed “Not ready — prepare locally” for the public backend. The R1 acceptance gate remains open for the manual checks in [verification](verification.md). Work sequentially; no parallel agents.
 
 ## Run and review
 
@@ -20,14 +20,16 @@ The local map is explicitly an illustration without a basemap or geocoder. Image
 
 ## Verified and remaining
 
-Strict types, production build, 32 unit/behavior tests and 14 browser journeys pass. English and Hindi PDF pages were rendered and visually reviewed. A dark-theme print background defect was corrected. The detailed evidence and limitations are in [verification.md](verification.md).
+The original R1 checks passed with 32 unit/behavior tests and 14 browser journeys; English and Hindi PDF pages were rendered and visually reviewed. The continuation adds live-mode browser preparation and dimension validation; current results and limits are in [R2 local preparation](R2-local-preparation.md) and [verification](verification.md).
 
 Next R1 work is a spoken VoiceOver or equivalent walkthrough, native browser 200% zoom review, and any user review feedback. Accessibility-tree assertions and CSS layout zoom are useful evidence but do not close those manual gaps. Independent Hindi review remains a release input. Do not claim full accessibility certification.
 
 ## Integration inputs, separately
 
+Local preparation corrects fixture-specific wording in public-mode search, evidence alt text, rule assessments, explanations, exports, attribution and privacy notices. Address lookup is disabled in public mode until a provider exists; manual coordinates and opt-in location work. Decoded image dimensions must match metadata before an image can be used for comparison. Public mode still has an illustrative geographic diagram, no basemap/geocoder, and deterministic explanations, no live assistant. The contract is still a proposal; these tests cannot prove the server publication boundary.
+
 The [AWS teammate / ML team mate checklist](aws-integration-request.md) is prepared but has not been sent. It distinguishes public publication/search/detail/rule/image inputs from model provenance and interpretation. [Public API](public-api-contract.md) and [hosting](hosting-proposal.md) documents are proposals, not deployed infrastructure. Recheck current teammate reports when integration is authorized; this work did not query the AWS account.
 
 ## Preservation and stop
 
-All additions are under `Web/ResidentPortal/` on the existing `webApp` branch. Existing app/backend/model files are unchanged. Dependencies, browser downloads, local runtime, build output and temporary PDF tools are ignored. No commit, push, deployment, retraining, private evidence publication or teammate communication occurred. Wait for the user's go before R2; do not interpret a ready endpoint as authorization.
+All additions are under `Web/ResidentPortal/` on the existing `webApp` branch. Existing app/backend/model files are unchanged. Dependencies, browser downloads, local runtime, build output and temporary PDF tools are ignored. No commit, push, deployment, retraining, private evidence publication or teammate communication occurred. Next: obtain the approved public contract/base URL and publication proof, then complete deployed R2 verification. The current authorization is local preparation; R3/R4 are not authorized by this continuation.

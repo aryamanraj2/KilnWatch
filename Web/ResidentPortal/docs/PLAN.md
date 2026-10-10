@@ -1,8 +1,8 @@
 # KilnWatch resident portal — overall plan
 
-Prepared 10 October 2026. Updated after local implementation: **R1 built; verification gate has explicit manual gaps**. See [verification](verification.md) and [handover](HANDOVER.md). R2 has not started.
+Prepared 10 October 2026. **R1 built; verification gate has explicit manual gaps. R2 frontend preparation is locally implemented.** The user authorized continuation, then confirmed the public backend is not ready and requested local preparation. See [verification](verification.md), [handover](HANDOVER.md), and [R2 local preparation](R2-local-preparation.md). R2 has no live connection or deployed acceptance proof.
 
-This document translates the [resident portal master brief](../../../App/docs/prompts/09-resident-portal-master-brief.md) into an ordered delivery plan. It began as the planning-only deliverable; the authorized local R1 implementation now exists. R2–R4 describe later gates only. Work sequentially, with no parallel agents.
+This document translates the [resident portal master brief](../../../App/docs/prompts/09-resident-portal-master-brief.md) into an ordered delivery plan. It began as the planning-only deliverable; local R1 and authorized R2 frontend preparation now exist. Deployed R2 acceptance and R3–R4 remain later gates. Work sequentially, with no parallel agents.
 
 ## 1. Outcome and boundaries
 
@@ -10,7 +10,7 @@ A resident can choose English or Hindi, check an area without signing in, explor
 
 R1 uses clearly labeled sample data throughout. It must not imply that sample candidates, sample human findings, illustrative imagery, or sample coverage are real observations. It must not conceal an unavailable public service behind fixtures.
 
-All new work belongs in `Web/ResidentPortal/`. Preserve existing changes and the current branch. Do not change the inspector app, Xcode project, shared core, backend behavior, infrastructure, training pipeline, or weights. Do not deploy, create paid resources, commit, push, contact teammates, retrain, or begin R2. Accounts, reviewer workflows, verdict entry, notifications, complaint filing, and case management are outside scope.
+All new work belongs in `Web/ResidentPortal/`. Preserve existing changes and the current branch. Do not change the inspector app, Xcode project, shared core, backend behavior, infrastructure, training pipeline, or weights. Do not deploy, create paid resources, commit, push, contact teammates, or retrain. The latest authorization extends work to local R2 frontend preparation only; connection needs the approved/ready public service. Accounts, reviewer workflows, verdict entry, notifications, complaint filing, and case management are outside scope.
 
 ## 2. Inspected starting point
 
@@ -245,7 +245,7 @@ Capture a small reviewed artifact set: desktop English area results, mobile Hind
 | Phase | Deliverable | Entry and completion gate | Current status |
 |---|---|---|---|
 | R1 — local resident experience | Full bilingual sample journey, states, exports, meaningful tests, public contract proposal and integration handover | Complete section 7, reviewed artifacts, no existing work overwritten; report and wait. | Locally implemented; automated checks pass; spoken screen-reader and native 200% zoom checks remain unverified |
-| R2 — public registry and real evidence | Approved anonymous records, bounded real search, public details/rules, pagination/coverage, published evidence | User's go plus ready/approved backend; prove deployed anonymous projection and refusals, real imagery and service failures. Mock HTTP cannot complete R2. | Not started |
+| R2 — public registry and real evidence | Approved anonymous records, bounded real search, public details/rules, pagination/coverage, published evidence | User's go plus ready/approved backend; prove deployed anonymous projection and refusals, real imagery and service failures. Mock HTTP cannot complete R2. | Frontend locally prepared/tested; approved backend pending, no live proof |
 | R3 — resident assistant | Real server-side public tools, grounded bilingual explanations/drafts, validated citations/events, limits and fallback | User's go plus ready service; prove real responses, rejected unsupported citations, cancellation/errors, and cost controls. Scripted replies cannot complete R3. | Not started |
 | R4 — release verification and hosting | Approved AWS Amplify release with operational, privacy, accessibility, attribution and performance proof | User's go and explicit deployment authorization; verify hosted deep links/refresh/assets, HTTPS geolocation, API/images, projection, exports and configuration. | Not started |
 
@@ -253,6 +253,6 @@ After each phase, report capabilities as **locally implemented/tested**, **live 
 
 ## 9. Handover for the next work session
 
-Read [HANDOVER.md](HANDOVER.md), [verification.md](verification.md), this plan and the master brief; recheck the branch/working tree and any updated teammate reports. Continue with the recorded R1 manual verification gaps or user feedback. Do not carry historical deployment blockers forward without checking newer supplied evidence. Do not start R2 simply because an endpoint becomes available while R1 is underway.
+Read [HANDOVER.md](HANDOVER.md), [verification.md](verification.md), [R2 local preparation](R2-local-preparation.md), this plan and the master brief; recheck the branch/working tree and any updated teammate reports. Local preparation is implemented/tested. Next obtain the approved public contract/base URL, publication proof and evidence inputs before connecting and verifying deployed R2. R1 manual verification gaps remain open. Do not carry historical deployment blockers forward without checking newer supplied evidence.
 
 Historical planning baseline: the first step added only this plan. The subsequent authorized work added the local portal, dependencies, tests, review artifacts and handover under `Web/ResidentPortal/`. No live API integration, deployment, commit, push, retraining, inspector-app change or teammate communication occurred.

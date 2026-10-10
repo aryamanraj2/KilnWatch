@@ -6,6 +6,7 @@ import { config } from '../../data/client';
 
 export default function Diagram({ query, page, selected, onSelect, onPoint }: { query: Search; page: Page | null; selected: string | null; onSelect: (id: string) => void; onPoint: (p: Point) => void }) {
   const { t, number } = useLocale();
+  const sample = config.mode === 'fixture';
   const scale = query.radius_m * 1.4;
   const cos = Math.cos(query.center[1] * Math.PI / 180);
   const project = (p: Point): [number, number] => [320 + (((p[0] - query.center[0] + 540) % 360) - 180) * 111195 * cos / scale * 260, 260 - (p[1] - query.center[1]) * 111195 / scale * 260];
@@ -13,7 +14,7 @@ export default function Diagram({ query, page, selected, onSelect, onPoint }: { 
   if (config.scenario === 'map-error' || Math.abs(query.center[1]) > 85) return <div className="diagram-error"><h3>{t('Map unavailable', 'मानचित्र उपलब्ध नहीं')}</h3><p>{t('Use the list and coordinate fields. All records and draft actions remain available.', 'सूची और निर्देशांक का उपयोग करें। सभी रिकॉर्ड और मसौदा विकल्प उपलब्ध हैं।')}</p></div>;
   return <div className="diagram">
     <div className="map-title"><span>{t('Illustrative map', 'सांकेतिक मानचित्र')}</span><span className="mono">N ↑</span></div>
-    <div className="map-canvas" role="group" aria-label={t('Sample area diagram. Choose a numbered candidate; coordinates are an alternative to placing a point.', 'नमूना क्षेत्र का चित्र। क्रमांकित रिकॉर्ड चुनें; बिंदु लगाने के लिए निर्देशांक भी दर्ज कर सकते हैं।')}><svg viewBox="0 0 640 520" aria-hidden="true" onClick={e => {
+    <div className="map-canvas" role="group" aria-label={sample ? t('Sample area diagram. Choose a numbered candidate; coordinates are an alternative to placing a point.', 'नमूना क्षेत्र का चित्र। क्रमांकित रिकॉर्ड चुनें; बिंदु लगाने के लिए निर्देशांक भी दर्ज कर सकते हैं।') : t('Area diagram of returned public records. Choose a numbered candidate; coordinates are an alternative to placing a point.', 'प्राप्त सार्वजनिक रिकॉर्ड का क्षेत्र चित्र। क्रमांकित रिकॉर्ड चुनें; बिंदु लगाने के लिए निर्देशांक भी दर्ज कर सकते हैं।')}><svg viewBox="0 0 640 520" aria-hidden="true" onClick={e => {
       if ((e.target as SVGElement).closest('[data-pin]')) return;
       const ctm = e.currentTarget.getScreenCTM(); if (!ctm) return;
       const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse());
@@ -33,7 +34,7 @@ export default function Diagram({ query, page, selected, onSelect, onPoint }: { 
         return <button data-pin key={kiln.id} style={{ left: `${x / 640 * 100}%`, top: `${y / 520 * 100}%` }} className={`map-pin ${active ? 'selected' : ''}`} aria-pressed={active} aria-label={`${i + 1} · ${kiln.id}`} onClick={() => onSelect(kiln.id)}><span>{i + 1}</span></button>;
       })}
     </div>
-    <div className="map-caption"><span><i className="legend-ring" />{number(query.radius_m / 1000, 1)} {t('km search radius', 'किमी खोज दायरा')}</span><span>{t('Sample coordinates · no basemap', 'नमूना निर्देशांक · वास्तविक नक्शा नहीं')}</span></div>
+    <div className="map-caption"><span><i className="legend-ring" />{number(query.radius_m / 1000, 1)} {t('km search radius', 'किमी खोज दायरा')}</span><span>{sample ? t('Sample coordinates · no basemap', 'नमूना निर्देशांक · वास्तविक नक्शा नहीं') : t('Public record coordinates · no basemap', 'सार्वजनिक रिकॉर्ड के निर्देशांक · वास्तविक नक्शा नहीं')}</span></div>
     <p className="map-help">{t('Select a pin to focus a record. Click the diagram to choose a new centre, then confirm below.', 'रिकॉर्ड देखने के लिए पिन चुनें। नया केंद्र चुनने के लिए चित्र पर क्लिक करें, फिर खोज फ़ॉर्म में पुष्टि करें।')}</p>
   </div>;
 }
