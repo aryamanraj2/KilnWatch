@@ -1,0 +1,11 @@
+@page { size: A4; margin: 18mm; }
+@media print {
+  :root { color-scheme: light !important; background: #fff !important; }
+  #root, main { background: #fff !important; min-height: 0 !important; }
+  body { background: #fff !important; color: #111 !important; font-size: 11pt !important; }
+  header, footer, .sample-strip, .no-print, .skip-link { display: none !important; }
+  .complaint-page { max-width: none !important; padding: 0 !important; margin: 0 !important; min-height: 0 !important; }
+  #print-document { display: block !important; font-family: -apple-system, 'Kohinoor Devanagari', 'Noto Sans Devanagari', 'Nirmala UI', sans-serif; }
+  .print-brand { font-weight: 650; font-size: 13pt; border-bottom: 1px solid #555; margin-bottom: 20pt; padding-bottom: 10pt; }
+  .print-body { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; line-height: 1.7; orphans: 3; widows: 3; }
+}

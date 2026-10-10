@@ -1,0 +1,28 @@
+import { useState } from 'react';
+import { config } from '../../data/client';
+import { safeImage, type EvidenceImage, type Kiln } from '../../data/model';
+import { useLocale } from '../../i18n';
+
+export function Evidence({ kiln }: { kiln: Kiln }) {
+  const { t, local, date } = useLocale();
+  const [position, setPosition] = useState(50), [failed, setFailed] = useState<Record<string, boolean>>({}), [loaded, setLoaded] = useState<Record<string, boolean>>({}), [attempt, setAttempt] = useState(0);
+  const sample = config.mode === 'fixture';
+  const entries = (['before', 'after'] as const).flatMap(side => {
+    const data = kiln.evidence[side]; return data ? [{ side, data, url: safeImage(data.url, sample, config.imageHosts) }] : [];
+  });
+  const valid = entries.filter(x => x.url && !failed[x.side]);
+  const pair = valid.length === 2 && valid[0].url !== valid[1].url && valid.every(x => x.data.acquired_at) && Date.parse(valid[0].data.acquired_at!) < Date.parse(valid[1].data.acquired_at!);
+  const ready = pair && valid.every(x => loaded[x.side]);
+  function imageLayer(data: EvidenceImage, side: string, url: string) {
+    return <><img key={`${side}-${attempt}`} src={url} alt={side === 'before' ? t('Earlier synthetic scene for this sample record', 'इस नमूना रिकॉर्ड का पहले का काल्पनिक दृश्य') : t('Later synthetic scene for this sample record', 'इस नमूना रिकॉर्ड का बाद का काल्पनिक दृश्य')} width="256" height="256" loading="lazy" onLoad={() => setLoaded(v => ({ ...v, [side]: true }))} onError={() => setFailed(v => ({ ...v, [side]: true }))} />{data.outline_px && <svg className="image-outline" viewBox="0 0 256 256" aria-hidden="true"><polygon points={data.outline_px.map(p => p.join(',')).join(' ')} /></svg>}</>;
+  }
+  return <section className="evidence-section" aria-labelledby="evidence-title"><div className="section-heading"><h2 id="evidence-title">{t('Look at the evidence', 'साक्ष्य देखें')}</h2><span className="small muted">{sample ? t('Illustrative imagery', 'सांकेतिक चित्र') : t('Published imagery', 'प्रकाशित चित्र')}</span></div>
+    {entries.length === 0 ? <div className="empty"><h3>{t('Imagery is not available', 'चित्र उपलब्ध नहीं हैं')}</h3><p>{t('There are no published images for this record. Missing imagery does not establish when a kiln appeared.', 'इस रिकॉर्ड के प्रकाशित चित्र नहीं हैं। चित्र न होने से यह तय नहीं होता कि भट्ठा कब बना।')}</p></div> : <>
+      {pair ? <div className="comparator"><div className="image-layer">{imageLayer(valid[0].data, 'before', valid[0].url!)}</div><div className="image-layer" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>{imageLayer(valid[1].data, 'after', valid[1].url!)}</div><div className="image-date earlier">{t('After', 'बाद में')}</div><div className="image-date later">{t('Before', 'पहले')}</div><div className="divider" style={{ left: `${position}%` }} aria-hidden="true"><span>↔</span></div>{sample && <span className="image-sample">{t('SAMPLE · NOT SATELLITE IMAGERY', 'नमूना · उपग्रह चित्र नहीं')}</span>}</div> : <div className="single-images">{valid.map(v => <div className="single-image" key={v.side}>{imageLayer(v.data, v.side, v.url!)}<span className="image-date earlier">{v.side === 'before' ? t('Before', 'पहले') : t('After', 'बाद में')}</span>{sample && <span className="image-sample">{t('SAMPLE', 'नमूना')}</span>}</div>)}</div>}
+      {pair && <div className="comparison-controls"><label htmlFor="compare">{t('Compare images', 'चित्रों की तुलना करें')} <span className="mono">{position}% {t('after visible', 'बाद वाला दृश्य')}</span></label><input id="compare" type="range" min="0" max="100" step="5" value={position} disabled={!ready} aria-valuetext={`${position}% ${t('later image; remaining area shows earlier image', 'बाद वाला चित्र; शेष में पहले वाला चित्र')}`} onChange={e => setPosition(Number(e.target.value))} /><div><button className="secondary" onClick={() => setPosition(0)}>{t('Show before', 'पहले का चित्र')}</button><button className="secondary" onClick={() => setPosition(100)}>{t('Show after', 'बाद का चित्र')}</button></div></div>}
+      <div className="evidence-metadata">{entries.map(v => <div key={v.side}><strong>{v.side === 'before' ? t('Before', 'पहले') : t('After', 'बाद में')}</strong><p className="mono">{v.data.acquired_at ? date(v.data.acquired_at) : t('Date unknown', 'तिथि अज्ञात')}{sample && ` · ${t('sample date', 'नमूना तिथि')}`}</p><p className="help">{local(v.data.source)} · 256 × 256 · {v.data.resolution_m ? `${v.data.resolution_m} ${t('m/pixel', 'मी/पिक्सेल')}` : t('Resolution not applicable', 'रिज़ॉल्यूशन लागू नहीं')}</p>{(!v.url || failed[v.side]) && <p className="field-error" role="status">{t('This image could not be loaded.', 'यह चित्र लोड नहीं हो सका।')}</p>}</div>)}</div>
+      {Object.values(failed).some(Boolean) && <button className="secondary" onClick={() => { setFailed({}); setLoaded({}); setAttempt(x => x + 1); }}>{t('Retry images', 'चित्र फिर लोड करें')}</button>}
+    </>}
+    <p className="help evidence-limitation">{t('Visible differences do not establish construction, operation, or a violation. Outlines appear only where image-specific metadata is supplied.', 'दिखाई देने वाला अंतर निर्माण, संचालन या उल्लंघन सिद्ध नहीं करता। रूपरेखा केवल उस चित्र के लिए उपलब्ध मेटाडेटा से दिखाई जाती है।')}</p>
+  </section>;
+}
