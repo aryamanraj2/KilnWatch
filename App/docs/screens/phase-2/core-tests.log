@@ -1,0 +1,74 @@
+Building for debugging...
+[Computing dependencies]
+[2 / 6] KilnWatchCoreTests-product
+[4 / 8] KilnWatchCoreTests-product
+[10 / 12] KilnWatchCoreTests-product
+[12 / 12] KilnWatchCoreTests-product
+Build complete! (6.61 sec)
+Test Suite 'All tests' started at 2026-10-09 19:15:06.327.
+Test Suite 'All tests' passed at 2026-10-09 19:15:06.339.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.012) seconds
+◇ Test run started.
+↳ Testing Library Version: 2073
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test authoritativeEmptyInvalidatesSavedRouteOnly(code:) started.
+◇ Test transportFailureUsesCacheAndCorruptOrAbsentCacheRecovers() started.
+◇ Test malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test httpErrorsAreTyped(code:) started.
+◇ Test malformedBodyNamesTheKey() started.
+◇ Test failedFlushKeepsVerdictAndPhotos() started.
+◇ Test datesAcceptOptionalFractionalSecondsAndOffsets() started.
+◇ Test unknownStatusAndTypeDecodeWithoutDroppingTheRecord() started.
+◇ Test fixturesMatchTheConcept() started.
+◇ Test kilnRoundTrips() started.
+◇ Test unknownEmbeddedEnumsSurviveFullRouteCache() started.
+◇ Test routeCacheRoundTrips() started.
+◇ Test malformedOptionalGeometryAndAxisOrder() started.
+◇ Test routeFixtureMetadataAndEmbeddedRecordsAgree() started.
+◇ Test navigationUsesAccessThenKilnFallbackAndServerOrder() started.
+◇ Test queueSurvivesACrashAfterEnqueue() started.
+◇ Test successfulRefreshSavesFullResponse() started.
+◇ Test legacySavedRouteKeepsStopsWithoutInventingMetadata() started.
+◇ Test failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test fixtureDecodes(name:) started.
+◇ Test successfulFlushRemovesVerdictAndPhotos() started.
+◇ Test case passing 1 argument code → 503 to httpErrorsAreTyped(code:) started.
+◇ Test case passing 1 argument code → 404 to authoritativeEmptyInvalidatesSavedRouteOnly(code:) started.
+◇ Test case passing 1 argument code → 200 to authoritativeEmptyInvalidatesSavedRouteOnly(code:) started.
+◇ Test case passing 1 argument code → 404 to httpErrorsAreTyped(code:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "Polygon", coordinates: [[77.0, 28.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0, 28.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0, 28.0, 0.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[181.0, 28.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument name → "kilns" to fixtureDecodes(name:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0, 91.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument name → "route_today" to fixtureDecodes(name:) started.
+◇ Test case passing 1 argument code → 401 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument code → 403 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument code → 503 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument name → "rules" to fixtureDecodes(name:) started.
+◇ Test case passing 1 argument code → 200 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[nan, 28.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+✔ Test datesAcceptOptionalFractionalSecondsAndOffsets() passed after 0.046 seconds.
+✔ Test malformedGeometryIsNeverMapped(geometry:) with 7 test cases passed after 0.046 seconds.
+✔ Test unknownStatusAndTypeDecodeWithoutDroppingTheRecord() passed after 0.047 seconds.
+✔ Test kilnRoundTrips() passed after 0.047 seconds.
+✔ Test fixturesMatchTheConcept() passed after 0.046 seconds.
+✔ Test malformedOptionalGeometryAndAxisOrder() passed after 0.047 seconds.
+✔ Test routeCacheRoundTrips() passed after 0.046 seconds.
+✔ Test unknownEmbeddedEnumsSurviveFullRouteCache() passed after 0.046 seconds.
+✔ Test fixtureDecodes(name:) with 3 test cases passed after 0.046 seconds.
+✔ Test routeFixtureMetadataAndEmbeddedRecordsAgree() passed after 0.046 seconds.
+✔ Test navigationUsesAccessThenKilnFallbackAndServerOrder() passed after 0.052 seconds.
+✔ Test legacySavedRouteKeepsStopsWithoutInventingMetadata() passed after 0.067 seconds.
+✔ Test queueSurvivesACrashAfterEnqueue() passed after 0.071 seconds.
+✔ Test malformedBodyNamesTheKey() passed after 0.072 seconds.
+✔ Test authoritativeEmptyInvalidatesSavedRouteOnly(code:) with 2 test cases passed after 0.075 seconds.
+✔ Test successfulRefreshSavesFullResponse() passed after 0.087 seconds.
+✔ Test httpErrorsAreTyped(code:) with 2 test cases passed after 0.089 seconds.
+✔ Test failedFlushKeepsVerdictAndPhotos() passed after 0.089 seconds.
+✔ Test failedRefreshPreservesValidCacheWithoutSampleFallback(code:) with 4 test cases passed after 0.093 seconds.
+✔ Test transportFailureUsesCacheAndCorruptOrAbsentCacheRecovers() passed after 0.094 seconds.
+✔ Test successfulFlushRemovesVerdictAndPhotos() passed after 0.096 seconds.
+✔ Test run with 21 tests in 0 suites passed after 0.097 seconds.

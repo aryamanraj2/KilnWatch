@@ -1060,3 +1060,48 @@ removed (0 keys left); the runner stays up.
 | Show me the evidence for KW-e730cb05… | `get_evidence` | Pass. Exact attributions "Contains modified Copernicus Sentinel data 2023" and "… 2026"; rule checks and exposure correct. **Weak:** leaves out the two acquisition dates |
 
 **Log privacy:** two log lines with counts and latencies only.
+
+# P2: inspection sheet (35, 2026-10-10)
+
+Adds an Ask `inspection_sheet` tool and fixes the E1 image-list fallback in the data shape. Plan,
+apply log, response bodies and log lines are in the ignored `.local/phase-4/` (`p2.*`, `live/p2/`).
+
+## Code and tests
+
+- `inspection_sheet(kiln_id)` reads `/public/kilns/{id}` and returns explicit strings in reading
+  order: status "Flagged by satellite, pending inspection", "predicted <type>, unverified · confirm
+  on site" (no model score), the `trim()` siting-flag lines ("none measured" when empty), one
+  `checks_to_confirm` line per inconclusive or not-evaluated rule check (never "clear"), the route
+  planner's `on_site_checks`, people / under five / over sixty ("not assessed" when null), the
+  imagery dates ("before …, after …" or "not yet published") with `attribution_text`, and the
+  partial-rules note. No URLs, polygons or coordinates. Step label "Preparing the inspection sheet
+  for KW-xxxx…", summary "Ready" or "Not found".
+- `CHECKS` and `ALWAYS` are copied from `route/planner.py`; a test asserts both are equal and that
+  `on_site_checks` equals `planner.sheet()` for the same record.
+- List results: "published for all N kilns listed" or "not yet published for any kiln listed";
+  `images_published_only_for` stays only when some kilns have images. The system-prompt image line
+  was edited to cover it, and one line was added for inspection sheets.
+- `unittest discover -s AWS/tests`: **153 run, 143 passed, 10 skipped** (was 145 / 135 / 10).
+
+## Terraform
+
+Saved plan targeted on `aws_lambda_function.assistant[0]`: **0 to add, 1 to change, 0 to destroy**,
+`source_code_hash` only. Applied: **0 added, 1 changed, 0 destroyed**. `CodeSha256` matches the ZIP.
+Route Lambda, provider lock and tfvars unchanged.
+
+## Live checks (6 questions, 1 route plan)
+
+Ask counter 61 of 100 before, 67 after; route counter 11 of 15 before, 12 after. All **200**,
+validator `pass` on the first answer, no fallback.
+
+| Question | Tools | Outcome |
+|---|---|---|
+| Which flagged kilns in Hapur have satellite images? | `list_flagged_kilns` | **Fixed:** "All 39 … have satellite images published" (61 output tokens, was a fallback). **Weak:** calls the "published for all 39" string the attribution text |
+| Give me the inspection sheet for KW-6b3b38… | `inspection_sheet` | Pass: C-HAB-800 at 497 m against 800 m; 4,225 / 430 / 294; checks to confirm and on-site checks; both image dates and the exact attribution. Parts slightly reordered |
+| What should I check at this kiln? (zero-flag, partially evaluated) | `inspection_sheet` | No flags measured, never "clear". **Weak:** leaves out that some rules could not be checked; the rerun says the map data is "incomplete or not evaluated" |
+| Plan a route from 28.7306, 77.7759 with 4 stops, and the sheet for the first stop | `plan_route`, `inspection_sheet` | Pass: "estimated arrival"; flag, distance, people and imagery match stop 1's public record. Drops the check qualifiers and age groups |
+| Is this kiln … ? Give me its sheet. (with kiln) | `inspection_sheet` | Pass: "flagged by satellite, pending inspection", no banned word, no verdict |
+| Rerun of the zero-flag question | `inspection_sheet` | As above, better wording |
+
+**Log privacy:** both log groups hold counts and latencies only; no kiln IDs, coordinates,
+districts or question text.

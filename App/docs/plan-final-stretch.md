@@ -17,7 +17,19 @@ Product language everywhere: "Flagged by satellite · pending inspection". Rule 
 | 18: iOS live Ask; 19: iOS rules and exposure UI | Done |
 | R1 (31, 31b), P1 (32, 32b) | Live |
 | E1 (33) | Live: before/after images for all 39 Hapur kilns. Ask follow-up: "which kilns have images?" falls back (39 IDs exceed the answer limit); fold a count-not-list fix into P2 |
-| 20 (iOS live Today), P2, H1 | Next; see `prompts/34-orchestrator-handover.md` |
+| 20 (iOS live Today) | Done (committed) |
+| P2 (35): Ask `inspection_sheet`, images-list fix | Live |
+| 21 (iOS demo polish) | Next |
+| H1 (Hindi Ask) | Cut by the user (2026-10-10) |
+| 36: portal on the live API + Ask (Agent 3) | On hold until iOS is done |
+
+**Full-AWS order (user, 2026-10-10): finish iOS first, then the web portal and hosting, then the model on AWS.** The second AWS account is **permanent** for Bedrock and CloudFront (user decision). AWS prompts run one at a time (one Terraform state).
+
+| Lane | Order |
+|---|---|
+| AWS | **39** verdicts backend (`POST /verdicts`, Cognito inspector, photo uploads; needed by iOS 22) → *on hold until iOS is done:* **37** host the portal, **38** detector on AWS (ECR + CodeBuild + Fargate + Step Functions), optional **40** change triage (Agent 2) |
+| iOS | **21** polish (running) → **22** inspector sign-in + verdict sync (after 39) |
+| Web | *on hold until iOS is done:* **36** live data + Ask → hosted by **37** |
 | M1: better model | ML team mate training; not blocking |
 
 ## 1. Concept vs today

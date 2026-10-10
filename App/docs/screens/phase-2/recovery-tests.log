@@ -1,0 +1,489 @@
+Command line invocation:
+    /Applications/Xcode-beta.app/Contents/Developer/usr/bin/xcodebuild -project /tmp/KilnWatchPhase2Checks/Phase2Checks.xcodeproj -scheme Phase2Checks -destination "platform=iOS Simulator,id=E098270B-C0FA-49DA-9CE6-ADE9B2F1AAC6" -parallel-testing-enabled NO "-only-testing:Phase2Checks/Phase2Checks/testLocationGranted" "-only-testing:Phase2Checks/Phase2Checks/testRouteRecoveryStatesAndMockScreens" -resultBundlePath /tmp/kilnwatch-phase2-recovery.xcresult test
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  KilnWatchCore: /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/Packages/KilnWatchCore @ local
+
+Writing result bundle at path:
+	/tmp/kilnwatch-phase2-recovery.xcresult
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (5 targets)
+    Target 'Phase2Checks' in project 'Phase2Checks'
+        ➜ Explicit dependency on target 'KilnWatch' in project 'Phase2Checks'
+    Target 'KilnWatch' in project 'Phase2Checks'
+        ➜ Explicit dependency on target 'KilnWatchCore-product' in project 'KilnWatchCore'
+    Target 'KilnWatchCore-product' in project 'KilnWatchCore'
+        ➜ Explicit dependency on target 'KilnWatchCore' in project 'KilnWatchCore'
+        ➜ Explicit dependency on target 'KilnWatchCore_KilnWatchCore' in project 'KilnWatchCore'
+    Target 'KilnWatchCore' in project 'KilnWatchCore'
+        ➜ Explicit dependency on target 'KilnWatchCore_KilnWatchCore' in project 'KilnWatchCore'
+    Target 'KilnWatchCore_KilnWatchCore' in project 'KilnWatchCore' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/KilnWatch/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+Build description signature: 4992c54515d3df359ee2def5cd34953e
+Build description path: /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/XCBuildData/4992c54515d3df359ee2def5cd34953e.xcbuilddata
+ClangStatCache /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache
+    cd /tmp/KilnWatchPhase2Checks/Phase2Checks.xcodeproj
+    /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -o /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache
+
+ProcessInfoPlistFile /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore.bundle/Info.plist /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/KilnWatchCore.build/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore-b.build/empty-KilnWatchCore_KilnWatchCore.plist (in target 'KilnWatchCore_KilnWatchCore' from project 'KilnWatchCore')
+    cd /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/Packages/KilnWatchCore
+    builtin-infoPlistUtility /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/KilnWatchCore.build/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore-b.build/empty-KilnWatchCore_KilnWatchCore.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore.bundle/Info.plist
+
+SwiftDriver Phase2Checks normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-SwiftDriver -- /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Phase2Checks -Onone @/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -target arm64-apple-ios27.0-simulator -g -module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -parse-as-library -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache -output-file-map /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -emit-const-values -const-gather-protocols-list /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks_const_extract_protocols.json -Xcc -iquote -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-generated-files.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-own-target-headers.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks-2a0af850774eaa281aae0e9365cfdf49-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-project-headers.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources-normal/arm64 -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources/arm64 -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-Swift.h -working-directory /tmp/KilnWatchPhase2Checks -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/Info.plist /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/KilnWatch.build/empty-KilnWatch.plist (in target 'KilnWatch' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-infoPlistUtility /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/KilnWatch.build/empty-KilnWatch.plist -producttype com.apple.product-type.application -genpkginfo /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/KilnWatch.build/assetcatalog_generated_info.plist -scanforprivacyfile /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/KilnWatchCore_KilnWatchCore.bundle -o /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/Info.plist
+
+CopySwiftLibs /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app (in target 'KilnWatch' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/KilnWatch.debug.dylib --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/Frameworks --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/PlugIns --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/SystemExtensions --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/KilnWatch.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/KilnWatch.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ProcessInfoPlistFile /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Info.plist /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/empty-Phase2Checks.plist (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-infoPlistUtility /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/empty-Phase2Checks.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/ProductTypeInfoPlistAdditions.plist -o /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Info.plist
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ Phase2Checks (in target 'Phase2Checks' from project 'Phase2Checks')
+
+SwiftCompile normal arm64 (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    
+
+SwiftCompile normal arm64 Compiling\ Phase2Checks.swift /tmp/KilnWatchPhase2Checks/Tests/Phase2Checks.swift (in target 'Phase2Checks' from project 'Phase2Checks')
+
+SwiftCompile normal arm64 /tmp/KilnWatchPhase2Checks/Tests/Phase2Checks.swift (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-SwiftPerFileCompile Phase2Checks.swift
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for Phase2Checks (in target 'Phase2Checks' from project 'Phase2Checks')
+
+SwiftDriver\ Compilation\ Requirements Phase2Checks normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Phase2Checks -Onone @/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -target arm64-apple-ios27.0-simulator -g -module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -parse-as-library -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache -output-file-map /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -emit-const-values -const-gather-protocols-list /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks_const_extract_protocols.json -Xcc -iquote -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-generated-files.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-own-target-headers.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks-2a0af850774eaa281aae0e9365cfdf49-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-project-headers.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources-normal/arm64 -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources/arm64 -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-Swift.h -working-directory /tmp/KilnWatchPhase2Checks -experimental-emit-module-separately -disable-cmo
+
+Copy /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftsourceinfo (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftsourceinfo /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+Copy /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.abi.json (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.abi.json /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftmodule (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftmodule /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+SwiftDriverJobDiscovery normal arm64 Compiling Phase2Checks.swift (in target 'Phase2Checks' from project 'Phase2Checks')
+
+SwiftDriver\ Compilation Phase2Checks normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-Swift-Compilation -- /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Phase2Checks -Onone @/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -target arm64-apple-ios27.0-simulator -g -module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -parse-as-library -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache -output-file-map /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -emit-const-values -const-gather-protocols-list /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks_const_extract_protocols.json -Xcc -iquote -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-generated-files.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-own-target-headers.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks-2a0af850774eaa281aae0e9365cfdf49-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks-project-headers.hmap -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources-normal/arm64 -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources/arm64 -Xcc -I/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks-Swift.h -working-directory /tmp/KilnWatchPhase2Checks -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Phase2Checks normal (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios27.0-simulator -bundle -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -O0 -Xlinker -no_warn_duplicate_libraries -L/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -L/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -filelist /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.LinkFileList -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -Xlinker -object_path_lto -Xlinker /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.swiftmodule -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks.xctest-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks.xctest-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Phase2Checks
+
+CopySwiftLibs /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Phase2Checks --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Frameworks --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/PlugIns --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/SystemExtensions --scan-folder /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ExtractAppIntentsMetadata (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name Phase2Checks --sdk-root /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk --xcode-version 27A5218g --platform-family iOS --deployment-target 27.0 --bundle-identifier com.kilnwatch.phase2checks --output /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest --target-triple arm64-apple-ios27.0-simulator --binary-file /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest/Phase2Checks --dependency-file /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks_dependency_info.dat --stringsdata-file /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.SwiftFileList --metadata-file-list /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks.DependencyMetadataFileList --static-metadata-file-list /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Phase2Checks.DependencyStaticMetadataFileList --swift-const-vals-list /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/Phase2Checks.build/Debug-iphonesimulator/Phase2Checks.build/Objects-normal/arm64/Phase2Checks.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --no-app-shortcuts-localization
+2026-10-09 19:37:40.892 appintentsmetadataprocessor[38015:20880270] Starting appintentsmetadataprocessor export
+2026-10-09 19:37:40.898 appintentsmetadataprocessor[38015:20880270] warning: Metadata extraction skipped, no AppIntents.framework dependency found
+
+CodeSign /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app/PlugIns/Phase2Checks.xctest
+
+CodeSign /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app (in target 'Phase2Checks' from project 'Phase2Checks')
+    cd /tmp/KilnWatchPhase2Checks
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app
+/Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Products/Debug-iphonesimulator/Phase2Checks-Runner.app: replacing existing signature
+
+PruneExplicitPrecompiledModules /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/aryamanjaiswal/Library/Developer/Xcode/DerivedData/Phase2Checks-gcdqiwfwxlkgwpbyekfgypaximge/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+2026-10-09 19:37:45.376290+0530 Phase2Checks-Runner[38021:20880514] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-10-09 19:37:53.044.
+Test Suite 'Phase2Checks.xctest' started at 2026-10-09 19:37:53.046.
+Test Suite 'Phase2Checks' started at 2026-10-09 19:37:53.046.
+Test Case '-[Phase2Checks.Phase2Checks testLocationGranted]' started.
+    t =     0.01s Start Test at 2026-10-09 19:37:53.055
+    t =     0.11s Set Up
+    t =     0.37s Open com.kilnwatch.inspector
+    t =     0.38s     Launch com.kilnwatch.inspector
+2026-10-09 19:37:53.723 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:37:53.723 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+objc[38021]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x1066c8398) and /Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x10679c310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+    t =     1.30s         Setting up automation session
+    t =     5.72s         Wait for com.kilnwatch.inspector to idle
+    t =    11.15s Waiting 10.0s for "My location" Button to exist
+    t =    12.18s     Checking `Expect predicate `existsNoRetry == 1` for object "My location" Button`
+    t =    12.18s         Checking existence of `"My location" Button`
+    t =    12.52s Tap "My location" Button
+    t =    12.52s     Wait for com.kilnwatch.inspector to idle
+    t =    12.52s     Find the "My location" Button
+    t =    12.58s     Check for interrupting elements affecting "location" Button
+    t =    12.67s     Synthesize event
+<unknown>:0: warning: -[Phase2Checks.Phase2Checks testLocationGranted] : This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+    t =    13.02s     Wait for com.kilnwatch.inspector to idle
+    t =    14.81s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    14.81s     Checking existence of `"Finding your location…" StaticText`
+    t =    14.87s     Capturing element debug description
+    t =    15.80s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    15.80s     Checking existence of `"Finding your location…" StaticText`
+    t =    15.86s     Capturing element debug description
+    t =    16.79s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    16.79s     Checking existence of `"Finding your location…" StaticText`
+    t =    16.86s     Capturing element debug description
+    t =    17.78s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    17.78s     Checking existence of `"Finding your location…" StaticText`
+    t =    17.85s     Capturing element debug description
+    t =    18.78s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    18.78s     Checking existence of `"Finding your location…" StaticText`
+    t =    18.85s     Capturing element debug description
+    t =    19.78s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    19.78s     Checking existence of `"Finding your location…" StaticText`
+    t =    19.85s     Capturing element debug description
+    t =    20.87s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    20.87s     Checking existence of `"Finding your location…" StaticText`
+    t =    20.94s     Capturing element debug description
+    t =    21.86s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    21.87s     Checking existence of `"Finding your location…" StaticText`
+    t =    21.93s     Capturing element debug description
+    t =    22.86s Checking `Expect predicate `BLOCKPREDICATE(0x1062b4960)` for object Target Application 'com.kilnwatch.inspector'`
+    t =    22.86s     Checking existence of `"Finding your location…" StaticText`
+    t =    22.96s     Checking existence of `"No location fix yet. Try again, or navigate with Maps." StaticText`
+    t =    23.01s     Checking existence of `"My Location" Other`
+    t =    23.08s Checking existence of `"Your location" Alert`
+    t =    23.13s Find the "Navigate to KW-0412" Button
+    t =    23.19s Requesting snapshot of accessibility hierarchy for app with pid 38034
+    t =    23.45s Requesting snapshot of accessibility hierarchy for app with pid 38034
+LOCATION_ACCESSIBILITY_TREE
+Attributes: Application, 0x106004dc0, pid: 38034, label: 'KilnWatch'
+Element subtree:
+ →Application, 0x106004dc0, pid: 38034, label: 'KilnWatch'
+    Window (Main), 0x106004f00, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x106004c80, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x106005040, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x106005540, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x106005400, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x1060057c0, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x106005900, {{0.0, 0.0}, {402.0, 874.0}}
+                Other, 0x106005e00, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x106005f40, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x106005cc0, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x106006080, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x106006300, {{0.0, 0.0}, {402.0, 874.0}}
+                          Other, 0x106006440, {{0.0, 0.0}, {402.0, 874.0}}
+                            Other, 0x1060061c0, {{0.0, 0.0}, {402.0, 874.0}}
+                              Other, 0x106006580, {{0.0, 0.0}, {402.0, 874.0}}
+                                Other, 0x106006800, {{0.0, 0.0}, {402.0, 874.0}}
+                                  Other, 0x106006940, {{0.0, 0.0}, {402.0, 874.0}}
+                                    Other, 0x1060066c0, {{0.0, 263.3}, {402.0, 239.7}}
+                                      Other, 0x106006a80, {{180.0, 361.0}, {42.0, 44.0}}, label: 'My Location'
+                                      Other, 0x106006d00, {{0.0, 0.0}, {402.0, 874.0}}
+                                        Map, 0x106006e40, {{0.0, 0.0}, {402.0, 874.0}}
+                                          Other, 0x106006bc0, {{58.5, 33.4}, {30.0, 30.0}}, identifier: 'VKPointFeature', label: 'KW-0395'
+                                          Other, 0x106006f80, {{158.6, 159.0}, {30.0, 30.0}}, identifier: 'VKPointFeature', label: 'KW-0451'
+                                          Other, 0x1060070c0, {{212.6, 308.9}, {30.0, 30.0}}, identifier: 'VKPointFeature', label: 'Hapur'
+                                          Other, 0x106007340, {{271.0, 378.8}, {30.0, 30.0}}, identifier: 'VKPointFeature', label: 'KW-0467'
+                                        Other, 0x106007480, {{0.0, 0.0}, {402.0, 874.0}}, identifier: 'AnnotationContainer'
+                                          Other, 0x1060075c0, {{151.3, 151.7}, {44.0, 44.0}}, label: 'KW-0451'
+                                            Other, 0x106007200, {{151.3, 151.7}, {44.0, 44.0}}
+                                              Other, 0x106007700, {{151.3, 151.7}, {44.0, 44.0}}
+                                                Button, 0x106007980, {{151.3, 151.7}, {44.0, 44.0}}, label: 'Stop 3, KW-0451'
+                                          Other, 0x106007ac0, {{51.3, 26.3}, {44.0, 44.0}}, label: 'KW-0395'
+                                            Other, 0x106007c00, {{51.3, 26.3}, {44.0, 44.0}}
+                                              Other, 0x106007840, {{51.3, 26.3}, {44.0, 44.0}}
+                                                Button, 0x106007e80, {{51.3, 26.3}, {44.0, 44.0}}, label: 'Stop 8, KW-0395'
+                                          Other, 0x106005a40, {{264.0, 371.7}, {44.0, 44.0}}, label: 'KW-0467'
+                                            Other, 0x106004640, {{264.0, 371.7}, {44.0, 44.0}}
+                                              Other, 0x103222f80, {{264.0, 371.7}, {44.0, 44.0}}
+                                                Button, 0x103223700, {{264.0, 371.7}, {44.0, 44.0}}, label: 'Stop 5, KW-0467'
+                                          Other, 0x103223980, {{180.0, 361.0}, {42.0, 44.0}}, label: 'My Location'
+                                      Link, 0x103223ac0, {{70.2, 482.0}, {28.6, 11.0}}, label: 'Legal'
+                                    Button, 0x103223d40, {{333.2, 62.0}, {46.7, 46.7}}, identifier: 'list.number', label: 'Route list'
+                                    StaticText, 0x103223c00, {{36.0, 74.0}, {232.7, 42.3}}, label: 'Today · Hapur, 9 stops · 7 h 15 m · leave 9:00 AM'
+                                      StaticText, 0x103221040, {{36.0, 74.0}, {110.3, 20.3}}, label: 'Today · Hapur'
+                                      StaticText, 0x1032208c0, {{36.0, 98.3}, {232.7, 18.0}}, label: '9 stops · 7 h 15 m · leave 9:00 AM'
+                                    Button, 0x107080000, {{331.7, 116.7}, {49.7, 49.7}}, identifier: 'globe.asia.australia', label: 'Satellite imagery'
+                                    Button, 0x107080140, {{331.8, 174.3}, {49.3, 49.3}}, identifier: 'location', label: 'My location'
+                                    StaticText, 0x107080280, {{32.0, 235.7}, {200.7, 15.7}}, label: 'Sample data · illustrative routing'
+                                    ScrollView, 0x1070803c0, {{0.0, 511.0}, {402.0, 210.0}}
+                                      Other, 0x107080500, {{20.0, 511.0}, {2814.0, 210.0}}
+                                        Other, 0x107080640, {{20.0, 511.0}, {930.0, 210.0}}
+                                          Button, 0x107080780, {{20.0, 511.0}, {302.0, 148.0}}, label: '1, Kiln KW-0412, FCBK, confidence 82%, 410 m from homes · rule requires 800 m, 6,240 people within 800 m, ETA 9:40 AM · 40 min drive'
+                                            StaticText, 0x1070808c0, {{36.0, 529.0}, {9.7, 18.0}}, label: '1'
+                                            Other, 0x107080a00, {{53.7, 527.0}, {164.0, 20.3}}, label: 'Kiln KW-0412, FCBK, confidence 82%'
+                                              StaticText, 0x107080b40, {{53.7, 527.0}, {73.7, 20.3}}, label: 'KW-0412'
+                                              StaticText, 0x107080c80, {{135.3, 529.0}, {82.3, 18.0}}, label: 'FCBK · 0.82'
+                                            StaticText, 0x107080dc0, {{36.0, 555.3}, {229.7, 38.0}}, label: '410 m from homes · rule requires 800 m'
+                                            StaticText, 0x107080f00, {{36.0, 601.3}, {185.0, 18.0}}, label: '6,240 people within 800 m'
+                                            StaticText, 0x107081040, {{36.0, 627.3}, {163.3, 15.7}}, label: 'ETA 9:40 AM · 40 min drive'
+                                          Button, 0x107081180, {{334.0, 511.0}, {302.0, 148.0}}, label: '2, Kiln KW-0388, FCBK, confidence 88%, 520 m from homes · rule requires 800 m, 4,910 people within 800 m, ETA 10:25 AM · 10 min drive'
+                                            StaticText, 0x1070812c0, {{350.0, 529.0}, {9.7, 18.0}}, label: '2'
+                                            Other, 0x107081400, {{367.7, 527.0}, {164.0, 20.3}}, label: 'Kiln KW-0388, FCBK, confidence 88%'
+                                              StaticText, 0x107081540, {{367.7, 527.0}, {73.7, 20.3}}, label: 'KW-0388'
+                                              StaticText, 0x107081680, {{449.3, 529.0}, {82.3, 18.0}}, label: 'FCBK · 0.88'
+                                            StaticText, 0x1070817c0, {{350.0, 555.3}, {231.7, 38.0}}, label: '520 m from homes · rule requires 800 m'
+                                            StaticText, 0x107081900, {{350.0, 601.3}, {185.0, 18.0}}, label: '4,910 people within 800 m'
+                                            StaticText, 0x107081a40, {{350.0, 627.3}, {171.3, 15.7}}, label: 'ETA 10:25 AM · 10 min drive'
+                                          Button, 0x107081b80, {{648.0, 511.0}, {302.0, 148.0}}, label: '3, Kiln KW-0451, likely CFCBK, confidence 64%, 690 m from homes · rule requires 800 m, 3,120 people within 800 m, ETA 11:10 AM · 10 min drive'
+                                            StaticText, 0x107081cc0, {{664.0, 529.0}, {9.7, 18.0}}, label: '3'
+                                            Other, 0x107081e00, {{681.7, 527.0}, {213.0, 20.3}}, label: 'Kiln KW-0451, likely CFCBK, confidence 64%'
+                                              StaticText, 0x107081f40, {{681.7, 527.0}, {73.7, 20.3}}, label: 'KW-0451'
+                                              StaticText, 0x107082080, {{763.3, 529.0}, {131.3, 18.0}}, label: 'likely CFCBK · 0.64'
+                                            StaticText, 0x1070821c0, {{664.0, 555.3}, {232.3, 38.0}}, label: '690 m from homes · rule requires 800 m'
+                                            StaticText, 0x107082300, {{664.0, 601.3}, {185.0, 18.0}}, label: '3,120 people within 800 m'
+                                            StaticText, 0x107082440, {{664.0, 627.3}, {171.3, 15.7}}, label: 'ETA 11:10 AM · 10 min drive'
+                                          Button, 0x107082580, {{20.0, 671.0}, {302.0, 50.0}}, label: 'Navigate to KW-0412'
+                                            StaticText, 0x1070826c0, {{20.0, 671.0}, {302.0, 50.0}}, label: 'Navigate'
+                                            Image, 0x107082800, {{121.7, 686.0}, {20.0, 20.0}}, identifier: 'arrow.triangle.turn.up.right.diamond', label: 'Directions'
+                                          Button, 0x107082940, {{334.0, 671.0}, {302.0, 50.0}}, label: 'Navigate to KW-0388'
+                                            StaticText, 0x107082a80, {{334.0, 671.0}, {302.0, 50.0}}, label: 'Navigate'
+                                            Image, 0x107082bc0, {{435.7, 686.0}, {20.0, 20.0}}, identifier: 'arrow.triangle.turn.up.right.diamond', label: 'Directions'
+                                          Button, 0x107082d00, {{648.0, 671.0}, {302.0, 50.0}}, label: 'Navigate to KW-0451'
+                                            StaticText, 0x107082e40, {{648.0, 671.0}, {302.0, 50.0}}, label: 'Navigate'
+                                            Image, 0x107082f80, {{749.7, 686.0}, {20.0, 20.0}}, identifier: 'arrow.triangle.turn.up.right.diamond', label: 'Directions'
+                                    Button, 0x1070830c0, {{20.0, 733.0}, {362.0, 50.0}}, label: 'Start route'
+                            Toolbar, 0x107083200, {{0.0, 0.0}, {402.0, 874.0}}, identifier: 'Toolbar', label: 'Toolbar'
+                              Other, 0x107083340, {{0.0, 0.0}, {402.0, 874.0}}
+                Other, 0x107083480, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x1070835c0, {{0.0, 791.0}, {402.0, 83.0}}
+                    Other, 0x107083700, {{0.0, 0.0}, {402.0, 874.0}}
+                      TabBar, 0x107083840, {{0.0, 791.0}, {402.0, 83.0}}, label: 'Tab Bar'
+                        Other, 0x107083980, {{64.0, 791.0}, {274.0, 62.0}}
+                          Other, 0x107083ac0, {{64.0, 791.0}, {94.0, 54.0}}
+                          Other, 0x107083c00, {{64.0, 791.0}, {274.0, 62.0}}
+                            Button, 0x107083d40, {{68.0, 795.0}, {94.0, 54.0}}, label: 'Today', Selected
+                              Image, 0x107083e80, {{100.3, 801.7}, {29.7, 26.3}}, identifier: 'map.fill', label: 'show map'
+                            Button, 0x107084000, {{154.0, 795.0}, {94.0, 54.0}}, label: 'Kilns'
+                              Image, 0x107084140, {{186.3, 804.3}, {29.3, 21.0}}, identifier: 'list.bullet', label: 'List'
+                            Button, 0x107084280, {{240.0, 795.0}, {94.0, 54.0}}, label: 'Ask'
+                              Image, 0x1070843c0, {{271.3, 801.7}, {31.3, 27.7}}, identifier: 'text.bubble.fill', label: 'comment lines'
+                          Other, 0x107084500, {{64.0, 791.0}, {274.0, 62.0}}
+                          Other, 0x107084640, {{68.0, 795.0}, {94.0, 54.0}}
+                            Other, 0x107084780, {{68.0, 795.0}, {94.0, 54.0}}
+                              Other, 0x1070848c0, {{68.0, 795.0}, {94.0, 54.0}}
+                              Other, 0x107084a00, {{68.0, 795.0}, {94.0, 54.0}}
+                                Other, 0x107084b40, {{68.0, 795.0}, {94.0, 54.0}}
+                                  Other, 0x107084c80, {{68.0, 795.0}, {94.0, 54.0}}
+                                    Other, 0x107084dc0, {{68.0, 795.0}, {94.0, 54.0}}
+                                  Other, 0x107084f00, {{68.0, 795.0}, {94.0, 54.0}}
+                                Other, 0x107085040, {{68.0, 795.0}, {94.0, 54.0}}
+                    Other, 0x107085180, {{0.0, 791.0}, {402.0, 83.0}}
+                      Other, 0x1070852c0, {{0.0, 791.0}, {402.0, 83.0}}
+                        Other, 0x107085400, {{0.0, 791.0}, {402.0, 83.0}}
+                          Other, 0x107085540, {{0.0, 791.0}, {402.0, 83.0}}
+                            Other, 0x107085680, {{0.0, 791.0}, {402.0, 83.0}}
+                              Other, 0x1070857c0, {{0.0, 791.0}, {402.0, 83.0}}
+                          Other, 0x107085900, {{0.0, 791.0}, {402.0, 83.0}}
+                            Other, 0x107085a40, {{0.0, 791.0}, {402.0, 83.0}}
+Path to element:
+ →Application, 0x106004dc0, pid: 38034, label: 'KilnWatch'
+Query chain:
+ →Find: Target Application 'com.kilnwatch.inspector'
+  Output: {
+    Application, 0x107085b80, pid: 38034, label: 'KilnWatch'
+  }
+
+    t =    23.51s Tear Down
+Test Case '-[Phase2Checks.Phase2Checks testLocationGranted]' passed (23.789 seconds).
+Test Case '-[Phase2Checks.Phase2Checks testRouteRecoveryStatesAndMockScreens]' started.
+    t =     0.00s Start Test at 2026-10-09 19:38:16.849
+    t =     0.08s Set Up
+    t =     0.08s Open com.kilnwatch.inspector
+    t =     0.08s     Launch com.kilnwatch.inspector
+    t =     0.08s         Terminate com.kilnwatch.inspector:38034
+2026-10-09 19:38:17.991 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:38:17.991 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.35s         Setting up automation session
+    t =     6.21s         Wait for com.kilnwatch.inspector to idle
+    t =     8.96s Waiting 10.0s for "Loading today's route" StaticText to exist
+    t =     9.99s     Checking `Expect predicate `existsNoRetry == 1` for object "Loading today's route" StaticText`
+    t =     9.99s         Checking existence of `"Loading today's route" StaticText`
+    t =    10.15s Checking existence of `"Start route" Button`
+    t =    10.18s Open com.kilnwatch.inspector
+    t =    10.18s     Launch com.kilnwatch.inspector
+    t =    10.18s         Terminate com.kilnwatch.inspector:38067
+2026-10-09 19:38:28.106 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:38:28.106 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    11.70s         Setting up automation session
+    t =    21.09s         Wait for com.kilnwatch.inspector to idle
+    t =    27.84s Waiting 10.0s for "No route planned for today" StaticText to exist
+    t =    28.87s     Checking `Expect predicate `existsNoRetry == 1` for object "No route planned for today" StaticText`
+    t =    28.88s         Checking existence of `"No route planned for today" StaticText`
+    t =    29.21s Tap "Plan a route" Button
+    t =    29.21s     Wait for com.kilnwatch.inspector to idle
+    t =    29.22s     Find the "Plan a route" Button
+    t =    29.25s     Check for interrupting elements affecting "Plan a route" Button
+    t =    29.35s     Synthesize event
+    t =    29.72s     Wait for com.kilnwatch.inspector to idle
+    t =    31.08s Waiting 5.0s for "Ask KilnWatch" NavigationBar to exist
+    t =    32.11s     Checking `Expect predicate `existsNoRetry == 1` for object "Ask KilnWatch" NavigationBar`
+    t =    32.11s         Checking existence of `"Ask KilnWatch" NavigationBar`
+    t =    32.20s Find the TextField (First Match)
+    t =    32.24s Open com.kilnwatch.inspector
+    t =    32.24s     Launch com.kilnwatch.inspector
+    t =    32.24s         Terminate com.kilnwatch.inspector:38080
+2026-10-09 19:38:50.181 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:38:50.181 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    33.55s         Setting up automation session
+    t =    42.75s         Wait for com.kilnwatch.inspector to idle
+    t =    49.70s Waiting 10.0s for "The route service returned 503. Try again." StaticText to exist
+    t =    50.79s     Checking `Expect predicate `existsNoRetry == 1` for object "The route service returned 503. Try again." StaticText`
+    t =    50.81s         Checking existence of `"The route service returned 503. Try again." StaticText`
+    t =    51.55s Find the "Retry" Button
+    t =    51.68s Checking existence of `"Start route" Button`
+    t =    51.71s Open com.kilnwatch.inspector
+    t =    51.71s     Launch com.kilnwatch.inspector
+    t =    51.71s         Terminate com.kilnwatch.inspector:38854
+2026-10-09 19:39:09.612 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:39:09.613 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    53.19s         Setting up automation session
+    t =    58.79s         Wait for com.kilnwatch.inspector to idle
+    t =    63.88s Waiting 10.0s for "No connection and no saved route. Try again when you have a signal." StaticText to exist
+    t =    64.90s     Checking `Expect predicate `existsNoRetry == 1` for object "No connection and no saved route. Try again when you have a signal." StaticText`
+    t =    64.90s         Checking existence of `"No connection and no saved route. Try again when you have a signal." StaticText`
+    t =    65.02s Find the "Retry" Button
+    t =    65.06s Checking existence of `"Start route" Button`
+    t =    65.08s Open com.kilnwatch.inspector
+    t =    65.08s     Launch com.kilnwatch.inspector
+    t =    65.08s         Terminate com.kilnwatch.inspector:39122
+2026-10-09 19:39:22.986 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:39:22.986 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    66.35s         Setting up automation session
+    t =    70.73s         Wait for com.kilnwatch.inspector to idle
+    t =    73.44s Waiting 10.0s for "The saved route could not be read. Reconnect and retry." StaticText to exist
+    t =    74.47s     Checking `Expect predicate `existsNoRetry == 1` for object "The saved route could not be read. Reconnect and retry." StaticText`
+    t =    74.48s         Checking existence of `"The saved route could not be read. Reconnect and retry." StaticText`
+    t =    74.63s Find the "Retry" Button
+    t =    74.73s Checking existence of `"Start route" Button`
+    t =    74.75s Open com.kilnwatch.inspector
+    t =    74.75s     Launch com.kilnwatch.inspector
+    t =    74.75s         Terminate com.kilnwatch.inspector:39616
+2026-10-09 19:39:32.662 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:39:32.662 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    76.02s         Setting up automation session
+    t =    84.19s         Wait for com.kilnwatch.inspector to idle
+    t =    95.81s Waiting 10.0s for "Offline · showing saved route" StaticText to exist
+    t =    96.83s     Checking `Expect predicate `existsNoRetry == 1` for object "Offline · showing saved route" StaticText`
+    t =    96.84s         Checking existence of `"Offline · showing saved route" StaticText`
+    t =   101.47s Find the "Navigate to KW-0412" Button
+    t =   103.66s Open com.kilnwatch.inspector
+    t =   103.67s     Launch com.kilnwatch.inspector
+    t =   103.67s         Terminate com.kilnwatch.inspector:39877
+2026-10-09 19:40:01.615 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:40:01.615 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =   106.21s         Setting up automation session
+    t =   112.31s         Wait for com.kilnwatch.inspector to idle
+    t =   119.55s Waiting 10.0s for "Offline · showing saved route" StaticText to exist
+    t =   120.58s     Checking `Expect predicate `existsNoRetry == 1` for object "Offline · showing saved route" StaticText`
+    t =   120.58s         Checking existence of `"Offline · showing saved route" StaticText`
+    t =   120.95s Find the "Navigate to KW-0412" Button
+    t =   121.07s Open com.kilnwatch.inspector
+    t =   121.07s     Launch com.kilnwatch.inspector
+    t =   121.07s         Terminate com.kilnwatch.inspector:41029
+2026-10-09 19:40:19.010 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:40:19.010 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =   122.38s         Setting up automation session
+    t =   131.27s         Wait for com.kilnwatch.inspector to idle
+<unknown>:0: warning: -[Phase2Checks.Phase2Checks testRouteRecoveryStatesAndMockScreens] : Invalid frame dimension (negative or non-finite).
+    t =   141.18s Waiting 10.0s for "Road geometry unavailable · stops still usable" StaticText to exist
+    t =   142.21s     Checking `Expect predicate `existsNoRetry == 1` for object "Road geometry unavailable · stops still usable" StaticText`
+    t =   142.22s         Checking existence of `"Road geometry unavailable · stops still usable" StaticText`
+    t =   142.60s Find the "Navigate to KW-0412" Button
+    t =   142.74s Checking existence of `"Stop 2, KW-0388" Button`
+    t =   142.78s Open com.kilnwatch.inspector
+    t =   142.79s     Launch com.kilnwatch.inspector
+    t =   142.79s         Terminate com.kilnwatch.inspector:41555
+2026-10-09 19:40:40.652 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:40:40.652 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =   144.02s         Setting up automation session
+    t =   148.95s         Wait for com.kilnwatch.inspector to idle
+    t =   152.39s Waiting 10.0s for "Kiln unavailable" StaticText to exist
+    t =   153.43s     Checking `Expect predicate `existsNoRetry == 1` for object "Kiln unavailable" StaticText`
+    t =   153.43s         Checking existence of `"Kiln unavailable" StaticText`
+    t =   153.58s Open com.kilnwatch.inspector
+    t =   153.58s     Launch com.kilnwatch.inspector
+    t =   153.58s         Terminate com.kilnwatch.inspector:42068
+2026-10-09 19:40:51.494 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:40:51.495 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =   154.87s         Setting up automation session
+    t =   159.01s         Wait for com.kilnwatch.inspector to idle
+    t =   162.49s Waiting 10.0s for "C-HAB-800" StaticText to exist
+    t =   163.51s     Checking `Expect predicate `existsNoRetry == 1` for object "C-HAB-800" StaticText`
+    t =   163.52s         Checking existence of `"C-HAB-800" StaticText`
+    t =   163.74s Find the "Close" Button
+    t =   163.88s Open com.kilnwatch.inspector
+    t =   163.88s     Launch com.kilnwatch.inspector
+    t =   163.88s         Terminate com.kilnwatch.inspector:42082
+2026-10-09 19:41:01.788 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-09 19:41:01.788 xcodebuild[37994:20879923] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =   165.16s         Setting up automation session
+    t =   169.20s         Wait for com.kilnwatch.inspector to idle
+    t =   173.22s Waiting 10.0s for "Record verdict" NavigationBar to exist
+    t =   174.24s     Checking `Expect predicate `existsNoRetry == 1` for object "Record verdict" NavigationBar`
+    t =   174.24s         Checking existence of `"Record verdict" NavigationBar`
+    t =   174.50s Tear Down
+Test Case '-[Phase2Checks.Phase2Checks testRouteRecoveryStatesAndMockScreens]' passed (174.999 seconds).
+Test Suite 'Phase2Checks' passed at 2026-10-09 19:41:11.847.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 198.788 (198.801) seconds
+Test Suite 'Phase2Checks.xctest' passed at 2026-10-09 19:41:11.852.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 198.788 (198.806) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 19:41:11.853.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 198.788 (198.810) seconds
+2026-10-09 19:42:17.985 xcodebuild[37994:20879923] [MT] IDETestOperationsObserverDebug: 276.991 elapsed -- Testing started completed.
+2026-10-09 19:42:17.985 xcodebuild[37994:20879923] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-09 19:42:17.985 xcodebuild[37994:20879923] [MT] IDETestOperationsObserverDebug: 276.991 sec, +276.991 sec -- end
+
+Test session results, code coverage, and logs:
+	/tmp/kilnwatch-phase2-recovery.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started

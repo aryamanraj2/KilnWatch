@@ -16,6 +16,18 @@ struct RuleDistanceBar: View {
     private var rule: Rule { Rule.named(violation.ruleId) }
 
     var body: some View {
+        content
+            .onScrollVisibilityChange(threshold: 0.6) { visible in
+                guard visible, !appeared else { return }
+                withAnimation(Motion.layout.animation(reduceMotion: reduceMotion)) { appeared = true }
+            }
+            .accessibilityRepresentation {
+                Text(accessibilityText)
+                    .accessibilityAction(named: "Show rule \(violation.ruleId)") { showSource() }
+            }
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .firstTextBaseline, spacing: Space.xs) { header }
@@ -41,15 +53,6 @@ struct RuleDistanceBar: View {
                 Text("Supplied check: \(check.status.label). Flag and check differ; inspect on site.")
                     .font(.footnote).foregroundStyle(.inkSecondary)
             }
-        }
-        .onScrollVisibilityChange(threshold: 0.6) { visible in
-            guard visible, !appeared else { return }
-            withAnimation(Motion.layout.animation(reduceMotion: reduceMotion)) { appeared = true }
-        }
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(accessibilityText)
-        .accessibilityAction(named: "Show rule \(violation.ruleId)") {
-            showSource()
         }
     }
 
@@ -89,7 +92,7 @@ struct RuleDistanceBar: View {
     }
 
     private var accessibilityText: String {
-        "\(check?.check ?? rule.name). Siting flag, needs inspection. \(legacyTechnology ? technologyLine : violation.compactLine(for: nil)). Rule \(violation.ruleId). \(check?.verification?.label ?? "Threshold verification unavailable"). \(violation.source)."
+        "\(check?.check ?? rule.name). Siting flag, needs inspection. \(legacyTechnology ? technologyLine : violation.compactLine(for: nil)). Rule \(violation.ruleId). \(check?.verification?.label ?? "Threshold verification unavailable"). \(violation.source).\(check.map { $0.status != .withinThreshold ? " Supplied check: \($0.status.label). Flag and check differ; inspect on site." : "" } ?? "")"
     }
 }
 

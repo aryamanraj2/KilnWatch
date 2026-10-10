@@ -139,10 +139,19 @@ extension Route {
                                                 timeZone: planTimeZone, calendar: Calendar(identifier: .gregorian)))
     }
 
+    /// The departure day, falling back to the earliest ordered stop or generation time.
+    private var planDay: Date { depart ?? stops.min { $0.order < $1.order }?.eta ?? generatedAt }
+
+    /// A plan expires only after its calendar day ends in Asia/Kolkata; never triggers planning.
+    public func hasPassed(now: Date = .now) -> Bool {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = Self.planTimeZone
+        return calendar.startOfDay(for: planDay) < calendar.startOfDay(for: now)
+    }
+
     /// "Today", "Tomorrow" or a date such as "Sun 11 Oct", for the plan's departure day in Asia/Kolkata.
     public func dayLabel(now: Date = .now, locale: Locale = .autoupdatingCurrent) -> String {
         var calendar = Calendar(identifier: .gregorian); calendar.timeZone = Self.planTimeZone
-        let day = depart ?? stops.min { $0.order < $1.order }?.eta ?? generatedAt
+        let day = planDay
         if calendar.isDate(day, inSameDayAs: now) { return "Today" }
         if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now), calendar.isDate(day, inSameDayAs: tomorrow) { return "Tomorrow" }
         return day.formatted(Date.VerbatimFormatStyle(format: "\(weekday: .abbreviated) \(day: .defaultDigits) \(month: .abbreviated)",

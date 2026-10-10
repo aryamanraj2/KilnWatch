@@ -14,27 +14,20 @@ extension AppModel {
     }
     /// The plan's own day, for example "Tomorrow · Hapur", never an assumed "Today".
     var routeTitle: String { route.map { "\($0.dayLabel()) · \($0.district)" } ?? "Today" }
-    var savedDate: String? {
+    func savedDate(compact: Bool = false) -> String? {
         guard case .saved(let route, _) = routeState else { return nil }
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Asia/Kolkata")!
         let planDate = route.depart ?? route.stops.first?.eta ?? route.generatedAt
         // A public plan is never refreshed automatically, so its saved date always shows.
         guard usesPublicRegistry || !calendar.isDate(planDate, inSameDayAs: .now) else { return nil }
-        var style = Date.FormatStyle.dateTime.day().month().year()
+        var style = Date.FormatStyle.dateTime.day().month(.abbreviated)
         style.timeZone = calendar.timeZone
-        return "Saved plan · \(planDate.formatted(style))"
+        return "\(compact ? "saved" : "Saved plan ·") \(planDate.formatted(style))"
     }
     var overview: MapCameraPosition {
         guard let route else { return .automatic }
-        let points = stops.compactMap { kiln($0.kilnId)?.footprint.centroid }
-            + (route.legs ?? []).flatMap { $0.geometry?.validatedCoordinates ?? [] }
-        guard let first = points.first else { return .automatic }
-        var rect = MKMapRect(origin: MKMapPoint(first.clLocation), size: MKMapSize(width: 1, height: 1))
-        for point in points.dropFirst() { rect = rect.union(MKMapRect(origin: MKMapPoint(point.clLocation), size: MKMapSize(width: 1, height: 1))) }
-        // The map's safe-area insets reserve room for the header and carousel.
-        let padding = max(rect.size.width, rect.size.height) * 0.16 + 1_000
-        return .rect(rect.insetBy(dx: -padding, dy: -padding))
+        return route.overviewRect(stopCoordinates: stops.compactMap { kiln($0.kilnId)?.footprint.centroid }).map { .rect($0) } ?? .automatic
     }
 }
 

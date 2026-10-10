@@ -62,6 +62,13 @@ SPECS = [
                       'max_stops': {'type': 'integer', 'minimum': 1, 'maximum': 8, 'description': 'Default 8.'},
                       'start_lat': {'type': 'number'}, 'start_lon': {'type': 'number'}},
                       'required': ['district']}}}},
+    {'toolSpec': {'name': 'inspection_sheet',
+                  'description': "One kiln's inspection sheet: siting flags with measured distances, checks to confirm on "
+                                 'site, people exposed and the imagery. Use it when asked for a sheet, a brief or what to '
+                                 'check at a kiln or route stop.',
+                  'inputSchema': {'json': {'type': 'object', 'properties': {
+                      'kiln_id': {'type': 'string', 'description': 'Full ID, for example KW- followed by 32 hex characters.'}},
+                      'required': ['kiln_id']}}}},
 ]
 # Rule facts as explicit words (a bare status or boolean column gets misread). Never the word the record key uses.
 STATUS_WORDS = {
@@ -84,6 +91,12 @@ SORTED_NOTE = 'Sorted by people_within_800m, highest first; rank 1 has the most 
 PARTIAL_NOTE = 'Some siting rules lacked data, so having no siting flags is not a clean result.'
 EXPOSURE_NOTE = ('Modelled estimate of residents within 800 m of the kiln edge, from HRSL v1.5.2 (Meta and CIESIN, '
                  'CC BY 4.0). Age groups are modelled shares of the same estimate.')
+# Copied from AWS/route/planner.py (each Lambda ZIP holds one folder); a test keeps the two equal.
+CHECKS = {'C-HAB-800': 'Distance to the nearest home', 'C-KILN-1K': 'Distance to the nearest kiln',
+          'UP-NH-300': 'Distance to the national highway', 'UP-RAIL-200': 'Distance to the railway'}
+ALWAYS = ['Kiln type: fixed chimney or zigzag', 'Is the kiln firing?']
+CONFIRM_WORDS = {'inconclusive': 'inconclusive, map data incomplete · measure on site',
+                 'not_evaluated': 'not evaluated, no usable data · confirm on site'}
 
 
 def number(value):
@@ -158,6 +171,40 @@ def attribution_text(meta):
     """The exact image attribution string(s), for the model to quote word for word."""
     found = [m.get('attribution') for m in (meta.get('before_metadata'), meta.get('after_metadata')) if m and m.get('attribution')]
     return '; '.join(dict.fromkeys(found)) or 'no image attribution'
+
+
+def on_site_checks(record):
+    """The route planner's sheet list: flag-derived checks, de-duplicated, then the checks for every kiln."""
+    labels = {c.get('rule_id'): c.get('check') for c in record.get('rule_checks') or []}
+    checks = [CHECKS.get(v.get('rule_id')) or labels.get(v.get('rule_id')) for v in record.get('violations') or []]
+    return list(dict.fromkeys(c for c in checks if c)) + ALWAYS
+
+
+def imagery_words(evidence):
+    if not (evidence.get('before') or evidence.get('after')): return 'not yet published'
+    def side(name):
+        if not evidence.get(name): return f'{name} not yet published'
+        return f"{name} {((evidence.get(name + '_metadata') or {}).get('acquired_at') or '')[:10] or 'date not recorded'}"
+    return f"{side('before')}, {side('after')}"
+
+
+def inspection_sheet(record):
+    """One kiln's sheet as explicit strings, in reading order. No URLs, polygons or coordinates."""
+    view, exposure = trim(record), record.get('exposure') or {}
+    sheet = {'kiln_id': record['kiln_id'], 'status': 'Flagged by satellite, pending inspection',
+             'kiln_type': f"predicted {record.get('type') or 'type unknown'}, unverified · confirm on site",
+             'siting_flags': view['siting_flags'] or 'none measured',
+             'checks_to_confirm': [f"{c.get('check')}: {CONFIRM_WORDS[c.get('status')]}"
+                                   for c in record.get('rule_checks') or [] if c.get('status') in CONFIRM_WORDS],
+             'on_site_checks': on_site_checks(record)}
+    for key in ('people', 'children_under_five', 'adults_over_sixty'):
+        value = exposure.get(key)
+        sheet['people_within_800m' if key == 'people' else key] = value if number(value) else 'not assessed'
+    if number(exposure.get('people')): sheet['exposure_note'] = EXPOSURE_NOTE
+    evidence = record.get('evidence') or {}
+    sheet.update(imagery=imagery_words(evidence), attribution_text=attribution_text(evidence))
+    if 'rules_note' in view: sheet['rules_note'] = view['rules_note']
+    return sheet
 
 
 def image_side(meta):
@@ -293,16 +340,20 @@ def run(api, name, args):
         images = image_fields(shown)
         result = {'radius_m': radius, 'count': len(shown), 'kilns': table(shown), **images, 'note': NOTE}
         return result, step(name, label, f'{len(shown)} within {radius} m', True), [k['kiln_id'] for k in shown]
-    if name in ('kiln_detail', 'get_evidence'):
+    if name in ('kiln_detail', 'get_evidence', 'inspection_sheet'):
         kiln_id = args.get('kiln_id')
         evidence = name == 'get_evidence'
+        labels = {'kiln_detail': ('Looking up a kiln', 'Looking up'), 'get_evidence': ('Gathering evidence', 'Gathering evidence for'),
+                  'inspection_sheet': ('Preparing an inspection sheet', 'Preparing the inspection sheet for')}[name]
         if not isinstance(kiln_id, str) or not KILN_ID.fullmatch(kiln_id):
-            return invalid(name, 'Gathering evidence' if evidence else 'Looking up a kiln')
-        label = f'{"Gathering evidence for" if evidence else "Looking up"} {kiln_id[:7]}…'
+            return invalid(name, labels[0])
+        label = f'{labels[1]} {kiln_id[:7]}…'
         record = api.get('/public/kilns/' + kiln_id)
         if record is None:
             return {'found': False, 'message': 'Not found or not flagged.'}, step(name, label, 'Not found', True), []
         if record.get('kiln_id') != kiln_id: raise UpstreamUnavailable('unexpected body')
+        if name == 'inspection_sheet':
+            return {'found': True, **inspection_sheet(record)}, step(name, label, 'Ready', True), [kiln_id]
         exposure = {'exposure_note': EXPOSURE_NOTE} if record.get('exposure') else {}
         if evidence:
             view, meta = trim(record, detail=True), record.get('evidence') or {}
@@ -342,8 +393,11 @@ def run(api, name, args):
 
 
 def image_fields(views):
-    """Lists carry no per-row image field (a boolean column was misread): one top-level ID list instead."""
+    """Lists carry no per-row image field (a boolean column was misread): one top-level fact instead.
+    All or none is a sentence; an ID list only for some (39 IDs overran the answer length)."""
     published = [view['kiln_id'] for view in views if view.pop('satellite_images') == 'published']
+    if not published: return {'satellite_images': 'not yet published for any kiln listed'}
+    if len(published) == len(views): return {'satellite_images': f'published for all {len(views)} kilns listed'}
     return {'images_published_only_for': published, 'images_note': IMAGES_NOTE}
 
 

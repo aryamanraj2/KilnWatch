@@ -449,7 +449,8 @@ kiln_id, lat, lon)`) is route-independent. The resident portal will later add it
   banned words. Since R1, answers may cite rule IDs.
 - `citations`: the full IDs that appear in `answer`, in order of first appearance, de-duplicated.
 - `steps`: one per tool call, written by the server (never model text, never raw tool output).
-  `tool` is `list_flagged_kilns`, `kilns_near`, `kiln_detail`, `get_evidence` (R1) or `unknown`; `ok: false`
+  `tool` is `list_flagged_kilns`, `kilns_near`, `kiln_detail`, `get_evidence` (R1), `plan_route` (P1),
+  `inspection_sheet` (P2) or `unknown`; `ok: false`
   means the model sent invalid tool input. A `kiln_detail` that finds nothing has
   `summary: "Not found"` and `ok: true`.
 - `fallback: true`: the model failed validation twice. `answer` is fixed server text with no
@@ -618,3 +619,12 @@ New tool `plan_route` (`district`, `priority`, `max_stops`, optional `start_lat`
 step is `{"tool": "plan_route", "label": "Planning a route", "summary": "N stops", "ok": true}`.
 Answers state the stops, order and times as returned and call the times estimates.
 `get_evidence` now also returns `attribution_text`, quoted exactly.
+
+**P2 (2026-10-10).** New tool `inspection_sheet(kiln_id)`: one kiln's sheet (siting flags with
+measured distances, checks to confirm on site, the same on-site checks as a route stop's `sheet`,
+people exposed or "not assessed", image dates and attribution). Its step is
+`{"tool": "inspection_sheet", "label": "Preparing the inspection sheet for KW-xxxx…", "summary": "Ready", "ok": true}`
+(`summary: "Not found"` when the kiln is not found). List results now say "published for all N
+kilns listed" (or "not yet published for any kiln listed") instead of listing every ID; the ID
+list remains only when some kilns have images. The response shape is unchanged; the app shows
+step labels as given.

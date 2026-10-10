@@ -126,7 +126,7 @@ Number it `20-live-today-route.md`. The iOS lane's own numbering is 18–29.
    - remove the registry runner;
    - set the Ask cap back to 50;
    - consider lowering the route cap;
-   - when AWS verifies the main account, switch CloudFront and Bedrock back to it (steps in `local-verification.md`).
+   - the second account stays permanent for Bedrock and CloudFront (user decision, 2026-10-10); no switch-back.
 5. **M1** whenever the ML teammate delivers: new IDs, so the user decides how to import; then re-run R1 and E1. No code changes.
 
 ## 8. Git state at handover
