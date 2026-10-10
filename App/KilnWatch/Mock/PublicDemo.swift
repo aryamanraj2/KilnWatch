@@ -21,7 +21,7 @@ enum PublicDemo {
 
     static func api(scenario: String) -> KilnWatchAPI {
         let host = "\(UUID().uuidString.lowercased()).example"
-        let records: [[String: Any]] = Fixtures.kilns.compactMap { kiln in
+        let records: [[String: Any]] = DemoOptions.string("rulesDemo").map(R1Demo.records) ?? Fixtures.kilns.compactMap { kiln in
             guard let data = try? JSONEncoder.kilnWatch.encode(kiln),
                   var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
             if DemoOptions.string("askDemo") != nil, kiln.kilnId == "KW-0412" { object["kiln_id"] = "KW-00000000000000000000000000000001" }

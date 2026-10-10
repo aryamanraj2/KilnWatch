@@ -204,3 +204,8 @@ Live Ask is implemented with typed stateless POST handling, honest waiting/serve
 ### Phase 4B live confirmation — 2026-10-10
 
 After explicit user reauthorization, one live Ask submission from the installed app succeeded for the Hapur count question: 39 flagged kilns, one full-ID citation, one server-written trace step and the disclaimer. The citation opened live detail with published imagery. Conservative count is 2 of 8, including the earlier unconfirmed reservation; no retries or counter reads. Updated evidence and scope are in `screens/phase-4/ask-report.md`. The selected-kiln contextual POST remains for the user to test. Implementation remains paused for orchestrator review; no prompts 19/20 started.
+
+
+## Prompt 19: rules and exposure UI — 2026-10-10
+
+Kiln detail shows live siting flags (measured against threshold, verification label, source), every supplied rule check, and HRSL modelled exposure with attribution; the Kilns list shows the top flag and the modelled residents. Partial assessment is never shown as clear; unknown statuses show as unavailable. The orchestrator reviewed it: 63 core tests passed, the root build succeeded, the leak scan found 0 hits, and the screenshots were reviewed. See `screens/phase-4c/rules-exposure-report.md`. Next for iOS: prompt 20 (live Today on `POST /routes/plan`, live since P1).

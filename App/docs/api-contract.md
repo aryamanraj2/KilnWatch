@@ -546,3 +546,75 @@ within 800 m of the kiln edge. Population: Meta and CIESIN High Resolution Settl
   polygons or feature coordinates. It appears in `steps` as
   `{"tool": "get_evidence", "label": "Gathering evidence for KW-xxxx…", "summary": "Found", "ok": true}`.
 - Answers may cite rule IDs, but only ones a tool returned in the same request.
+
+## P1: `POST /routes/plan` (live, 2026-10-10)
+
+A public inspection route for one district, built from road travel times (Amazon Location,
+Car, no live traffic). Public with **no `Authorization` header**, like `/ask`. The URL is the
+existing public base URL plus `/routes/plan`. `GET /routes/today` (the signed-in inspector's
+route) is still **not built**.
+
+### Request
+
+```json
+{"district": "Hapur", "start": {"lat": 28.7306, "lon": 77.7759}, "depart": "2026-10-11T09:00:00+05:30",
+ "budget_min": 480, "max_stops": 8, "priority": "people", "kiln_ids": ["KW-…"]}
+```
+
+| Key | Rules and default |
+|---|---|
+| `district` | Required; same validation as the public API |
+| `start` | Optional `{lat, lon}` numbers. Default: the centre of the selected kilns (said in `notes`) |
+| `depart` | Optional RFC 3339 with `T` and an offset. Default: tomorrow 09:00 Asia/Kolkata |
+| `budget_min` | Optional integer 60–720, default 480 |
+| `max_stops` | Optional integer 1–8, default 8 |
+| `priority` | `"people"` (default: most people within 800 m) or `"flags"` (most siting flags, then people). There is no "schools first" |
+| `kiln_ids` | Optional, 1–8 unique full IDs. Plans exactly these (IDs not found in the district are reported in `notes`) |
+
+Body at most 4 KB. Unknown keys or any bad value give 400.
+
+### Success, 200
+
+The same `Route` shape as `GET /routes/today` with the Phase 2 additions, plus `notes`:
+`district`, `generated_at`, `route_id` (`plan-<date>-<district>-<hash of the inputs>`), `depart`,
+`budget_min`, `stops[]` (`order` from 1, `kiln_id`, `eta` in `+05:30`, `service_min` 35, `access`,
+`sheet`), `legs[]` (one per stop including start-to-first, GeoJSON `[longitude, latitude]`, at most
+about 200 points each), `kilns[]` (the full public records of the stops) and `notes[]` (plain
+strings). It decodes into KilnWatchCore `Route`; `notes` is ignored by the current client.
+
+- **Selection and order:** the top kilns by `priority` (at most 8) are ordered by driving time
+  (nearest neighbour + 2-opt). The lowest-priority stop is dropped until driving plus 35 minutes
+  per stop fits `budget_min`. Same input, same plan. A kiln without an exposure estimate is left
+  out (the sheet needs a number), never ranked as zero.
+- **ETAs are estimates** from road travel times without live traffic, plus the on-site time.
+  `budget_min` is a limit, not a prediction.
+- **`access`** is the kiln centroid, **not a verified entrance**: its note says "Kiln centroid,
+  not a verified entrance · confirm on site".
+- **`sheet`:** `rules_flagged` (rule IDs from `violations`), `people_exposed`, and `on_site_checks`
+  (a short fixed list from the flags plus "Kiln type: fixed chimney or zigzag" and "Is the kiln
+  firing?").
+- If the road-legs call fails, the plan comes back **without `legs`** and a note says so.
+- Every kiln stays "Flagged by satellite · pending inspection".
+
+### Errors
+
+Nested format `{"error": {"code", "message", "retryable"}}`; provider error text is never echoed.
+
+| Status | Code | Meaning | Retryable |
+|---|---|---|---|
+| 400 | `invalid_request` | Bad body | no |
+| 404 | `no_kilns` | Nothing flagged (with an exposure estimate) in the district, or none of `kiln_ids` found | no |
+| 429 | `daily_cap_reached` | The global daily cap is used up | no (try tomorrow, UTC) |
+| 503 | `routing_unavailable` | Amazon Location or the daily counter failed | yes |
+| 503 | `upstream_unavailable` | The public read API failed | yes |
+
+**Cap and throttle:** **15 plans per UTC day across all callers** (Ask's `plan_route` counts too),
+counted before any routing call; 400 and 404 are not counted. Stage throttling on this route is
+1 request/s with a burst of 2 (the gateway's own 429 body, without `error.code`).
+
+### Ask
+
+New tool `plan_route` (`district`, `priority`, `max_stops`, optional `start_lat`/`start_lon`). Its
+step is `{"tool": "plan_route", "label": "Planning a route", "summary": "N stops", "ok": true}`.
+Answers state the stops, order and times as returned and call the times estimates.
+`get_evidence` now also returns `attribution_text`, quoted exactly.

@@ -7,14 +7,13 @@ You build, test and deploy. You do not orchestrate. Work sequentially in this on
 ## The go (scope)
 
 The user gave the go by running this prompt. It covers **exactly** this:
-1. **Preflight:** at most 3 small Amazon Location calls from the main account in `ap-south-1` (a 2×2 route matrix and one 3-waypoint route), to prove that the API works and to see the response shape.
+1. **Preflight: already done** in the first run (it passed; the results are in `.local/phase-4/p1/`). Don't repeat it. At most 1 extra Amazon Location call, only if you need to check a response shape.
 2. Local code and tests in the files listed under "Files".
 3. **One** Terraform plan and apply that **adds** the route planner (a Lambda, its role and policy, a log group, the API integration, route and permission) and changes **only** the API stage's route settings for the new route, plus `aws_lambda_function.assistant[0]` (the code hash). Nothing else may change or be destroyed.
 4. One line in the ignored `AWS/terraform.tfvars`: `enable_route_planner = true`. Back up the file first, to `.local/phase-4/terraform.tfvars.pre-p1`.
 5. At most **6** live `POST /routes/plan` calls and at most **6** live `/ask` questions.
 
 **Stop and report, without building further, if:**
-- the preflight fails with an access, "not allowed" or region error (the second-account fallback is a separate decision for the user);
 - the worst-case cost at the daily cap is over **$20 a month** (see Step 1);
 - the plan contains anything else.
 
@@ -46,10 +45,13 @@ Do **not** touch `App/` (other than the API contract), the registry, the rules e
 4. `AWS/assistant/{core,tools,validator,handler}.py` and `AWS/assistant.tf`: the pattern to copy (Lambda outside the VPC, reads the public API, an atomic DynamoDB daily counter, privacy-safe logs, nested `{"error":{code,message,retryable}}` errors).
 5. The Amazon Location Routes v2 docs for `CalculateRouteMatrix` and `CalculateRoutes`: the request limits, `RoutingBoundary`, which options keep a request in the **Core** pricing tier, and the IAM actions and resource. Also the Routes pricing page.
 
-## Step 1: preflight and cost (stop here on failure)
+## Step 1: preflight and cost (the preflight is done; recheck the cost only)
 
-1. With the AWS CLI (`aws geo-routes …`, `--region ap-south-1`, `--profile kilnwatch`), make a 2×2 `calculate-route-matrix` call between two real Hapur kiln centroids (from the public API), travel mode Car, Core-tier options only. Then one `calculate-routes` call with 3 waypoints, asking for the leg geometry. Save the responses to `.local/phase-4/p1/` and report the durations and distances.
-2. **Cost.** From the pricing page, compute the cost of one plan at the maximum size: a (1 + 15) × (1 + 15) matrix (start plus 15 kilns), plus one `CalculateRoutes` call for the legs. Then the worst case at a daily cap of **30 plans** for 30 days. Also mention any free tier. **Stop if the worst case is over $20 a month.**
+**The user's decision after the first run (option A):** at most **8** kilns per plan and a daily cap of **15** plans. The matrix is (start + 8 kilns) origins × 8 kilns destinations = **72 cells**, which fits the Unbounded limits (≤ 15 origins, ≤ 100 cells), so no `RoutingBoundary` geometry is needed. That is about $0.0365 a plan and $16.43 a month at the worst case. The start is never a destination, because there is no return leg.
+
+
+1. (Done in the first run; for reference only.) With the AWS CLI (`aws geo-routes …`, `--region ap-south-1`, `--profile kilnwatch`), make a 2×2 `calculate-route-matrix` call between two real Hapur kiln centroids (from the public API), travel mode Car, Core-tier options only. Then one `calculate-routes` call with 3 waypoints, asking for the leg geometry. Save the responses to `.local/phase-4/p1/` and report the durations and distances.
+2. **Cost.** Restate it with these numbers: a 9 × 8 matrix plus one `CalculateRoutes` call per plan, at a cap of 15 plans a day for 30 days. **Stop if it is over $20 a month.**
 
 ## Step 2: the planner (pure Python, no new dependencies)
 
@@ -60,15 +62,15 @@ Do **not** touch `App/` (other than the API contract), the registry, the rules e
 - `start` `{lat, lon}` (optional; the default is the mean of the selected kilns' centroids, labelled in the response as "Default start: centre of the selected kilns");
 - `depart` (optional RFC 3339; the default is tomorrow 09:00 Asia/Kolkata);
 - `budget_min` (optional, 60–720, default 480);
-- `max_stops` (optional, 1–15, default 8);
+- `max_stops` (optional, 1–8, default 8);
 - `priority`: `"people"` (default: most people within 800 m first) or `"flags"` (most siting flags first, then people). **There is no "schools first":** no Hapur kiln has a school flag today (every school check is inconclusive), so it would be misleading;
-- `kiln_ids` (optional, ≤ 15 full IDs; when given, plan exactly these, no selection).
+- `kiln_ids` (optional, ≤ 8 full IDs; when given, plan exactly these, no selection).
 
 Unknown keys, a bad shape, or a body over 4 KB give 400 `invalid_request`.
 
 **Plan:**
 1. Read the district's kilns from the public API (as the assistant does). Kilns with `exposure: null` are never ranked as zero: they go last under `people`, and are excluded if the sheet would need a number (report how many). Today all 39 have exposure.
-2. Choose candidates by priority (at most 15), get one Core-tier matrix for start plus candidates (Car, no traffic), then order them with nearest-neighbour + 2-opt on driving time. Add a fixed `service_min` of 35 per stop. Drop the lowest-priority stop and re-solve until the total (driving plus service) fits `budget_min` and the count is ≤ `max_stops`. It must be deterministic: same input, same output. No OR-Tools.
+2. Choose candidates by priority (at most 8), get one Core-tier, Unbounded matrix with origins = start + candidates and destinations = candidates (Car, no traffic; never more than 100 cells), then order them with nearest-neighbour + 2-opt on driving time. Add a fixed `service_min` of 35 per stop. Drop the lowest-priority stop and re-solve until the total (driving plus service) fits `budget_min` and the count is ≤ `max_stops`. It must be deterministic: same input, same output. No OR-Tools.
 3. One `CalculateRoutes` call over the final order for the leg distances, durations and geometry. If that call fails, return the plan **without** `legs` rather than fail, because the contract allows that.
 4. **Response (exactly the route contract):**
    - `district`, `generated_at`, `route_id` (e.g. `plan-<date>-<district>-<short hash of the inputs>`), `depart`, `budget_min`;
@@ -85,7 +87,7 @@ Unknown keys, a bad shape, or a body over 4 KB give 400 `invalid_request`.
    - 429 `daily_cap_reached`;
    - 503 `routing_unavailable` (Amazon Location failed) or `upstream_unavailable` (the public API failed).
    - Never echo provider error text.
-6. **Cap:** reuse the assistant's DynamoDB daily-counter pattern. Use either the same table with a distinct key (`route#YYYY-MM-DD`) or a new table, whichever needs the smaller IAM grant. Cap = `var.route_daily_cap`, default **30**.
+6. **Cap:** reuse the assistant's DynamoDB daily-counter pattern. Use either the same table with a distinct key (`route#YYYY-MM-DD`) or a new table, whichever needs the smaller IAM grant. Cap = `var.route_daily_cap`, default **15**.
 7. **Logs:** counts and latencies only (stops, matrix cells, Location ms, total ms). No coordinates, kiln lists or bodies.
 
 ## Step 3: infrastructure (`AWS/route.tf`)

@@ -1,0 +1,245 @@
+{
+  "kiln_id": "KW-00000000000000000000000000000001",
+  "footprint": {
+    "centroid": {
+      "latitude": 28.747059,
+      "longitude": 77.72956
+    },
+    "polygon": [
+      {
+        "latitude": 28.746674,
+        "longitude": 77.7299
+      },
+      {
+        "latitude": 28.747029,
+        "longitude": 77.730112
+      },
+      {
+        "latitude": 28.747444,
+        "longitude": 77.729221
+      },
+      {
+        "latitude": 28.747089,
+        "longitude": 77.729009
+      }
+    ]
+  },
+  "type": "FCBK",
+  "type_confidence": 0.324,
+  "detection_confidence": 0.324,
+  "type_verification": "unverified",
+  "first_seen": "2026-10-05T05:41:03.148000Z",
+  "last_seen": "2026-10-05T05:41:03.148000Z",
+  "status": "flagged",
+  "violations": [
+    {
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+      "rule_id": "C-HAB-800",
+      "measured_to": {
+        "latitude": 28.749671,
+        "longitude": 77.72481
+      },
+      "threshold_m": 800,
+      "evidence_url": null,
+      "measured_distance_m": 497
+    }
+  ],
+  "rules_assessment": "partially_evaluated",
+  "exposure": {
+    "people": 4225,
+    "adults_over_sixty": 294,
+    "children_under_five": 430
+  },
+  "rule_checks": [
+    {
+      "rule_id": "C-HAB-800",
+      "check": "Distance to habitation",
+      "status": "within_threshold",
+      "threshold_m": 800,
+      "measured_distance_m": 497,
+      "verification": "secondary_sources",
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+      "rule_id": "C-KILN-1K",
+      "check": "Distance to another kiln",
+      "status": "beyond_threshold",
+      "threshold_m": 1000,
+      "measured_distance_m": 1273,
+      "verification": "secondary_sources",
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+      "rule_id": "C-ORCH-800",
+      "check": "Distance to an orchard",
+      "status": "inconclusive",
+      "threshold_m": 800,
+      "measured_distance_m": null,
+      "verification": "secondary_sources",
+      "source": "Central 2022 rules"
+    },
+    {
+      "rule_id": "UP-SCH-1K",
+      "check": "Distance to a school",
+      "status": "inconclusive",
+      "threshold_m": 1000,
+      "measured_distance_m": null,
+      "verification": "unverified_compilation",
+      "source": "UP siting rules (2012)"
+    },
+    {
+      "rule_id": "UP-NH-300",
+      "check": "Distance to a national highway",
+      "status": "beyond_threshold",
+      "threshold_m": 300,
+      "measured_distance_m": null,
+      "verification": "unverified_compilation",
+      "source": "UP siting rules (2012)"
+    },
+    {
+      "rule_id": "UP-RAIL-200",
+      "check": "Distance to a railway line",
+      "status": "beyond_threshold",
+      "threshold_m": 200,
+      "measured_distance_m": null,
+      "verification": "unverified_compilation",
+      "source": "UP siting rules (2012)"
+    },
+    {
+      "rule_id": "UP-MUN-5K",
+      "check": "Distance to a municipal council, corporation or nagar panchayat",
+      "status": "not_evaluated",
+      "threshold_m": null,
+      "measured_distance_m": null,
+      "verification": "secondary_sources",
+      "source": "UP siting rules (2026 amendment)"
+    },
+    {
+      "rule_id": "C-TECH-10K",
+      "check": "Technology within 10 km of a non-attainment city",
+      "status": "not_evaluated",
+      "threshold_m": null,
+      "measured_distance_m": null,
+      "verification": "unverified_compilation",
+      "source": "Central 2022 rules"
+    }
+  ],
+  "district": "Hapur",
+  "evidence": {
+    "before": null,
+    "after": null,
+    "before_metadata": {
+      "acquired_at": "2023-12-05T05:40:56.807000Z",
+      "attribution": "Contains modified Copernicus Sentinel data 2023",
+      "centroid_px": [
+        128.818205,
+        128.237018
+      ],
+      "crs": "EPSG:32643",
+      "footprint_px": null,
+      "geotransform": [
+        765270.0,
+        10.0,
+        0.0,
+        3184300.0,
+        0.0,
+        -10.0
+      ],
+      "grid_code": "MGRS-43RGM",
+      "gsd_m": 10,
+      "nodata_fraction": 0.0,
+      "object_key": "test-evidence/synthetic.png",
+      "patch_px": 256,
+      "published_url": null,
+      "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+      "scene_cloud_pct": 0.000186,
+      "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+      "sha256": "77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc",
+      "source_assets": [
+        {
+          "band": "red",
+          "href": null,
+          "offset": -0.1,
+          "scale": 0.0001
+        },
+        {
+          "band": "green",
+          "href": null,
+          "offset": -0.1,
+          "scale": 0.0001
+        },
+        {
+          "band": "blue",
+          "href": null,
+          "offset": -0.1,
+          "scale": 0.0001
+        }
+      ]
+    },
+    "after_metadata": {
+      "acquired_at": "2026-10-05T05:41:03.148000Z",
+      "attribution": "Contains modified Copernicus Sentinel data 2026",
+      "centroid_px": [
+        128.818205,
+        128.237018
+      ],
+      "crs": "EPSG:32643",
+      "footprint_px": [
+        [
+          132.237745,
+          132.42878
+        ],
+        [
+          134.218656,
+          128.445917
+        ],
+        [
+          125.408457,
+          124.045025
+        ],
+        [
+          123.427527,
+          128.027871
+        ]
+      ],
+      "geotransform": [
+        765270.0,
+        10.0,
+        0.0,
+        3184300.0,
+        0.0,
+        -10.0
+      ],
+      "grid_code": "MGRS-43RGM",
+      "gsd_m": 10,
+      "nodata_fraction": 0.0,
+      "object_key": "test-evidence/synthetic.png",
+      "patch_px": 256,
+      "published_url": null,
+      "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+      "scene_cloud_pct": 5.6e-05,
+      "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+      "sha256": "a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5",
+      "source_assets": [
+        {
+          "band": "red",
+          "href": null,
+          "offset": -0.1,
+          "scale": 0.0001
+        },
+        {
+          "band": "green",
+          "href": null,
+          "offset": -0.1,
+          "scale": 0.0001
+        },
+        {
+          "band": "blue",
+          "href": null,
+          "offset": -0.1,
+          "scale": 0.0001
+        }
+      ]
+    }
+  }
+}

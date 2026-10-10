@@ -873,3 +873,117 @@ Counter 44 of 50 before, 49 after. All **200**, validator `pass`, no fallback.
 | How far is the nearest school? (with kiln) | `get_evidence` | Inconclusive, "not a clear result"; does not mention that the school threshold is unverified |
 
 **Log privacy:** 5 log lines with counts and latencies only; no question fragments.
+
+# P1: route planning (32, 2026-10-10)
+
+Public `POST /routes/plan` (Lambda `kilnwatch-route`) plus the Ask tool `plan_route`. Preflight
+responses, plans, response bodies and log lines are in the ignored `.local/phase-4/` (`p1/`, `p1.*`,
+`live/p1/`).
+
+## Preflight and cost
+
+- Main account, `ap-south-1`: a 2×2 `CalculateRouteMatrix` and a 3-waypoint `CalculateRoutes`
+  (Car) both succeeded and were billed in the **Core** bucket. No access or region block.
+- Prices (`ap-south-1` public price list): Core route matrix $0.50 per 1,000 routes (each
+  origin × destination cell is one route); Core `CalculateRoutes` $0.50 per 1,000 requests. Free
+  tier: 10,000 Core routes a month for the first 3 months.
+- The first plan size (start + 15 kilns, 16×16) cost $0.1285 a plan and $115.65 a month at 30 plans
+  a day, over the $20 limit, so the first run stopped. **Decision (option A):** at most 8 kilns,
+  a 9 × 8 Unbounded matrix (72 cells, inside the 15-origin / 100-cell Unbounded limit) and a daily
+  cap of 15. Worst case: (72 + 1) × $0.0005 = **$0.0365 a plan**, × 15 × 30 = **$16.43 a month**.
+
+## Code and tests
+
+- `AWS/route/planner.py`: selection (`people`, or `flags` then people; kilns without an exposure
+  estimate are left out and counted, never ranked as zero), one matrix, nearest-neighbour + 2-opt on
+  driving seconds, trimming the lowest-priority stop until driving + 35 min per stop fits
+  `budget_min`, one `CalculateRoutes` for the legs (left out if it fails), and the route contract
+  plus `notes`. `AWS/route/route_handler.py`: validation, the public API read, the cap
+  (`route#YYYY-MM-DD` in the assistant's counter table), error mapping, count-and-latency logs.
+  The ZIP (`package_route.py`) also carries `assistant/tools.py` for the public API client.
+- Ask: `plan_route` tool (explicit stop strings, no geometry or URLs; cap and routing errors become
+  plain error results); the system prompt's "not available yet" route line is replaced; every rule
+  check's sentence carries its threshold basis inline; `get_evidence` returns `attribution_text`,
+  quoted exactly.
+- The planner's exact request parameters were validated offline against the botocore `geo-routes`
+  model, and the leg parser was run on the saved preflight response.
+- `unittest discover -s AWS/tests`: **136 run, 126 passed, 10 skipped** (was 107 / 97 / 10).
+- Four live plans decode into KilnWatchCore `Route` (temporary package outside `App/`): all stops in
+  `kilns`, every leg geometry valid.
+
+## Terraform
+
+`enable_route_planner = true` in the ignored tfvars (backup `.local/phase-4/terraform.tfvars.pre-p1`).
+Saved plan targeted on the 7 route resources, the stage and `aws_lambda_function.assistant[0]`:
+**7 to add, 2 to change, 0 to destroy**. The stage change only adds the `POST /routes/plan` route
+setting (rate 1, burst 2); the assistant change is `source_code_hash` only. Applied: **7 added,
+2 changed, 0 destroyed**. Both `CodeSha256` values match their ZIPs. Provider lock unchanged.
+The route role allows only logs, `dynamodb:UpdateItem` on `route#*` keys and the two `geo-routes`
+actions on the `ap-south-1` routes provider.
+
+## Live checks
+
+Route counter 0 before, 7 after (4 direct plans and 3 from Ask). Ask counter 50 of 100 before, 56 after.
+
+| Plan | Status | Stops | Driving + on site (budget 480) | ETAs | Legs | Latency |
+|---|---|---|---|---|---|---|
+| 1. `people`, default start, 8 stops | 200 | 8 | 72 + 280 = 352 min | increasing, +05:30 | 8, 0.4–8.1 km | 8.2 s (cold) |
+| 2. `flags`, default start, 8 stops | 200 | 8 | 95 + 280 = 375 min | increasing | 8, 1.3–14.5 km | 1.5 s |
+| 3. start near Hapur town, 5 stops | 200 | 5 | 42 + 175 = 217 min | increasing | 5, 0.4–10.7 km | 1.2 s |
+| 4. `kiln_ids`, 3 IDs | 200 | 3 | 38 + 105 = 143 min | increasing | 3, 0.9–14.5 km | 1.2 s |
+| 5. invalid body | 400 `invalid_request` | – | – | – | – | 0.6 s |
+
+Sanity: each order's straight-line path is within 10–13% of the best permutation, and the road
+distance is 1.4–1.9 times the straight line. No back-and-forth jumps.
+
+| Ask question | Tools | Outcome |
+|---|---|---|
+| Plan tomorrow in Hapur | `plan_route` | Stops and times match plan 1 exactly. The times are not called estimates |
+| Plan a route starting near 28.7306, 77.7759 with 4 stops | `plan_route` | 4 stops with times and flags exactly as returned. "(estimate)" dropped |
+| Which kilns should I visit first for the most exposed people? | `list_flagged_kilns`, `plan_route` | Gives the route's visiting order (selected by people) and calls driving and finish estimates; it doesn't say the order is by road, not by exposure |
+| Plan my route for today | none | Asks for the district; no invented route |
+| How far is the nearest school? (with kiln) | `get_evidence` | Inconclusive, "not a clear result", and **the 1000 m threshold is unverified** |
+| Show me the evidence for this kiln | `get_evidence` | Both attribution strings quoted exactly |
+
+All 200, validator `pass`, no fallback. **Log privacy:** both log groups hold counts and latencies
+only (route: stops, matrix cells, Location ms, total ms); no kiln IDs, coordinates, districts or
+question text.
+
+# P1b: route answer wording (32b, 2026-10-10)
+
+Fixes the two P1 wording problems in the tool data and the validator. Plan, apply log, response
+bodies and log lines are in the ignored `.local/phase-4/` (`p1b.*`, `live/p1/p1b-*`).
+
+## Code and tests
+
+- `plan_route` result: every stop reads "Stop N: KW-…, estimated arrival 09:13, …" (key
+  `visiting_order`), the finish is "estimated finish 14:52", and the departure is "planned departure
+  09:00 on <date> (Asia/Kolkata)". No bare times.
+- New `selection` sentence, built from the plan's own stops and the request's priority: "These are
+  the N kilns with the most people within 800 m. The visiting order follows road travel time, not the
+  people ranking. Ranked by people: KW-… (25,701), …" (the same for siting flags; "These are the
+  kilns you named, in road order." for named kilns).
+- Validator: when `plan_route` ran in the request and the answer has a clock time, the answer must
+  contain a word starting "estimat", else one regeneration with "Call the times estimates, for
+  example 'estimated arrival 09:13'.", then the fallback. Answers without `plan_route` are untouched.
+- `unittest discover -s AWS/tests`: **141 run, 131 passed, 10 skipped** (was 136 / 126 / 10).
+
+## Terraform
+
+Saved plan targeted on `aws_lambda_function.assistant[0]`: **0 to add, 1 to change, 0 to destroy**,
+`source_code_hash` only. Applied: **0 added, 1 changed, 0 destroyed**. `CodeSha256` matches the ZIP.
+The route Lambda was not changed (its ZIP still carries the earlier `tools.py`; only the public API
+client is used there, which did not change). Provider lock and tfvars unchanged.
+
+## Live checks (3 questions)
+
+Ask counter 56 of 100 before, 59 after; route counter 7 of 15 before, 10 after. All **200**,
+validator `pass` on the first answer (no regeneration), no fallback.
+
+| Question | Tools | Outcome |
+|---|---|---|
+| Plan tomorrow in Hapur | `plan_route` | Times called estimates; totals match plan 1. **Weak:** it does not list the stops ("the stops are listed in visiting order…") |
+| Which kilns should I visit first for the most exposed people? | `list_flagged_kilns`, `plan_route` | All 8 arrivals "estimated arrival …", exact. **Still weak:** it gives the road order and leaves out the people ranking from `selection` |
+| Plan a route starting near 28.7306, 77.7759 with 4 stops | `plan_route` | Pass: 4 stops, every time estimated, people and flags exact |
+
+**Log privacy:** both log groups hold counts and latencies only; no kiln IDs, coordinates, districts or question text.

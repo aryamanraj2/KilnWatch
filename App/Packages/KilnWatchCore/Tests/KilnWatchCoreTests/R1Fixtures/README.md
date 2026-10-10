@@ -1,0 +1,3 @@
+`*.recorded.json` are sanitized copies of the recorded public R1 list/detail and Ask response. Registry IDs are consistently remapped to full synthetic IDs. URLs, private provenance and storage object identifiers are replaced with a synthetic test path; null evidence remains null. No sample image is substituted. The reference detail is synthetic ID ending 01.
+
+The recorded Ask answer mentions C-HAB-800 in prose, but returns only a kiln citation. `ask-mixed.synthetic.json` is a separately labelled synthetic response with explicit mixed kiln/rule citations, duplicates, an unknown rule and repeated/failed get_evidence steps. These resources never authorize live POSTs.

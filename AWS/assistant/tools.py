@@ -5,6 +5,7 @@ import re
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timedelta, timezone
 
 # Same shapes as AWS/registry/contract.py (ID, DISTRICT); copied so the ZIP needs nothing beyond this folder.
 KILN_ID = re.compile(r'^KW-(?:[0-9]{4,}|[0-9a-f]{32})$')
@@ -49,6 +50,18 @@ SPECS = [
                   'inputSchema': {'json': {'type': 'object', 'properties': {
                       'kiln_id': {'type': 'string', 'description': 'Full ID, for example KW- followed by 32 hex characters.'}},
                       'required': ['kiln_id']}}}},
+    {'toolSpec': {'name': 'plan_route',
+                  'description': 'Plan an inspection route over flagged kilns in a district: the stops in visiting order with '
+                                 'estimated arrival times from road travel times without live traffic, departing tomorrow at '
+                                 '09:00. priority people visits the kilns with the most people within 800 m; flags visits the '
+                                 "kilns with the most siting flags. If the inspector's location is given, pass it as "
+                                 'start_lat and start_lon.',
+                  'inputSchema': {'json': {'type': 'object', 'properties': {
+                      'district': {'type': 'string', 'description': 'District name, for example Hapur.'},
+                      'priority': {'type': 'string', 'enum': ['people', 'flags'], 'description': 'Default people.'},
+                      'max_stops': {'type': 'integer', 'minimum': 1, 'maximum': 8, 'description': 'Default 8.'},
+                      'start_lat': {'type': 'number'}, 'start_lon': {'type': 'number'}},
+                      'required': ['district']}}}},
 ]
 # Rule facts as explicit words (a bare status or boolean column gets misread). Never the word the record key uses.
 STATUS_WORDS = {
@@ -62,6 +75,11 @@ VERIFICATION_WORDS = {
     'secondary_sources': 'sourced threshold: quoted by court records, legal digests or news reports (not an unverified threshold)',
     'unverified_compilation': 'unverified threshold (from an academic compilation)'}
 FLAG_BASIS = {'secondary_sources': 'sourced threshold (secondary sources)', 'unverified_compilation': 'unverified threshold'}
+IST = timezone(timedelta(hours=5, minutes=30))
+ROUTE_ERRORS = {'daily_cap_reached': "Route planning has reached today's limit. No route was planned.",
+                'routing_unavailable': 'Road routing is temporarily unavailable. No route was planned.',
+                'no_kilns': 'No flagged kilns with an exposure estimate were found in that district. No route was planned.'}
+ROUTE_DOWN = 'Route planning is temporarily unavailable. No route was planned.'
 SORTED_NOTE = 'Sorted by people_within_800m, highest first; rank 1 has the most people.'
 PARTIAL_NOTE = 'Some siting rules lacked data, so having no siting flags is not a clean result.'
 EXPOSURE_NOTE = ('Modelled estimate of residents within 800 m of the kiln edge, from HRSL v1.5.2 (Meta and CIESIN, '
@@ -111,6 +129,14 @@ def trim(record, detail=False):
     return view
 
 
+def basis_words(check):
+    """The threshold's basis as a clause, so a sentence about one check can't lose "unverified"."""
+    subject = f"the {check['threshold_m']} m threshold" if check.get('threshold_m') is not None else "this rule's threshold"
+    return {'secondary_sources': f'{subject} is a sourced threshold (court records, legal digests or news reports)',
+            'unverified_compilation': f'{subject} is an unverified threshold (from an academic compilation)'
+            }.get(check.get('verification'), f'{subject} has an unknown basis')
+
+
 def rule_words(record, with_source=False):
     """Every rule check in explicit words. No feature names, coordinates or URLs."""
     out = []
@@ -119,13 +145,19 @@ def rule_words(record, with_source=False):
         if measured is None:
             measured = 'no mapped feature found' if c.get('status') in ('inconclusive', 'beyond_threshold') else 'not measured'
         words = {'rule_id': c.get('rule_id'), 'check': c.get('check'),
-                 'status_words': STATUS_WORDS.get(c.get('status'), 'unknown status'),
+                 'status_words': f"{c.get('check')}: {STATUS_WORDS.get(c.get('status'), 'unknown status')}; {basis_words(c)}",
                  'measured_distance_m': measured,
                  'threshold_m': c.get('threshold_m') if c.get('threshold_m') is not None else 'no distance threshold',
                  'threshold_basis': VERIFICATION_WORDS.get(c.get('verification'), 'threshold basis unknown')}
         if with_source: words['source'] = c.get('source')
         out.append(words)
     return out
+
+
+def attribution_text(meta):
+    """The exact image attribution string(s), for the model to quote word for word."""
+    found = [m.get('attribution') for m in (meta.get('before_metadata'), meta.get('after_metadata')) if m and m.get('attribution')]
+    return '; '.join(dict.fromkeys(found)) or 'no image attribution'
 
 
 def image_side(meta):
@@ -154,6 +186,70 @@ class PublicAPI:
             raise UpstreamUnavailable(exc.code) from None
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
             raise UpstreamUnavailable(type(exc).__name__) from None
+
+    def post(self, path, payload, timeout=12):
+        """Returns (status, decoded object body or {}) for any HTTP answer; network failures raise UpstreamUnavailable."""
+        request = urllib.request.Request(self.base + path, data=json.dumps(payload).encode(), method='POST',
+                                         headers={'content-type': 'application/json', 'accept': 'application/json',
+                                                  'user-agent': 'kilnwatch-assistant'})
+        try:
+            with self.opener.open(request, timeout=timeout) as reply:
+                status, raw = reply.status, reply.read(2_000_000)
+        except urllib.error.HTTPError as exc:
+            status, raw = exc.code, exc.read(10_000)
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            raise UpstreamUnavailable(type(exc).__name__) from None
+        try:
+            body = json.loads(raw)
+        except ValueError:
+            body = None
+        return status, body if isinstance(body, dict) else {}
+
+
+def clock(stamp):
+    return datetime.fromisoformat(stamp).astimezone(IST)
+
+
+def selection_words(stops, priority):
+    """Why these kilns, kept apart from the visiting order (road order is not a ranking).
+    priority None means the kilns were named in the request."""
+    if priority is None:
+        return 'These are the kilns you named, in road order.'
+    people = lambda s: s['sheet']['people_exposed']
+    if priority == 'flags':
+        ranked = sorted(stops, key=lambda s: (-len(s['sheet']['rules_flagged']), -people(s), s['kiln_id']))
+        listed = ', '.join(f"{s['kiln_id']} ({len(s['sheet']['rules_flagged'])} siting flags, {people(s):,} people)" for s in ranked)
+        return (f'These are the {len(stops)} kilns with the most siting flags. The visiting order follows road travel time, '
+                f'not the siting-flag ranking. Ranked by siting flags: {listed}.')
+    ranked = sorted(stops, key=lambda s: (-people(s), s['kiln_id']))
+    listed = ', '.join(f"{s['kiln_id']} ({people(s):,})" for s in ranked)
+    return (f'These are the {len(stops)} kilns with the most people within 800 m. The visiting order follows road travel '
+            f'time, not the people ranking. Ranked by people: {listed}.')
+
+
+def route_words(body, priority='people'):
+    """The plan as explicit strings for the model. No coordinates, geometry or URLs. Every time is labelled
+    estimated inside the phrase itself, so an answer that quotes the time keeps the word."""
+    depart, stops = clock(body['depart']), body['stops']
+    lines = []
+    for s in stops:
+        sheet = s['sheet']
+        flags = ', '.join(sheet['rules_flagged']) or 'none'
+        lines.append(f"Stop {s['order']}: {s['kiln_id']}, estimated arrival {clock(s['eta']):%H:%M}, "
+                     f"{sheet['people_exposed']:,} people within 800 m, siting flags {flags}")
+    result = {'district': body['district'], 'depart': f'planned departure {depart:%H:%M} on {depart:%Y-%m-%d} (Asia/Kolkata)',
+              'stop_count': len(stops), **({'selection': selection_words(stops, priority)} if stops else {}),
+              'visiting_order': lines, 'budget': f"{body['budget_min']} min"}
+    if stops:
+        service = sum(s['service_min'] for s in stops)
+        last = clock(stops[-1]['eta'])
+        driving = (last - depart).total_seconds() / 60 - (service - stops[-1]['service_min'])
+        finish = last + timedelta(minutes=stops[-1]['service_min'])
+        result.update(total_driving=f'about {round(driving)} min (estimate)',
+                      on_site_time=f'{service} min ({stops[0]["service_min"]} min per stop)',
+                      finish=f'estimated finish {finish:%H:%M}')
+    result['notes'] = [n for n in body.get('notes', []) if isinstance(n, str)]
+    return result
 
 
 def run(api, name, args):
@@ -213,6 +309,7 @@ def run(api, name, args):
             result = {'found': True, 'kiln_id': kiln_id, 'detected_on': view['last_seen'],
                       'satellite_images': view['satellite_images'],
                       'before_image': image_side(meta.get('before_metadata')), 'after_image': image_side(meta.get('after_metadata')),
+                      'attribution_text': attribution_text(meta),
                       'rules_assessment': view['rules_assessment'], 'siting_flags': view['siting_flags'],
                       'rule_checks': rule_words(record, with_source=True),
                       **{k: view[k] for k in ('rules_note',) if k in view},
@@ -221,6 +318,26 @@ def run(api, name, args):
         else:
             result = {'found': True, 'kiln': trim(record, detail=True), 'rule_checks': rule_words(record), **exposure, 'note': NOTE}
         return result, step(name, label, 'Found', True), [kiln_id]
+    if name == 'plan_route':
+        label = 'Planning a route'
+        district, max_stops, priority = args.get('district'), integer(args.get('max_stops'), 1, 8, 8), args.get('priority', 'people')
+        lat, lon = args.get('start_lat'), args.get('start_lon')
+        if not isinstance(district, str) or not DISTRICT.fullmatch(district) or max_stops is None \
+                or priority not in ('people', 'flags') or (lat is None) != (lon is None) \
+                or (lat is not None and not valid_point(lat, lon)):
+            return invalid(name, label)
+        status, body = api.post('/routes/plan', {'district': district, 'priority': priority, 'max_stops': max_stops,
+                                                 **({'start': {'lat': lat, 'lon': lon}} if lat is not None else {})})
+        if status == 200:
+            try:
+                result, ids = route_words(body, priority), [s['kiln_id'] for s in body['stops']]
+                if all(isinstance(i, str) and KILN_ID.fullmatch(i) for i in ids):
+                    return result, step(name, label, f'{len(ids)} stops', True), ids
+            except (KeyError, TypeError, ValueError, AttributeError):
+                pass
+            return {'error': ROUTE_DOWN}, step(name, label, 'No route', True), []
+        code = body.get('error', {}).get('code') if isinstance(body.get('error'), dict) else None
+        return {'error': ROUTE_ERRORS.get(code, ROUTE_DOWN)}, step(name, label, 'No route', True), []
     return invalid('unknown', 'Unknown tool')
 
 

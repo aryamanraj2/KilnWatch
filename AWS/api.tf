@@ -177,9 +177,10 @@ resource "aws_apigatewayv2_stage" "default" {
       throttling_burst_limit = 20
     }
   }
-  # Phase 4A: the public, per-call-billed Ask route gets its own tighter limit (empty unless enable_assistant).
+  # Phase 4A and P1: the public, per-call-billed Ask and route-planning routes get their own tighter limit
+  # (empty unless enable_assistant / enable_route_planner).
   dynamic "route_settings" {
-    for_each = aws_apigatewayv2_route.ask[*].route_key
+    for_each = concat(aws_apigatewayv2_route.ask[*].route_key, aws_apigatewayv2_route.route_plan[*].route_key)
     content {
       route_key              = route_settings.value
       throttling_rate_limit  = 1

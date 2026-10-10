@@ -11,8 +11,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4B0A00000000000000000013 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App/Config/Base.xcconfig; sourceTree = "<group>"; };
 		4B0A00000000000000000001 /* KilnWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KilnWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B0A00000000000000000013 /* App/Config/Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App/Config/Base.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -39,7 +39,7 @@
 			isa = PBXGroup;
 			children = (
 				4B0A00000000000000000002 /* App/KilnWatch */,
-				4B0A00000000000000000013 /* Base.xcconfig */,
+				4B0A00000000000000000013 /* App/Config/Base.xcconfig */,
 				4B0A00000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -203,7 +203,7 @@
 		};
 		4B0A0000000000000000000E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B0A00000000000000000013 /* Base.xcconfig */;
+			baseConfigurationReference = 4B0A00000000000000000013 /* App/Config/Base.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -237,7 +237,7 @@
 		};
 		4B0A0000000000000000000F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B0A00000000000000000013 /* Base.xcconfig */;
+			baseConfigurationReference = 4B0A00000000000000000013 /* App/Config/Base.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

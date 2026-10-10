@@ -19,7 +19,8 @@ extension Kiln {
     var topViolation: Violation? {
         violations.min { lhs, rhs in
             func severity(_ v: Violation) -> Double {
-                guard let m = v.measuredDistanceM, let t = v.thresholdM, t > 0 else { return 2 }
+                guard RuleCheck.canDrawBar(measured: v.measuredDistanceM, threshold: v.thresholdM),
+                      let m = v.measuredDistanceM, let t = v.thresholdM else { return 2 }
                 return m / t
             }
             return severity(lhs) < severity(rhs)

@@ -98,7 +98,7 @@ final class AppModel {
         set { ask.draft = newValue }
     }
     var isAskTest: Bool { DemoOptions.string("askDemo") != nil }
-    var shownRule: Rule?
+    var shownRule: RuleReference?
     let maps = MapsHandoff()
     private let api: KilnWatchAPI?
     private let cache: RouteCache
@@ -130,7 +130,7 @@ final class AppModel {
             configuredPublic = KilnWatchAPI(baseURL: url, session: KilnWatchAPI.publicReadSession())
         }
         #if DEBUG
-        if !useFixtures, let scenario = DemoOptions.string("publicDemo") ?? (DemoOptions.string("askDemo") != nil ? "loaded" : nil) {
+        if !useFixtures, let scenario = DemoOptions.string("publicDemo") ?? (DemoOptions.string("askDemo") != nil || DemoOptions.string("rulesDemo") != nil ? "loaded" : nil) {
             configuredPublic = PublicDemo.api(scenario: scenario)
             isPublicDemo = true
         } else { isPublicDemo = false }
@@ -153,7 +153,7 @@ final class AppModel {
         demo = DemoState(rawValue: DemoOptions.string("demo") ?? "") ?? .live
         cache = demo == .live ? RouteCache() : RouteCache(directory: URL.kilnWatchStore.appending(path: "DebugRouteCache"))
         if let id = DemoOptions.string("open") { open(kiln: id) }
-        shownRule = DemoOptions.string("rule").map(Rule.named)
+        shownRule = DemoOptions.string("rule").map(RuleReference.catalog)
     }
 
     func kiln(_ id: String) -> Kiln? { detailRecords[id] ?? kilns[id] }
@@ -341,7 +341,7 @@ final class AppModel {
     func handle(_ url: URL) -> OpenURLAction.Result {
         guard url.scheme == "kilnwatch" else { return .systemAction }
         let id = url.lastPathComponent
-        if url.host() == "kiln" { open(kiln: id) } else { shownRule = Rule.named(id) }
+        if url.host() == "kiln" { open(kiln: id) } else { shownRule = .catalog(id) }
         return .handled
     }
 
@@ -367,7 +367,7 @@ struct RootView: View {
             }
         }
         .environment(\.openURL, OpenURLAction { model.handle($0) })
-        .sheet(item: $model.shownRule) { RuleSheet(rule: $0) }
+        .sheet(item: $model.shownRule) { RuleSheet(reference: $0) }
         .alert("Use kiln location?", isPresented: Binding(get: { model.maps.confirmation != nil }, set: { if !$0 { model.maps.cancel() } })) {
             Button("Open Maps") { model.maps.openPending() }
             Button("Cancel", role: .cancel) { model.maps.cancel() }
@@ -427,8 +427,10 @@ private struct RouteAccessory: View {
 
 /// A rule from the catalog, opened from a citation chip.
 struct RuleSheet: View {
-    let rule: Rule
+    let reference: RuleReference
+    private var rule: Rule { reference.rule }
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         NavigationStack {
@@ -437,35 +439,56 @@ struct RuleSheet: View {
                     Text(rule.id)
                         .font(.title.weight(.semibold).monospaced())
                         .foregroundStyle(.ink)
-                    Text(rule.name)
+                    Text(reference.check?.check ?? rule.name)
                         .font(.headline)
                         .foregroundStyle(.ink)
                     VStack(alignment: .leading, spacing: Space.xxs) {
                         Text("Check").eyebrow()
-                        Text(rule.check).font(.body).foregroundStyle(.ink)
-                        if let threshold = rule.thresholdM { Text("Catalog threshold: \(Int(threshold).grouped) m").font(.body).foregroundStyle(.ink) }
-                        if let requirement = rule.requirement { Text(requirement).font(.body).foregroundStyle(.ink) }
-                        ForEach(rule.overrides, id: \.state) { override in
-                            Text("\(override.state): \(Int(override.thresholdM).grouped) m").font(.body).foregroundStyle(.ink)
+                        if let kilnId = reference.kilnId {
+                            Text(kilnId).font(.footnote.monospaced()).foregroundStyle(.inkSecondary)
+                                .typesettingLanguage(.explicit(.init(identifier: "zxx")))
+                        }
+                        if let check = reference.check {
+                            Text(check.status.label).font(.body).foregroundStyle(.ink)
+                            Text(check.measurementLine).font(.body.monospacedDigit()).foregroundStyle(.ink)
+                            if let flag = reference.flag,
+                               flag.measuredDistanceM != check.measuredDistanceM || flag.thresholdM != check.thresholdM || check.status != .withinThreshold {
+                                Text("Supplied flag: \(flag.compactLine(for: nil)). Flag and check differ; inspect on site.")
+                                    .font(.footnote).foregroundStyle(.inkSecondary)
+                            }
+                        } else if let flag = reference.flag {
+                            Text("Siting flag · needs inspection").font(.body).foregroundStyle(.ink)
+                            Text(flag.compactLine(for: nil)).font(.body.monospacedDigit()).foregroundStyle(.ink)
+                        } else {
+                            Text(rule.check).font(.body).foregroundStyle(.ink)
+                            if let threshold = RuleCheck.metres(rule.thresholdM) { Text("Reference threshold: \(threshold)").font(.body).foregroundStyle(.ink) }
+                            if let requirement = rule.requirement { Text("Reference requirement: \(requirement)").font(.body).foregroundStyle(.ink) }
+                            Text("Reference only. No kiln measurement or check result supplied.").font(.footnote).foregroundStyle(.inkSecondary)
                         }
                     }
+                    ThresholdWarning(verification: reference.verification)
                     VStack(alignment: .leading, spacing: Space.xxs) {
-                        Text("Legal source").eyebrow()
-                        Text(rule.source).font(.body).foregroundStyle(.ink)
+                        Text("Threshold source").eyebrow()
+                        Text(reference.check?.source ?? reference.flag?.source ?? rule.source).font(.body).foregroundStyle(.ink)
+                        if let check = reference.check, let flag = reference.flag, flag.source != check.source {
+                            Text("Supplied flag source: \(flag.source)").font(.footnote).foregroundStyle(.inkSecondary)
+                        }
                     }
-                    Text("Thresholds from the 2022 central rules and UP siting rules, including the 2026 amendment, compiled October 2026. Not yet checked against the gazette text.")
+                    Text(reference.verification?.explanation ?? "Threshold verification unavailable.")
                         .font(.footnote)
                         .foregroundStyle(.inkSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Space.margin)
             }
+            .navigationTitle("Rule source")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close", systemImage: "xmark", role: .close) { dismiss() }
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents(typeSize.isAccessibilitySize ? [.large] : [.medium, .large])
     }
 }

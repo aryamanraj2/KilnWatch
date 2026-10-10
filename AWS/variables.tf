@@ -242,3 +242,19 @@ variable "cdn_profile" {
   type        = string
   default     = ""
 }
+
+variable "enable_route_planner" {
+  description = "P1 public POST /routes/plan route planner Lambda (Amazon Location Routes, Core tier). Needs enable_assistant (it shares the counter table). Build AWS/build/route.zip first."
+  type        = bool
+  default     = false
+}
+
+variable "route_daily_cap" {
+  description = "Hard cap on route plans per UTC day across all callers (each plan is one 9 x 8 matrix and one route)."
+  type        = number
+  default     = 15
+  validation {
+    condition     = var.route_daily_cap >= 1 && floor(var.route_daily_cap) == var.route_daily_cap
+    error_message = "route_daily_cap must be a positive integer."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "answer": "The kiln KW-00000000000000000000000000000001 has one siting flag: C-HAB-800 (Distance to habitation) at 497 m from the nearest mapped feature, with a threshold of 800 m from secondary sources. Other rule checks are either beyond thresholds, inconclusive due to incomplete maps, or not evaluated for lack of data.",
+  "citations": [
+    "KW-00000000000000000000000000000001"
+  ],
+  "steps": [
+    {
+      "tool": "get_evidence",
+      "label": "Gathering evidence for KW-6b3b\u2026",
+      "summary": "Found",
+      "ok": true
+    }
+  ],
+  "fallback": false,
+  "disclaimer": "Answers cite registry records. Agents never record verdicts. Kilns are flagged by satellite and pending inspection."
+}

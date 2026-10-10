@@ -7,6 +7,8 @@ enum AskDemo {
     static let id = "KW-00000000000000000000000000000001"
     static let disclaimer = "Answers cite registry records. Agents never record verdicts. Kilns are flagged by satellite and pending inspection."
     static func response(scenario: String, call: Int) -> (Int, Data) {
+        if scenario == "r1Recorded" { return (200, R1Demo.data("R1Ask.recorded")) }
+        if scenario == "r1Mixed" { return (200, R1Demo.data("R1AskMixed.synthetic")) }
         switch scenario {
         case "dailyLimit": return error(status: 429, code: "daily_cap_reached", retryable: false)
         case "invalid": return error(status: 400, code: "invalid_request", retryable: false)

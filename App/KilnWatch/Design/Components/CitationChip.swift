@@ -4,6 +4,7 @@ import SwiftUI
 /// Routing goes through `openURL` (`kilnwatch://kiln/KW-0412`, `kilnwatch://rule/C-HAB-800`), handled at the app root.
 struct CitationChip: View {
     let id: String
+    var action: (() -> Void)?
     @Environment(\.openURL) private var openURL
 
     static func url(for id: String) -> URL {
@@ -11,7 +12,7 @@ struct CitationChip: View {
     }
 
     var body: some View {
-        Button { openURL(Self.url(for: id)) } label: {
+        Button { if let action { action() } else { openURL(Self.url(for: id)) } } label: {
             Text(id)
                 .font(.footnote.monospaced().weight(.medium))
                 .typesettingLanguage(.explicit(.init(identifier: "zxx")))

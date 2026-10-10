@@ -34,6 +34,7 @@ private struct KilnDetailView: View {
     @Environment(AppModel.self) private var model
     @State private var showVerdict = false
     @State private var scroll = ScrollPosition(edge: .top)
+    @State private var checksExpanded = DemoOptions.bool("checksExpanded")
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let kiln: Kiln
@@ -46,23 +47,39 @@ private struct KilnDetailView: View {
                     .card()
                 section("Flagged rules", id: "rules") {
                     VStack(alignment: .leading, spacing: Space.l) {
-                        if kiln.rulesAssessment == "not_evaluated" || (kiln.rulesAssessment == nil && kiln.violations.isEmpty) {
-                            Text("Rules not evaluated").font(.body).foregroundStyle(.inkSecondary)
-                        } else if kiln.violations.isEmpty {
+                        if kiln.violations.isEmpty {
                             Text("No rule flags measured").font(.body).foregroundStyle(.inkSecondary)
                         }
                         ForEach(kiln.violations, id: \.ruleId) { violation in
-                            RuleDistanceBar(violation: violation, kiln: kiln, color: model.status(for: kiln).color)
+                            RuleDistanceBar(violation: violation, kiln: kiln,
+                                            check: kiln.ruleChecks?.first { $0.ruleId == violation.ruleId })
                         }
-                        if kiln.rulesAssessment == "partially_evaluated" {
-                            Text("Some rules could not be checked from map data. Check on site.")
+                        if let note = kiln.assessmentNote {
+                            Text(note)
                                 .font(.footnote).foregroundStyle(.inkSecondary)
                         }
                     }
                     .card()
                 }
-                section(isFixture ? "Within 800 m" : "Population exposure", id: "exposure") {
-                    ExposureBlock(exposure: kiln.exposure, bufferRadiusM: isFixture ? 800 : nil).card()
+                section("Rule checks", id: "ruleChecks") {
+                    if let checks = kiln.ruleChecks, !checks.isEmpty {
+                        DisclosureGroup("All supplied checks · \(checks.count)", isExpanded: $checksExpanded) {
+                            VStack(alignment: .leading, spacing: Space.l) {
+                                ForEach(checks, id: \.ruleId) { check in
+                                    RuleCheckRow(check: check, kilnId: kiln.kilnId)
+                                    if check != checks.last { Divider() }
+                                }
+                            }.padding(.top, Space.s)
+                        }.tint(.ink).card()
+                    } else {
+                        Text(kiln.rulesAssessment == "not_evaluated" ? "Rule checks not evaluated · no usable data" : "Rule checks unavailable")
+                            .font(.body).foregroundStyle(.inkSecondary).card()
+                    }
+                }
+                section(kiln.exposure == nil ? "Population exposure" : "Within 800 m", id: "exposure") {
+                    ExposureBlock(exposure: kiln.exposure, bufferRadiusM: 800,
+                                  modelled: !isFixture && (!model.isPublicDemo || DemoOptions.string("rulesDemo") == "recorded"),
+                                  sample: isFixture || (model.isPublicDemo && DemoOptions.string("rulesDemo") != "recorded")).card()
                 }
                 section(isFixture ? "Nearest home and school" : "Location and footprint", id: "map") {
                     BufferMap(kiln: kiln, illustrative: isFixture).card()
@@ -279,7 +296,7 @@ private struct BufferMap: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(accessibilityText)
 
-            Text(illustrative ? "Dashed ring: 800 m buffer from the kiln footprint" : "Satellite-detected footprint and location · pending inspection")
+            Text(illustrative ? "Illustrative 800 m ring around the kiln location · sample data" : "Satellite-detected footprint and location · pending inspection")
                 .font(.caption)
                 .foregroundStyle(.inkSecondary)
         }
@@ -299,9 +316,9 @@ private struct BufferMap: View {
     }
 
     private var accessibilityText: String {
-        if !illustrative { return "Map of \(kiln.kilnId), satellite-detected footprint and location, pending inspection. No siting buffer has been assessed." }
+        if !illustrative { return "Map of \(kiln.kilnId), satellite-detected footprint and location, pending inspection. No buffer is drawn." }
         let parts = points.map { $0.label.replacingOccurrences(of: " m", with: " metres") }
-        return "Map of \(kiln.kilnId) and its 800 metre buffer. " + parts.joined(separator: ". ")
+        return "Sample map of \(kiln.kilnId) with an illustrative 800 metre ring around the kiln location. " + parts.joined(separator: ". ")
     }
 }
 

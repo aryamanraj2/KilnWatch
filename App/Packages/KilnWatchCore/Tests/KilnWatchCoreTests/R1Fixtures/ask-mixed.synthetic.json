@@ -1,0 +1,26 @@
+{
+  "answer": "Local synthetic test: KW-00000000000000000000000000000001 has a siting signal under C-HAB-800. C-FUTURE-2K has no bundled reference.",
+  "citations": [
+    "KW-00000000000000000000000000000001",
+    "C-HAB-800",
+    "KW-00000000000000000000000000000001",
+    "C-FUTURE-2K",
+    "C-HAB-800"
+  ],
+  "steps": [
+    {
+      "tool": "get_evidence",
+      "label": "Gathering evidence for KW-00000000000000000000000000000001",
+      "summary": "Found",
+      "ok": true
+    },
+    {
+      "tool": "get_evidence",
+      "label": "Gathering evidence again",
+      "summary": "Invalid tool input",
+      "ok": false
+    }
+  ],
+  "fallback": false,
+  "disclaimer": "Answers cite registry records. Agents never record verdicts. Kilns are flagged by satellite and pending inspection."
+}

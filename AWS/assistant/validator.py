@@ -9,6 +9,8 @@ BANNED = re.compile(r'\b(?:' + '|'.join(BANNED_WORDS) + r')\w*', re.IGNORECASE)
 KILN_TOKEN = re.compile(r'\bKW-[0-9A-Za-z]*', re.IGNORECASE)
 # Rule IDs have three segments (C-HAB-800, UP-SCH-1K, UP/HR-SCH-1K, C-TECH-10K); kiln IDs have two (KW-<hex|digits>).
 RULE_ID = re.compile(r'\b[A-Z]{1,4}(?:/[A-Z]{1,4})?-[A-Z]{2,6}-[0-9]+[KM]?\b')
+CLOCK = re.compile(r'\b\d{1,2}:\d{2}\b')
+ESTIMATE = re.compile(r'\bestimat', re.IGNORECASE)
 
 
 def citations(answer):
@@ -16,8 +18,9 @@ def citations(answer):
     return list(dict.fromkeys(KILN_TOKEN.findall(answer)))
 
 
-def check(answer, known_ids, known_rules=()):
-    """Return None when the answer passes, else a reason the model can act on."""
+def check(answer, known_ids, known_rules=(), route_planned=False):
+    """Return None when the answer passes, else a reason the model can act on.
+    route_planned: plan_route ran in this request, so any clock time in the answer is a route estimate."""
     if not isinstance(answer, str) or not answer.strip():
         return 'Your answer was empty.'
     for token in citations(answer):
@@ -28,4 +31,6 @@ def check(answer, known_ids, known_rules=()):
             return f'Your answer cited rule {rule}, which no tool returned in this request. Cite only rule IDs exactly as tools returned them.'
     if BANNED.search(answer):
         return 'Your answer used a banned word. Say "flagged by satellite, pending inspection" instead.'
+    if route_planned and CLOCK.search(answer) and not ESTIMATE.search(answer):
+        return "Call the times estimates, for example 'estimated arrival 09:13'."
     return None

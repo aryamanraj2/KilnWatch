@@ -34,7 +34,16 @@ struct KilnsView: View {
                     }
                 } header: {
                     if !results.isEmpty {
-                        Text("\(model.usesPublicRegistry ? model.district : district) · \(results.count) kilns").eyebrow()
+                        VStack(alignment: .leading, spacing: Space.xs) {
+                            Text("\(model.usesPublicRegistry ? model.district : district) · \(results.count) kilns").eyebrow()
+                            if results.contains(where: { $0.exposure != nil }) {
+                                Text(model.usesPublicRegistry && (!model.isPublicDemo || DemoOptions.string("rulesDemo") == "recorded")
+                                     ? Exposure.attribution : "Sample population figures · illustrative, not an HRSL calculation")
+                                    .font(.footnote).foregroundStyle(.inkSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .textCase(nil)
                     }
                 }
             }
@@ -111,12 +120,19 @@ private struct KilnRow: View {
                     Text("\(Text(top.ruleId).monospaced()) · \(top.compactLine(for: kiln))")
                         .font(.subheadline)
                         .foregroundStyle(.ink)
+                    if model.usesPublicRegistry {
+                        Text("Siting flag · needs inspection").font(.footnote).foregroundStyle(.flagged)
+                        ThresholdWarning(verification: kiln.ruleChecks?.first { $0.ruleId == top.ruleId }?.verification)
+                    }
+                } else {
+                    Text("No rule flags measured").font(.subheadline).foregroundStyle(.inkSecondary)
+                    if let note = kiln.assessmentNote { Text(note).font(.footnote).foregroundStyle(.inkSecondary) }
                 }
             }
             if !typeSize.isAccessibilitySize && !model.usesPublicRegistry { Spacer(minLength: Space.xs) }
             VStack(alignment: typeSize.isAccessibilitySize || model.usesPublicRegistry ? .leading : .trailing, spacing: Space.xxs) {
                 StatusBadge(status: model.status(for: kiln), detailed: model.usesPublicRegistry)
-                Text(kiln.exposure.map { "\($0.people.grouped) people" } ?? "Exposure not assessed")
+                Text(kiln.exposure.map { model.usesPublicRegistry ? "\($0.people.grouped) modelled residents within 800 m" : "\($0.people.grouped) people · sample" } ?? "Population exposure not assessed")
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.inkSecondary)
             }

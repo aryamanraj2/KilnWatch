@@ -206,3 +206,46 @@ func askTransportIsTypedAndNotRetried(code: URLError.Code) async {
     conversation.draft = "Second question?"; #expect(conversation.send()); try await settle(conversation)
     #expect(!conversation.retry(oldID) && calls.withLock { $0 } == 2)
 }
+
+@Test func recordedR1AskPreservesProseRuleWithoutInventedCitation() async throws {
+    let body = try r1Fixture("ask-rule.recorded")
+    let answer = try await AskStub { _ in (200, body) }.api.ask(question: "Explain the siting flags")
+    #expect(answer.answer.contains("C-HAB-800"))
+    #expect(answer.uniqueCitations == ["KW-00000000000000000000000000000001"])
+    #expect(answer.steps.map(\.tool) == ["get_evidence"])
+    let original = try JSONDecoder().decode(AskAnswer.self, from: body)
+    #expect(answer == original)
+}
+@Test func explicitR1MixedCitationsUseTypedNavigationAndDeduplicate() async throws {
+    let body = try r1Fixture("ask-mixed.synthetic")
+    let calls = Mutex(0)
+    let answer = try await AskStub { request in
+        calls.withLock { $0 += 1 }
+        #expect(request.httpMethod == "POST" && request.value(forHTTPHeaderField: "Authorization") == nil)
+        return (200, body)
+    }.api.ask(question: "Local mixed citation case")
+    let id = "KW-00000000000000000000000000000001"
+    #expect(answer.uniqueCitations == [id, "C-HAB-800", "C-FUTURE-2K"])
+    #expect(answer.uniqueCitations.compactMap(AskCitation.init) == [.kiln(id), .rule("C-HAB-800"), .rule("C-FUTURE-2K")])
+    #expect(answer.steps.count == 2 && answer.steps[0].ok && !answer.steps[1].ok)
+    #expect(answer.steps[1].label == "Gathering evidence again" && answer.steps[1].summary == "Invalid tool input")
+    #expect(calls.withLock { $0 } == 1)
+    #expect(throws: AskError.invalidInput(.kiln)) { try AskRequest(question: "Explain", kilnId: "C-HAB-800") }
+}
+@Test(arguments: ["https://example.test/rule", "C-HAB", "C-HAB-800/path", "arbitrary", "C-HAB-800\n", "KW-short", "C-HAB-800?x=1", "KW-00000000000000000000000000000001\n"])
+func malformedR1CitationsFailWithoutRetry(id: String) async throws {
+    let body = try JSONEncoder().encode(AskAnswer(answer: "Local", citations: [id], steps: [], fallback: false, disclaimer: "Pending inspection"))
+    let calls = Mutex(0)
+    await #expect(throws: AskError.malformedResponse) { try await AskStub { _ in calls.withLock { $0 += 1 }; return (200, body) }.api.ask(question: "Record?") }
+    #expect(calls.withLock { $0 } == 1)
+}
+@Test func R1RegistryBodiesDecodeThroughPublicClientWithoutAuth() async throws {
+    let listing = try r1Fixture("list.recorded"), detail = try r1Fixture("detail.recorded")
+    let stub = AskStub { request in
+        #expect(request.httpMethod == "GET" && request.value(forHTTPHeaderField: "Authorization") == nil)
+        return (200, request.url?.path == "/v1/public/kilns" ? listing : detail)
+    }
+    #expect(try await stub.api.publicKilns(district: "Hapur").count == 39)
+    let record = try await stub.api.publicKiln(id: "KW-00000000000000000000000000000001")
+    #expect(record.ruleChecks?.count == 8 && record.exposure?.people == 4225)
+}

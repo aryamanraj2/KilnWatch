@@ -460,7 +460,7 @@ class PromptAccuracyTests(unittest.TestCase):
                      'measured siting signal pending inspection, not a legal conclusion.',
                      'Call a threshold unverified only when the tool says "unverified threshold". '
                      'Never call an inconclusive or not-evaluated check clear.',
-                     'When you describe satellite images, include the attribution the tool gives.',
+                     'When you describe satellite images, include the attribution: quote attribution_text exactly.',
                      'Distances to habitation, schools, orchards, highways, railways and other kilns are per kiln, in rule '
                      'checks. If the question names no kiln and the inspector is not viewing one, say which kiln is needed.',
                      'When a tool says "not assessed" or not_evaluated, say that plainly.',
@@ -552,7 +552,7 @@ class RuleFactsTests(Env):
                 checks = {c['rule_id']: c for c in result['rule_checks']}
                 self.assertEqual(len(checks), len(RULES)); self.assertEqual(ids, [PUBLISHED]); self.assertTrue(step['ok'])
                 for rule_id, _, status, threshold, _, verification in RULES:
-                    self.assertEqual(checks[rule_id]['status_words'], tools.STATUS_WORDS[status])
+                    self.assertTrue(checks[rule_id]['status_words'].startswith(f"{dict((r[0], r[1]) for r in RULES)[rule_id]}: {tools.STATUS_WORDS[status]}; "))
                     self.assertEqual(checks[rule_id]['threshold_basis'], tools.VERIFICATION_WORDS[verification])
                 self.assertEqual(checks['C-HAB-800']['measured_distance_m'], 497)
                 self.assertEqual(checks['C-ORCH-800']['measured_distance_m'], 'no mapped feature found')
@@ -725,6 +725,179 @@ class CrossAccountBedrockTests(Env):
                     api=tools.PublicAPI(BASE, StubOpener()), model_id='m', metrics=metrics)
         self.assertEqual(metrics['validator'], 'pass')
 
+
+
+PLAN = {'district': 'Hapur', 'generated_at': '2026-10-10T12:00:00Z', 'route_id': 'plan-2026-10-11-hapur-0a1b2c3d',
+        'depart': '2026-10-11T09:00:00+05:30', 'budget_min': 480,
+        'stops': [{'order': 1, 'kiln_id': PUBLISHED, 'eta': '2026-10-11T09:12:00+05:30', 'service_min': 35,
+                   'access': {'lat': 28.7, 'lon': 77.7, 'note': 'Kiln centroid, not a verified entrance · confirm on site'},
+                   'sheet': {'rules_flagged': ['C-HAB-800', 'C-KILN-1K'], 'people_exposed': 25701, 'on_site_checks': []}},
+                  {'order': 2, 'kiln_id': KID, 'eta': '2026-10-11T09:58:00+05:30', 'service_min': 35,
+                   'access': {'lat': 28.71, 'lon': 77.71, 'note': 'x'},
+                   'sheet': {'rules_flagged': [], 'people_exposed': 812, 'on_site_checks': []}}],
+        'legs': [{'to_kiln_id': PUBLISHED, 'distance_m': 5000, 'duration_s': 720,
+                  'geometry': {'type': 'LineString', 'coordinates': [[77.6, 28.6], [77.7, 28.7]]}}],
+        'kilns': [{'kiln_id': PUBLISHED, 'footprint': {'polygon': [[77.1, 28.1]]}}],
+        'notes': ['ETAs are estimates from road travel times without live traffic, plus 35 minutes on site per stop.']}
+
+
+class RouteOpener:
+    """Serves POST /routes/plan with a fixed status and body."""
+    def __init__(self, status=200, body=PLAN, fail=False):
+        self.status, self.body, self.fail, self.requests = status, body, fail, []
+
+    def open(self, request, timeout):
+        assert request.full_url == BASE + '/routes/plan' and request.get_method() == 'POST' and timeout == 12
+        self.requests.append(json.loads(request.data))
+        if self.fail: raise TimeoutError()
+        raw = json.dumps(self.body).encode()
+        if self.status != 200: raise urllib.error.HTTPError(request.full_url, self.status, 'x', {}, io.BytesIO(raw))
+        return Reply(raw)
+
+
+class RouteToolTests(Env):
+    def plan(self, args, **opener):
+        opener = RouteOpener(**opener)
+        return tools.run(tools.PublicAPI(BASE, opener), 'plan_route', args), opener
+
+    def test_validation(self):
+        for args in ({}, {'district': 'Hapur;drop'}, {'district': 'Hapur', 'max_stops': 9}, {'district': 'Hapur', 'max_stops': 0},
+                     {'district': 'Hapur', 'priority': 'schools'}, {'district': 'Hapur', 'start_lat': 28.7},
+                     {'district': 'Hapur', 'start_lat': 95, 'start_lon': 77}, {'district': 'Hapur', 'max_stops': 2.5}):
+            with self.subTest(args=args):
+                (result, step, ids), opener = self.plan(args)
+                self.assertEqual((step['ok'], ids, opener.requests), (False, [], []))
+        (_, step, _), opener = self.plan({'district': 'Hapur', 'max_stops': 4, 'start_lat': 28.7306, 'start_lon': 77.7759})
+        self.assertEqual(opener.requests, [{'district': 'Hapur', 'priority': 'people', 'max_stops': 4,
+                                            'start': {'lat': 28.7306, 'lon': 77.7759}}])
+        (_, _, _), opener = self.plan({'district': 'Hapur'})
+        self.assertEqual(opener.requests, [{'district': 'Hapur', 'priority': 'people', 'max_stops': 8}])
+
+    def test_explicit_strings(self):
+        (result, step, ids), _ = self.plan({'district': 'Hapur', 'priority': 'flags'})
+        self.assertEqual(step, {'tool': 'plan_route', 'label': 'Planning a route', 'summary': '2 stops', 'ok': True})
+        self.assertEqual(ids, [PUBLISHED, KID])
+        self.assertEqual(result['visiting_order'], [
+            f'Stop 1: {PUBLISHED}, estimated arrival 09:12, 25,701 people within 800 m, siting flags C-HAB-800, C-KILN-1K',
+            f'Stop 2: {KID}, estimated arrival 09:58, 812 people within 800 m, siting flags none'])
+        self.assertEqual((result['depart'], result['total_driving'], result['on_site_time'], result['finish']),
+                         ('planned departure 09:00 on 2026-10-11 (Asia/Kolkata)', 'about 23 min (estimate)',
+                          '70 min (35 min per stop)', 'estimated finish 10:33'))
+        self.assertEqual(result['notes'], PLAN['notes'])
+        text = json.dumps(result)
+        for leaked in ('http', 'LineString', 'coordinates', 'polygon', '28.7', 'access', 'route_id'):
+            self.assertNotIn(leaked, text)
+        self.assertNotRegex(text, validator.BANNED)
+
+    def test_error_mapping(self):
+        cases = [(429, {'error': {'code': 'daily_cap_reached'}}, tools.ROUTE_ERRORS['daily_cap_reached']),
+                 (503, {'error': {'code': 'routing_unavailable', 'message': 'x'}}, tools.ROUTE_ERRORS['routing_unavailable']),
+                 (404, {'error': {'code': 'no_kilns'}}, tools.ROUTE_ERRORS['no_kilns']),
+                 (429, {'message': 'Too Many Requests'}, tools.ROUTE_DOWN),
+                 (503, {'error': {'code': 'upstream_unavailable'}}, tools.ROUTE_DOWN),
+                 (200, {'stops': 'not a list'}, tools.ROUTE_DOWN),
+                 (200, {**PLAN, 'stops': [{**PLAN['stops'][0], 'kiln_id': 'KW-6b3b'}]}, tools.ROUTE_DOWN)]
+        for status, body, message in cases:
+            with self.subTest(status=status, body=body):
+                (result, step, ids), _ = self.plan({'district': 'Hapur'}, status=status, body=body)
+                self.assertEqual((result, step['summary'], step['ok'], ids), ({'error': message}, 'No route', True, []))
+        with self.assertRaises(tools.UpstreamUnavailable):
+            self.plan({'district': 'Hapur'}, fail=True)
+
+    def test_answer_cites_route_ids_and_rules(self):
+        bedrock = StubBedrock(use('plan_route', {'district': 'Hapur'}),
+                              say(f'Stop 1 is {PUBLISHED} at 09:12 (estimate), siting flags C-HAB-800.'))
+        body = core.answer('Plan tomorrow in Hapur', bedrock=bedrock, api=tools.PublicAPI(BASE, RouteOpener()), model_id='m')
+        self.assertEqual((body['fallback'], body['citations']), (False, [PUBLISHED]))
+        self.assertEqual(body['steps'], [{'tool': 'plan_route', 'label': 'Planning a route', 'summary': '2 stops', 'ok': True}])
+
+    def test_system_prompt_route_line(self):
+        self.assertIn('Use plan_route for route or visit-order questions. State the stops, their order and times exactly '
+                      'as returned, and call the times estimates. Never invent a route, a stop or a time.', core.SYSTEM)
+        self.assertNotIn('Route planning is not available yet', core.SYSTEM)
+        self.assertIn('plan_route', [s['toolSpec']['name'] for s in tools.SPECS])
+
+
+
+# Road order differs from both rankings: KID (812 people, 0 flags) is visited first.
+ROAD_FIRST = {**PLAN, 'stops': [{**PLAN['stops'][1], 'order': 1, 'eta': '2026-10-11T09:12:00+05:30'},
+                                {**PLAN['stops'][0], 'order': 2, 'eta': '2026-10-11T09:58:00+05:30'}]}
+
+
+class RouteWordingTests(Env):
+    def plan(self, args, body=ROAD_FIRST):
+        return tools.run(tools.PublicAPI(BASE, RouteOpener(body=body)), 'plan_route', args)[0]
+
+    def test_every_time_is_estimated(self):
+        for priority in ('people', 'flags'):
+            result = self.plan({'district': 'Hapur', 'priority': priority})
+            text = json.dumps({k: v for k, v in result.items() if k != 'depart'})
+            times = list(validator.CLOCK.finditer(text))
+            self.assertEqual(len(times), 3)   # two arrivals and the finish
+            for match in times:
+                self.assertRegex(text[:match.start()], r'estimated (?:arrival|finish) $')
+            self.assertTrue(result['depart'].startswith('planned departure 09:00'))
+
+    def test_ranking_sentence_kept_apart_from_order(self):
+        people = self.plan({'district': 'Hapur'})
+        self.assertEqual(people['selection'],
+                         'These are the 2 kilns with the most people within 800 m. The visiting order follows road travel '
+                         f'time, not the people ranking. Ranked by people: {PUBLISHED} (25,701), {KID} (812).')
+        flags = self.plan({'district': 'Hapur', 'priority': 'flags'})
+        self.assertEqual(flags['selection'],
+                         'These are the 2 kilns with the most siting flags. The visiting order follows road travel time, '
+                         f'not the siting-flag ranking. Ranked by siting flags: {PUBLISHED} (2 siting flags, 25,701 people), '
+                         f'{KID} (0 siting flags, 812 people).')
+        for result in (people, flags):
+            self.assertTrue(result['visiting_order'][0].startswith(f'Stop 1: {KID}'))
+            self.assertFalse(any('Ranked' in line or 'kilns with the most' in line for line in result['visiting_order']))
+        self.assertEqual(tools.selection_words(ROAD_FIRST['stops'], None), 'These are the kilns you named, in road order.')
+        self.assertNotIn('selection', tools.route_words({**PLAN, 'stops': []}))
+
+    def test_validator_needs_estimate_only_after_plan_route(self):
+        bare = f'Stop 1 is {KID} at 09:12.'
+        reason = validator.check(bare, [KID], route_planned=True)
+        self.assertEqual(reason, "Call the times estimates, for example 'estimated arrival 09:13'.")
+        for ok in (f'Stop 1 is {KID}, estimated arrival 09:12.', f'Stop 1 is {KID} at 09:12 (estimate).',
+                   f'Stop 1 is {KID}; the route has 1 stop.'):
+            self.assertIsNone(validator.check(ok, [KID], route_planned=True))
+        self.assertIsNone(validator.check(bare, [KID]))   # no route: a time is untouched
+        self.assertIsNone(validator.check(f'{KID} was imaged at 05:41 UTC.', [KID], route_planned=False))
+
+    def test_regenerates_then_passes(self):
+        bedrock = StubBedrock(use('plan_route', {'district': 'Hapur'}), say(f'Visit {KID} at 09:12.'),
+                              say(f'Visit {KID}, estimated arrival 09:12.'))
+        metrics = {}
+        body = core.answer('Plan tomorrow in Hapur', bedrock=bedrock, api=tools.PublicAPI(BASE, RouteOpener(body=ROAD_FIRST)),
+                           model_id='m', metrics=metrics)
+        self.assertEqual((body['fallback'], body['answer'], metrics['validator']),
+                         (False, f'Visit {KID}, estimated arrival 09:12.', 'regenerated'))
+        self.assertIn("Call the times estimates", json.dumps(bedrock.calls[-1]['messages'][-1]))
+
+    def test_non_route_answer_with_time_untouched(self):
+        bedrock = StubBedrock(use('kiln_detail', {'kiln_id': KID}), say(f'{KID} was last seen at 05:41 UTC.'))
+        metrics = {}
+        body = core.answer('When was it seen?', bedrock=bedrock, api=tools.PublicAPI(BASE, StubOpener()), model_id='m', metrics=metrics)
+        self.assertEqual((body['fallback'], metrics['validator']), (False, 'pass'))
+
+class LeftoverTests(Env):
+    run_tool = RuleFactsTests.run_tool
+
+    def test_basis_inline_in_each_check(self):
+        result, _, _ = self.run_tool('get_evidence', {'kiln_id': PUBLISHED})
+        checks = {c['rule_id']: c['status_words'] for c in result['rule_checks']}
+        self.assertEqual(checks['UP-SCH-1K'], f"Distance to a school: {tools.STATUS_WORDS['inconclusive']}; "
+                                              'the 1000 m threshold is an unverified threshold (from an academic compilation)')
+        self.assertTrue(checks['C-HAB-800'].endswith('the 800 m threshold is a sourced threshold (court records, legal digests or news reports)'))
+        self.assertTrue(checks['C-TECH-10K'].endswith("this rule's threshold is an unverified threshold (from an academic compilation)"))
+        for rule_id, _, _, _, _, verification in RULES:
+            self.assertEqual('unverified' in checks[rule_id], verification == 'unverified_compilation')
+
+    def test_attribution_text(self):
+        result, _, _ = self.run_tool('get_evidence', {'kiln_id': PUBLISHED})
+        self.assertEqual(result['attribution_text'], 'Contains modified Copernicus Sentinel data 2026')
+        self.assertEqual(self.run_tool('get_evidence', {'kiln_id': IDS[0]})[0]['attribution_text'], 'no image attribution')
+        self.assertIn('quote attribution_text exactly', core.SYSTEM)
 
 if __name__ == '__main__':
     unittest.main()

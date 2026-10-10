@@ -27,10 +27,10 @@ Facts about the data:
 - Call a threshold unverified only when the tool says "unverified threshold". Never call an inconclusive or not-evaluated check clear. When a tool says "not assessed" or not_evaluated, say that plainly.
 - Cite rule IDs only exactly as tools returned them. Exposure is a modelled estimate; never state health effects.
 - Satellite images: use satellite_images for one kiln, or images_published_only_for for a list. Never say images are published for a kiln that isn't listed there.
-- When you describe satellite images, include the attribution the tool gives.
+- When you describe satellite images, include the attribution: quote attribution_text exactly.
 - Distances to habitation, schools, orchards, highways, railways and other kilns are per kiln, in rule checks. If the question names no kiln and the inspector is not viewing one, say which kiln is needed.
 - Never invent distances, thresholds, rules, owners, emissions or health effects; use only the numbers tools return.
-- Route planning is not available yet. Say so, and never invent a route or a visiting order. Listing the kilns nearest a point, sorted by distance_m from a tool, is fine.
+- Use plan_route for route or visit-order questions. State the stops, their order and times exactly as returned, and call the times estimates. Never invent a route, a stop or a time.
 
 How to answer:
 - Use only facts from tool results in this conversation. Call a tool when you need data.
@@ -133,6 +133,9 @@ def answer(question, kiln_id=None, lat=None, lon=None, *, bedrock=None, api=None
         messages.append(message)
         return reply.get('stopReason'), message
 
+    def route_planned():
+        return any(s['tool'] == 'plan_route' for s in steps)
+
     def text_of(message):
         return plain_text('\n'.join(b['text'] for b in message['content'] if 'text' in b)).strip()
 
@@ -161,7 +164,7 @@ def answer(question, kiln_id=None, lat=None, lon=None, *, bedrock=None, api=None
             if stop != 'tool_use':
                 if stop == 'max_tokens': return None, 'Your answer was too long. Answer in at most 120 words.'
                 text = text_of(message)
-                return text, check(text, known, rules)
+                return text, check(text, known, rules, route_planned())
             if metrics['rounds'] >= MAX_TOOL_ROUNDS:
                 return None, 'You reached the tool limit. Answer now using only the tool results you already have.'
             metrics['rounds'] += 1
@@ -177,7 +180,7 @@ def answer(question, kiln_id=None, lat=None, lon=None, *, bedrock=None, api=None
         messages.append({'role': 'user', 'content': pending + [{'text': reason + ' Answer again using only tool results.'}]})
         stop, message = converse()
         text = text_of(message) if stop not in ('tool_use', 'max_tokens') else None
-        reason = check(text, known, rules) if text is not None else 'no answer'
+        reason = check(text, known, rules, route_planned()) if text is not None else 'no answer'
         metrics['validator'] = 'regenerated'
     else:
         metrics['validator'] = 'pass'

@@ -1,0 +1,5406 @@
+{
+  "kilns": [
+    {
+      "kiln_id": "KW-00000000000000000000000000000002",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.683193,
+          "longitude": 77.757537
+        },
+        "polygon": [
+          {
+            "latitude": 28.682889,
+            "longitude": 77.757873
+          },
+          {
+            "latitude": 28.683473,
+            "longitude": 77.757898
+          },
+          {
+            "latitude": 28.683496,
+            "longitude": 77.757202
+          },
+          {
+            "latitude": 28.682912,
+            "longitude": 77.757177
+          }
+        ]
+      },
+      "type": "CFCBK",
+      "type_confidence": 0.745,
+      "detection_confidence": 0.745,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-RAIL-200",
+          "measured_to": {
+            "latitude": 28.684635,
+            "longitude": 77.758507
+          },
+          "threshold_m": 200,
+          "evidence_url": null,
+          "measured_distance_m": 142
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 1148,
+        "adults_over_sixty": 71,
+        "children_under_five": 117
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 959,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1094,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "within_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 142,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000003",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.751785,
+          "longitude": 77.810308
+        },
+        "polygon": [
+          {
+            "latitude": 28.751432,
+            "longitude": 77.810733
+          },
+          {
+            "latitude": 28.752085,
+            "longitude": 77.810782
+          },
+          {
+            "latitude": 28.752138,
+            "longitude": 77.809883
+          },
+          {
+            "latitude": 28.751485,
+            "longitude": 77.809833
+          }
+        ]
+      },
+      "type": "CFCBK",
+      "type_confidence": 0.287,
+      "detection_confidence": 0.287,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.752086,
+            "longitude": 77.804577
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 517
+        },
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-NH-300",
+          "measured_to": {
+            "latitude": 28.74972,
+            "longitude": 77.807916
+          },
+          "threshold_m": 300,
+          "evidence_url": null,
+          "measured_distance_m": 271
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 755,
+        "adults_over_sixty": 46,
+        "children_under_five": 77
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 517,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "within_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 271,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 486,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000004",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.680523,
+          "longitude": 77.74046
+        },
+        "polygon": [
+          {
+            "latitude": 28.680023,
+            "longitude": 77.740756
+          },
+          {
+            "latitude": 28.680396,
+            "longitude": 77.741083
+          },
+          {
+            "latitude": 28.681023,
+            "longitude": 77.740164
+          },
+          {
+            "latitude": 28.680651,
+            "longitude": 77.739837
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.56,
+      "detection_confidence": 0.56,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.680704,
+            "longitude": 77.737665
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 212
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 6976,
+        "adults_over_sixty": 430,
+        "children_under_five": 711
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 212,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1597,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 1023,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000005",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.762611,
+          "longitude": 77.772457
+        },
+        "polygon": [
+          {
+            "latitude": 28.762441,
+            "longitude": 77.771946
+          },
+          {
+            "latitude": 28.762152,
+            "longitude": 77.772295
+          },
+          {
+            "latitude": 28.762781,
+            "longitude": 77.772968
+          },
+          {
+            "latitude": 28.763072,
+            "longitude": 77.772619
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.405,
+      "detection_confidence": 0.405,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.762934,
+            "longitude": 77.773064
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 19
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 15199,
+        "adults_over_sixty": 1007,
+        "children_under_five": 1548
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 19,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": 1905,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 1286,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 1147,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000006",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.762857,
+          "longitude": 77.773692
+        },
+        "polygon": [
+          {
+            "latitude": 28.762387,
+            "longitude": 77.774036
+          },
+          {
+            "latitude": 28.762778,
+            "longitude": 77.774321
+          },
+          {
+            "latitude": 28.763327,
+            "longitude": 77.77335
+          },
+          {
+            "latitude": 28.762934,
+            "longitude": 77.773064
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.305,
+      "detection_confidence": 0.305,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.762811,
+            "longitude": 77.772932
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 19
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 13667,
+        "adults_over_sixty": 904,
+        "children_under_five": 1392
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 19,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": 1950,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 1192,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000007",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.696572,
+          "longitude": 77.7968
+        },
+        "polygon": [
+          {
+            "latitude": 28.696075,
+            "longitude": 77.79706
+          },
+          {
+            "latitude": 28.69644,
+            "longitude": 77.797403
+          },
+          {
+            "latitude": 28.697069,
+            "longitude": 77.79654
+          },
+          {
+            "latitude": 28.696704,
+            "longitude": 77.796197
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.485,
+      "detection_confidence": 0.485,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.699016,
+            "longitude": 77.802737
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 594
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 1570,
+        "adults_over_sixty": 97,
+        "children_under_five": 160
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1564,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 594,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 1239,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 699,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000008",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.692168,
+          "longitude": 77.80982
+        },
+        "polygon": [
+          {
+            "latitude": 28.691954,
+            "longitude": 77.809297
+          },
+          {
+            "latitude": 28.691671,
+            "longitude": 77.809705
+          },
+          {
+            "latitude": 28.692381,
+            "longitude": 77.810343
+          },
+          {
+            "latitude": 28.692665,
+            "longitude": 77.809935
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.605,
+      "detection_confidence": 0.605,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.691751,
+            "longitude": 77.80959
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 0
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4802,
+        "adults_over_sixty": 296,
+        "children_under_five": 489
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1209,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 0,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000009",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.713294,
+          "longitude": 77.776524
+        },
+        "polygon": [
+          {
+            "latitude": 28.713081,
+            "longitude": 77.775946
+          },
+          {
+            "latitude": 28.712776,
+            "longitude": 77.776309
+          },
+          {
+            "latitude": 28.713506,
+            "longitude": 77.777101
+          },
+          {
+            "latitude": 28.713812,
+            "longitude": 77.776738
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.508,
+      "detection_confidence": 0.508,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.713081,
+            "longitude": 77.775946
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 0
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.706111,
+            "longitude": 77.77889
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 781
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 20838,
+        "adults_over_sixty": 1283,
+        "children_under_five": 2123
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 0,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 781,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 876,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000000a",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.753978,
+          "longitude": 77.767474
+        },
+        "polygon": [
+          {
+            "latitude": 28.753784,
+            "longitude": 77.766958
+          },
+          {
+            "latitude": 28.753506,
+            "longitude": 77.767307
+          },
+          {
+            "latitude": 28.754171,
+            "longitude": 77.76799
+          },
+          {
+            "latitude": 28.754449,
+            "longitude": 77.767641
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.328,
+      "detection_confidence": 0.328,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.762152,
+            "longitude": 77.772295
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 967
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 17872,
+        "adults_over_sixty": 1124,
+        "children_under_five": 1821
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1232,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 967,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": 1006,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 429,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000000b",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.774126,
+          "longitude": 77.75502
+        },
+        "polygon": [
+          {
+            "latitude": 28.773895,
+            "longitude": 77.754495
+          },
+          {
+            "latitude": 28.773621,
+            "longitude": 77.75489
+          },
+          {
+            "latitude": 28.774357,
+            "longitude": 77.755545
+          },
+          {
+            "latitude": 28.774631,
+            "longitude": 77.755151
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.441,
+      "detection_confidence": 0.441,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.778125,
+            "longitude": 77.747431
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 834
+        },
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-RAIL-200",
+          "measured_to": {
+            "latitude": 28.774494,
+            "longitude": 77.756122
+          },
+          "threshold_m": 200,
+          "evidence_url": null,
+          "measured_distance_m": 58
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 345,
+        "adults_over_sixty": 24,
+        "children_under_five": 35
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1581,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 834,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "within_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 58,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000000c",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.699167,
+          "longitude": 77.803225
+        },
+        "polygon": [
+          {
+            "latitude": 28.699016,
+            "longitude": 77.802737
+          },
+          {
+            "latitude": 28.698724,
+            "longitude": 77.803104
+          },
+          {
+            "latitude": 28.699318,
+            "longitude": 77.803714
+          },
+          {
+            "latitude": 28.69961,
+            "longitude": 77.803346
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.568,
+      "detection_confidence": 0.568,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.69644,
+            "longitude": 77.797403
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 594
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4228,
+        "adults_over_sixty": 260,
+        "children_under_five": 431
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 594,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000000d",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.727357,
+          "longitude": 77.826877
+        },
+        "polygon": [
+          {
+            "latitude": 28.727084,
+            "longitude": 77.826295
+          },
+          {
+            "latitude": 28.726796,
+            "longitude": 77.826707
+          },
+          {
+            "latitude": 28.72763,
+            "longitude": 77.827459
+          },
+          {
+            "latitude": 28.727918,
+            "longitude": 77.827047
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.612,
+      "detection_confidence": 0.612,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-NH-300",
+          "measured_to": {
+            "latitude": 28.726759,
+            "longitude": 77.826704
+          },
+          "threshold_m": 300,
+          "evidence_url": null,
+          "measured_distance_m": 4
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 13016,
+        "adults_over_sixty": 802,
+        "children_under_five": 1326
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 946,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1630,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "within_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 4,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000000e",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.699985,
+          "longitude": 77.779228
+        },
+        "polygon": [
+          {
+            "latitude": 28.699759,
+            "longitude": 77.778736
+          },
+          {
+            "latitude": 28.6995,
+            "longitude": 77.779158
+          },
+          {
+            "latitude": 28.70021,
+            "longitude": 77.77972
+          },
+          {
+            "latitude": 28.700469,
+            "longitude": 77.779299
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.418,
+      "detection_confidence": 0.418,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.707228,
+            "longitude": 77.780195
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 754
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.705429,
+            "longitude": 77.779694
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 551
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 2809,
+        "adults_over_sixty": 173,
+        "children_under_five": 286
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 754,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 551,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 336,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 948,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000000f",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.772213,
+          "longitude": 77.803432
+        },
+        "polygon": [
+          {
+            "latitude": 28.771747,
+            "longitude": 77.80377
+          },
+          {
+            "latitude": 28.772118,
+            "longitude": 77.804051
+          },
+          {
+            "latitude": 28.772679,
+            "longitude": 77.803095
+          },
+          {
+            "latitude": 28.772308,
+            "longitude": 77.802814
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.447,
+      "detection_confidence": 0.447,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.766004,
+            "longitude": 77.811526
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 989
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 60,
+        "adults_over_sixty": 4,
+        "children_under_five": 6
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 989,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000010",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.691928,
+          "longitude": 77.809895
+        },
+        "polygon": [
+          {
+            "latitude": 28.691733,
+            "longitude": 77.810271
+          },
+          {
+            "latitude": 28.692222,
+            "longitude": 77.810176
+          },
+          {
+            "latitude": 28.692123,
+            "longitude": 77.809518
+          },
+          {
+            "latitude": 28.691634,
+            "longitude": 77.809613
+          }
+        ]
+      },
+      "type": "CFCBK",
+      "type_confidence": 0.257,
+      "detection_confidence": 0.257,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.6922,
+            "longitude": 77.81018
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 0
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 5074,
+        "adults_over_sixty": 312,
+        "children_under_five": 517
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1170,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 0,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000011",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.751888,
+          "longitude": 77.804053
+        },
+        "polygon": [
+          {
+            "latitude": 28.75169,
+            "longitude": 77.803528
+          },
+          {
+            "latitude": 28.7514,
+            "longitude": 77.803913
+          },
+          {
+            "latitude": 28.752086,
+            "longitude": 77.804577
+          },
+          {
+            "latitude": 28.752376,
+            "longitude": 77.804193
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.685,
+      "detection_confidence": 0.685,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.751772,
+            "longitude": 77.809855
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 517
+        },
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-NH-300",
+          "measured_to": {
+            "latitude": 28.752211,
+            "longitude": 77.804712
+          },
+          "threshold_m": 300,
+          "evidence_url": null,
+          "measured_distance_m": 19
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 1299,
+        "adults_over_sixty": 80,
+        "children_under_five": 132
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1705,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 517,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "within_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 19,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 645,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000012",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.75538,
+          "longitude": 77.739846
+        },
+        "polygon": [
+          {
+            "latitude": 28.755166,
+            "longitude": 77.739305
+          },
+          {
+            "latitude": 28.754872,
+            "longitude": 77.739702
+          },
+          {
+            "latitude": 28.755595,
+            "longitude": 77.740388
+          },
+          {
+            "latitude": 28.755888,
+            "longitude": 77.739991
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.482,
+      "detection_confidence": 0.482,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.756146,
+            "longitude": 77.739594
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 48
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.762237,
+            "longitude": 77.732825
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 992
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 7068,
+        "adults_over_sixty": 491,
+        "children_under_five": 720
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 48,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 992,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000013",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.67905,
+          "longitude": 77.796244
+        },
+        "polygon": [
+          {
+            "latitude": 28.678839,
+            "longitude": 77.795663
+          },
+          {
+            "latitude": 28.678515,
+            "longitude": 77.796082
+          },
+          {
+            "latitude": 28.679261,
+            "longitude": 77.796825
+          },
+          {
+            "latitude": 28.679586,
+            "longitude": 77.796406
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.481,
+      "detection_confidence": 0.481,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 393,
+        "adults_over_sixty": 24,
+        "children_under_five": 40
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1199,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 987,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 880,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000014",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.7394,
+          "longitude": 77.74759
+        },
+        "polygon": [
+          {
+            "latitude": 28.739041,
+            "longitude": 77.747906
+          },
+          {
+            "latitude": 28.739416,
+            "longitude": 77.748105
+          },
+          {
+            "latitude": 28.739759,
+            "longitude": 77.747276
+          },
+          {
+            "latitude": 28.739382,
+            "longitude": 77.747076
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.57,
+      "detection_confidence": 0.57,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 9332,
+        "adults_over_sixty": 575,
+        "children_under_five": 951
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1131,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1831,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": 1148,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 793,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000015",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.70577,
+          "longitude": 77.779292
+        },
+        "polygon": [
+          {
+            "latitude": 28.705429,
+            "longitude": 77.779694
+          },
+          {
+            "latitude": 28.705964,
+            "longitude": 77.779805
+          },
+          {
+            "latitude": 28.706111,
+            "longitude": 77.77889
+          },
+          {
+            "latitude": 28.705574,
+            "longitude": 77.77878
+          }
+        ]
+      },
+      "type": "CFCBK",
+      "type_confidence": 0.339,
+      "detection_confidence": 0.339,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.707346,
+            "longitude": 77.779054
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 138
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.700469,
+            "longitude": 77.779299
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 551
+        },
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-NH-300",
+          "measured_to": {
+            "latitude": 28.705112,
+            "longitude": 77.779849
+          },
+          "threshold_m": 300,
+          "evidence_url": null,
+          "measured_distance_m": 38
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 8486,
+        "adults_over_sixty": 523,
+        "children_under_five": 865
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 138,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 551,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "within_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 38,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 1019,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000016",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.680217,
+          "longitude": 77.769264
+        },
+        "polygon": [
+          {
+            "latitude": 28.679733,
+            "longitude": 77.769502
+          },
+          {
+            "latitude": 28.680069,
+            "longitude": 77.769838
+          },
+          {
+            "latitude": 28.680702,
+            "longitude": 77.769027
+          },
+          {
+            "latitude": 28.680366,
+            "longitude": 77.768691
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.381,
+      "detection_confidence": 0.381,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.687506,
+            "longitude": 77.775723
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 998
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 1148,
+        "adults_over_sixty": 71,
+        "children_under_five": 117
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1305,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 998,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 268,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000001",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.747059,
+          "longitude": 77.72956
+        },
+        "polygon": [
+          {
+            "latitude": 28.746674,
+            "longitude": 77.7299
+          },
+          {
+            "latitude": 28.747029,
+            "longitude": 77.730112
+          },
+          {
+            "latitude": 28.747444,
+            "longitude": 77.729221
+          },
+          {
+            "latitude": 28.747089,
+            "longitude": 77.729009
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.324,
+      "detection_confidence": 0.324,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.749671,
+            "longitude": 77.72481
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 497
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4225,
+        "adults_over_sixty": 294,
+        "children_under_five": 430
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 497,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1273,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null,
+        "before_metadata": {
+          "acquired_at": "2023-12-05T05:40:56.807000Z",
+          "attribution": "Contains modified Copernicus Sentinel data 2023",
+          "centroid_px": [
+            128.818205,
+            128.237018
+          ],
+          "crs": "EPSG:32643",
+          "footprint_px": null,
+          "geotransform": [
+            765270.0,
+            10.0,
+            0.0,
+            3184300.0,
+            0.0,
+            -10.0
+          ],
+          "grid_code": "MGRS-43RGM",
+          "gsd_m": 10,
+          "nodata_fraction": 0.0,
+          "object_key": "test-evidence/synthetic.png",
+          "patch_px": 256,
+          "published_url": null,
+          "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+          "scene_cloud_pct": 0.000186,
+          "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+          "sha256": "77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc",
+          "source_assets": [
+            {
+              "band": "red",
+              "href": null,
+              "offset": -0.1,
+              "scale": 0.0001
+            },
+            {
+              "band": "green",
+              "href": null,
+              "offset": -0.1,
+              "scale": 0.0001
+            },
+            {
+              "band": "blue",
+              "href": null,
+              "offset": -0.1,
+              "scale": 0.0001
+            }
+          ]
+        },
+        "after_metadata": {
+          "acquired_at": "2026-10-05T05:41:03.148000Z",
+          "attribution": "Contains modified Copernicus Sentinel data 2026",
+          "centroid_px": [
+            128.818205,
+            128.237018
+          ],
+          "crs": "EPSG:32643",
+          "footprint_px": [
+            [
+              132.237745,
+              132.42878
+            ],
+            [
+              134.218656,
+              128.445917
+            ],
+            [
+              125.408457,
+              124.045025
+            ],
+            [
+              123.427527,
+              128.027871
+            ]
+          ],
+          "geotransform": [
+            765270.0,
+            10.0,
+            0.0,
+            3184300.0,
+            0.0,
+            -10.0
+          ],
+          "grid_code": "MGRS-43RGM",
+          "gsd_m": 10,
+          "nodata_fraction": 0.0,
+          "object_key": "test-evidence/synthetic.png",
+          "patch_px": 256,
+          "published_url": null,
+          "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+          "scene_cloud_pct": 5.6e-05,
+          "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+          "sha256": "a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5",
+          "source_assets": [
+            {
+              "band": "red",
+              "href": null,
+              "offset": -0.1,
+              "scale": 0.0001
+            },
+            {
+              "band": "green",
+              "href": null,
+              "offset": -0.1,
+              "scale": 0.0001
+            },
+            {
+              "band": "blue",
+              "href": null,
+              "offset": -0.1,
+              "scale": 0.0001
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000017",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.778279,
+          "longitude": 77.746884
+        },
+        "polygon": [
+          {
+            "latitude": 28.777842,
+            "longitude": 77.747213
+          },
+          {
+            "latitude": 28.77817,
+            "longitude": 77.747466
+          },
+          {
+            "latitude": 28.778716,
+            "longitude": 77.746555
+          },
+          {
+            "latitude": 28.778388,
+            "longitude": 77.746302
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.32,
+      "detection_confidence": 0.32,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.773895,
+            "longitude": 77.754495
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 834
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 159,
+        "adults_over_sixty": 11,
+        "children_under_five": 16
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1000,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 834,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 710,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000018",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.691403,
+          "longitude": 77.8226
+        },
+        "polygon": [
+          {
+            "latitude": 28.690933,
+            "longitude": 77.822931
+          },
+          {
+            "latitude": 28.691312,
+            "longitude": 77.823218
+          },
+          {
+            "latitude": 28.691873,
+            "longitude": 77.822269
+          },
+          {
+            "latitude": 28.691494,
+            "longitude": 77.821982
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.252,
+      "detection_confidence": 0.252,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.685202,
+            "longitude": 77.819686
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 710
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.688174,
+            "longitude": 77.813663
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 892
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4470,
+        "adults_over_sixty": 275,
+        "children_under_five": 455
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 710,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 892,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000019",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.7674,
+          "longitude": 77.739662
+        },
+        "polygon": [
+          {
+            "latitude": 28.766864,
+            "longitude": 77.740082
+          },
+          {
+            "latitude": 28.767336,
+            "longitude": 77.740398
+          },
+          {
+            "latitude": 28.767936,
+            "longitude": 77.739243
+          },
+          {
+            "latitude": 28.767465,
+            "longitude": 77.738926
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.394,
+      "detection_confidence": 0.394,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.7727,
+            "longitude": 77.738356
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 535
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.763141,
+            "longitude": 77.733403
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 722
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4012,
+        "adults_over_sixty": 279,
+        "children_under_five": 409
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 535,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 722,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000001a",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.678747,
+          "longitude": 77.818416
+        },
+        "polygon": [
+          {
+            "latitude": 28.678241,
+            "longitude": 77.818701
+          },
+          {
+            "latitude": 28.678627,
+            "longitude": 77.819043
+          },
+          {
+            "latitude": 28.679252,
+            "longitude": 77.818131
+          },
+          {
+            "latitude": 28.678867,
+            "longitude": 77.817789
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.568,
+      "detection_confidence": 0.568,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.685037,
+            "longitude": 77.819687
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 659
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 5768,
+        "adults_over_sixty": 355,
+        "children_under_five": 588
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 659,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1056,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000001b",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.688253,
+          "longitude": 77.813084
+        },
+        "polygon": [
+          {
+            "latitude": 28.687814,
+            "longitude": 77.813392
+          },
+          {
+            "latitude": 28.688174,
+            "longitude": 77.813663
+          },
+          {
+            "latitude": 28.688693,
+            "longitude": 77.812777
+          },
+          {
+            "latitude": 28.688331,
+            "longitude": 77.812505
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.555,
+      "detection_confidence": 0.555,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.685111,
+            "longitude": 77.819593
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 672
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.691733,
+            "longitude": 77.810271
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 417
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 11597,
+        "adults_over_sixty": 714,
+        "children_under_five": 1181
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 672,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 417,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000001c",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.762806,
+          "longitude": 77.732877
+        },
+        "polygon": [
+          {
+            "latitude": 28.76247,
+            "longitude": 77.732352
+          },
+          {
+            "latitude": 28.762237,
+            "longitude": 77.732825
+          },
+          {
+            "latitude": 28.763141,
+            "longitude": 77.733403
+          },
+          {
+            "latitude": 28.763376,
+            "longitude": 77.732929
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.288,
+      "detection_confidence": 0.288,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.759834,
+            "longitude": 77.733593
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 277
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.767465,
+            "longitude": 77.738926
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 722
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 6590,
+        "adults_over_sixty": 458,
+        "children_under_five": 671
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 277,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 722,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000001d",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.688882,
+          "longitude": 77.789295
+        },
+        "polygon": [
+          {
+            "latitude": 28.688597,
+            "longitude": 77.788781
+          },
+          {
+            "latitude": 28.688351,
+            "longitude": 77.789207
+          },
+          {
+            "latitude": 28.689167,
+            "longitude": 77.78981
+          },
+          {
+            "latitude": 28.689412,
+            "longitude": 77.789385
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.626,
+      "detection_confidence": 0.626,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-RAIL-200",
+          "measured_to": {
+            "latitude": 28.688699,
+            "longitude": 77.787818
+          },
+          "threshold_m": 200,
+          "evidence_url": null,
+          "measured_distance_m": 95
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 5013,
+        "adults_over_sixty": 309,
+        "children_under_five": 511
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1042,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 370,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "within_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 95,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000001e",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.687994,
+          "longitude": 77.775908
+        },
+        "polygon": [
+          {
+            "latitude": 28.687822,
+            "longitude": 77.775358
+          },
+          {
+            "latitude": 28.687506,
+            "longitude": 77.775723
+          },
+          {
+            "latitude": 28.688165,
+            "longitude": 77.776458
+          },
+          {
+            "latitude": 28.688481,
+            "longitude": 77.776094
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.268,
+      "detection_confidence": 0.268,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.692345,
+            "longitude": 77.772006
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 586
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4590,
+        "adults_over_sixty": 283,
+        "children_under_five": 468
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 983,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 586,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 829,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 1093,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-0000000000000000000000000000001f",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.692851,
+          "longitude": 77.772127
+        },
+        "polygon": [
+          {
+            "latitude": 28.692694,
+            "longitude": 77.771569
+          },
+          {
+            "latitude": 28.692345,
+            "longitude": 77.772006
+          },
+          {
+            "latitude": 28.693007,
+            "longitude": 77.772684
+          },
+          {
+            "latitude": 28.693357,
+            "longitude": 77.772247
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.476,
+      "detection_confidence": 0.476,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.692368,
+            "longitude": 77.766727
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 475
+        },
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.688481,
+            "longitude": 77.776094
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 586
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 3986,
+        "adults_over_sixty": 246,
+        "children_under_five": 406
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 475,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 586,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 1094,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000020",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.765371,
+          "longitude": 77.813527
+        },
+        "polygon": [
+          {
+            "latitude": 28.76503,
+            "longitude": 77.813887
+          },
+          {
+            "latitude": 28.765592,
+            "longitude": 77.813993
+          },
+          {
+            "latitude": 28.765713,
+            "longitude": 77.813167
+          },
+          {
+            "latitude": 28.765151,
+            "longitude": 77.813061
+          }
+        ]
+      },
+      "type": "CFCBK",
+      "type_confidence": 0.425,
+      "detection_confidence": 0.425,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.765419,
+            "longitude": 77.812459
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 63
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 1933,
+        "adults_over_sixty": 119,
+        "children_under_five": 197
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 63,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000021",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.698178,
+          "longitude": 77.731357
+        },
+        "polygon": [
+          {
+            "latitude": 28.69766,
+            "longitude": 77.731577
+          },
+          {
+            "latitude": 28.697993,
+            "longitude": 77.731949
+          },
+          {
+            "latitude": 28.698697,
+            "longitude": 77.731138
+          },
+          {
+            "latitude": 28.698362,
+            "longitude": 77.730765
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.47,
+      "detection_confidence": 0.47,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.697937,
+            "longitude": 77.730259
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 68
+        },
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-RAIL-200",
+          "measured_to": {
+            "latitude": 28.697441,
+            "longitude": 77.731373
+          },
+          "threshold_m": 200,
+          "evidence_url": null,
+          "measured_distance_m": 31
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4983,
+        "adults_over_sixty": 307,
+        "children_under_five": 508
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 68,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "not_evaluated",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "within_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 31,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000022",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.744333,
+          "longitude": 77.809045
+        },
+        "polygon": [
+          {
+            "latitude": 28.743886,
+            "longitude": 77.809357
+          },
+          {
+            "latitude": 28.744241,
+            "longitude": 77.809632
+          },
+          {
+            "latitude": 28.744781,
+            "longitude": 77.808734
+          },
+          {
+            "latitude": 28.744426,
+            "longitude": 77.808458
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.404,
+      "detection_confidence": 0.404,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.751485,
+            "longitude": 77.809833
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 751
+        },
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-RAIL-200",
+          "measured_to": {
+            "latitude": 28.746338,
+            "longitude": 77.808314
+          },
+          "threshold_m": 200,
+          "evidence_url": null,
+          "measured_distance_m": 177
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 4017,
+        "adults_over_sixty": 247,
+        "children_under_five": 409
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1587,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 751,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 309,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "within_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 177,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000023",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.760049,
+          "longitude": 77.782474
+        },
+        "polygon": [
+          {
+            "latitude": 28.759757,
+            "longitude": 77.781938
+          },
+          {
+            "latitude": 28.7595,
+            "longitude": 77.782373
+          },
+          {
+            "latitude": 28.760344,
+            "longitude": 77.78301
+          },
+          {
+            "latitude": 28.760598,
+            "longitude": 77.782576
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.361,
+      "detection_confidence": 0.361,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.762778,
+            "longitude": 77.774321
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 816
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 3550,
+        "adults_over_sixty": 221,
+        "children_under_five": 362
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 816,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": 1957,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 812,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000024",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.740653,
+          "longitude": 77.817416
+        },
+        "polygon": [
+          {
+            "latitude": 28.740099,
+            "longitude": 77.817705
+          },
+          {
+            "latitude": 28.740471,
+            "longitude": 77.818077
+          },
+          {
+            "latitude": 28.741207,
+            "longitude": 77.817127
+          },
+          {
+            "latitude": 28.740836,
+            "longitude": 77.816755
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.336,
+      "detection_confidence": 0.336,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.744241,
+            "longitude": 77.809632
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 792
+        },
+        {
+          "source": "UP siting rules (2012)",
+          "rule_id": "UP-NH-300",
+          "measured_to": {
+            "latitude": 28.740682,
+            "longitude": 77.818323
+          },
+          "threshold_m": 300,
+          "evidence_url": null,
+          "measured_distance_m": 34
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 2416,
+        "adults_over_sixty": 149,
+        "children_under_five": 246
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 792,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "within_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 34,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 709,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000025",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.726612,
+          "longitude": 77.801514
+        },
+        "polygon": [
+          {
+            "latitude": 28.726183,
+            "longitude": 77.801865
+          },
+          {
+            "latitude": 28.726564,
+            "longitude": 77.802112
+          },
+          {
+            "latitude": 28.727041,
+            "longitude": 77.801165
+          },
+          {
+            "latitude": 28.726659,
+            "longitude": 77.800917
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.56,
+      "detection_confidence": 0.56,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-HAB-800",
+          "measured_to": {
+            "latitude": 28.727503,
+            "longitude": 77.793189
+          },
+          "threshold_m": 800,
+          "evidence_url": null,
+          "measured_distance_m": 761
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 25701,
+        "adults_over_sixty": 1583,
+        "children_under_five": 2618
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "within_threshold",
+          "threshold_m": 800,
+          "measured_distance_m": 761,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 1260,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": 733,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000026",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.765509,
+          "longitude": 77.81183
+        },
+        "polygon": [
+          {
+            "latitude": 28.765013,
+            "longitude": 77.812132
+          },
+          {
+            "latitude": 28.765419,
+            "longitude": 77.812459
+          },
+          {
+            "latitude": 28.766004,
+            "longitude": 77.811526
+          },
+          {
+            "latitude": 28.7656,
+            "longitude": 77.811199
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.561,
+      "detection_confidence": 0.561,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [
+        {
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+          "rule_id": "C-KILN-1K",
+          "measured_to": {
+            "latitude": 28.765326,
+            "longitude": 77.813094
+          },
+          "threshold_m": 1000,
+          "evidence_url": null,
+          "measured_distance_m": 63
+        }
+      ],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 2748,
+        "adults_over_sixty": 169,
+        "children_under_five": 280
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "within_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 63,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "kiln_id": "KW-00000000000000000000000000000027",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.705981,
+          "longitude": 77.813116
+        },
+        "polygon": [
+          {
+            "latitude": 28.705445,
+            "longitude": 77.813367
+          },
+          {
+            "latitude": 28.705798,
+            "longitude": 77.813739
+          },
+          {
+            "latitude": 28.706516,
+            "longitude": 77.812866
+          },
+          {
+            "latitude": 28.706163,
+            "longitude": 77.812492
+          }
+        ]
+      },
+      "type": "FCBK",
+      "type_confidence": 0.303,
+      "detection_confidence": 0.303,
+      "type_verification": "unverified",
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "status": "flagged",
+      "violations": [],
+      "rules_assessment": "partially_evaluated",
+      "exposure": {
+        "people": 3503,
+        "adults_over_sixty": 216,
+        "children_under_five": 357
+      },
+      "rule_checks": [
+        {
+          "rule_id": "C-HAB-800",
+          "check": "Distance to habitation",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": 1734,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-KILN-1K",
+          "check": "Distance to another kiln",
+          "status": "beyond_threshold",
+          "threshold_m": 1000,
+          "measured_distance_m": 1145,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-ORCH-800",
+          "check": "Distance to an orchard",
+          "status": "inconclusive",
+          "threshold_m": 800,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "Central 2022 rules"
+        },
+        {
+          "rule_id": "UP-SCH-1K",
+          "check": "Distance to a school",
+          "status": "inconclusive",
+          "threshold_m": 1000,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-NH-300",
+          "check": "Distance to a national highway",
+          "status": "beyond_threshold",
+          "threshold_m": 300,
+          "measured_distance_m": 1147,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-RAIL-200",
+          "check": "Distance to a railway line",
+          "status": "beyond_threshold",
+          "threshold_m": 200,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "UP siting rules (2012)"
+        },
+        {
+          "rule_id": "UP-MUN-5K",
+          "check": "Distance to a municipal council, corporation or nagar panchayat",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "secondary_sources",
+          "source": "UP siting rules (2026 amendment)"
+        },
+        {
+          "rule_id": "C-TECH-10K",
+          "check": "Technology within 10 km of a non-attainment city",
+          "status": "not_evaluated",
+          "threshold_m": null,
+          "measured_distance_m": null,
+          "verification": "unverified_compilation",
+          "source": "Central 2022 rules"
+        }
+      ],
+      "district": "Hapur",
+      "evidence": {
+        "before": null,
+        "after": null
+      }
+    }
+  ],
+  "next_cursor": null
+}

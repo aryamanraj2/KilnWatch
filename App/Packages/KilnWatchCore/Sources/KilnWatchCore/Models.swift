@@ -25,6 +25,8 @@ public struct Kiln: Codable, Hashable, Sendable, Identifiable {
     /// Optional in older records; never an authorization claim.
     public let district: String?
     public let rulesAssessment: String?
+    /// Missing in legacy routes. Absence/empty checks never establishes an assessment.
+    public let ruleChecks: [RuleCheck]?
     public let typeVerification: String?
     public let provenance: DetectionProvenance?
 

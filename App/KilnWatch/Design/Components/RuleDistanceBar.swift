@@ -6,10 +6,12 @@ import SwiftUI
 struct RuleDistanceBar: View {
     let violation: Violation
     let kiln: Kiln
+    var check: RuleCheck?
     var color: Color = .flagged
 
     @State private var appeared = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(AppModel.self) private var model
 
     private var rule: Rule { Rule.named(violation.ruleId) }
 
@@ -19,35 +21,48 @@ struct RuleDistanceBar: View {
                 HStack(alignment: .firstTextBaseline, spacing: Space.xs) { header }
                 VStack(alignment: .leading, spacing: Space.xxs) { header }
             }
-            if let measured = violation.measuredDistanceM, let threshold = violation.thresholdM {
+            Label("Siting flag · needs inspection", systemImage: "flag.fill")
+                .font(.footnote).foregroundStyle(.flagged)
+            if RuleCheck.canDrawBar(measured: violation.measuredDistanceM, threshold: violation.thresholdM),
+               let measured = violation.measuredDistanceM, let threshold = violation.thresholdM {
                 bar(measured: measured, threshold: threshold)
-                let shown = appeared ? measured : 0
-                Text("\(Text("\(Int(shown).grouped)\u{00A0}m").monospaced()) · requires \(Text("\(Int(threshold).grouped)\u{00A0}m").monospaced())")
-                    .contentTransition(.numericText(value: shown))
+                Text(violation.compactLine(for: kiln)).monospacedDigit()
                     .font(.subheadline)
                     .foregroundStyle(.ink)
             } else {
-                Text(technologyLine)
+                Text(legacyTechnology ? technologyLine : violation.compactLine(for: nil))
                     .font(.subheadline)
                     .foregroundStyle(.ink)
+            }
+            ThresholdWarning(verification: check?.verification)
+            Text(violation.source.isEmpty ? "Source unavailable" : violation.source)
+                .font(.footnote).foregroundStyle(.inkSecondary)
+            if let check, check.status != .withinThreshold {
+                Text("Supplied check: \(check.status.label). Flag and check differ; inspect on site.")
+                    .font(.footnote).foregroundStyle(.inkSecondary)
             }
         }
         .onScrollVisibilityChange(threshold: 0.6) { visible in
             guard visible, !appeared else { return }
             withAnimation(Motion.layout.animation(reduceMotion: reduceMotion)) { appeared = true }
         }
-        .accessibilityElement(children: .ignore)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel(accessibilityText)
         .accessibilityAction(named: "Show rule \(violation.ruleId)") {
-            openURL(CitationChip.url(for: violation.ruleId))
+            showSource()
         }
     }
 
-    @Environment(\.openURL) private var openURL
+    private var legacyTechnology: Bool {
+        violation.ruleId == "C-TECH-10K" && model.usesIllustrativeEvidence(for: kiln) && check == nil
+    }
+    private func showSource() {
+        model.shownRule = RuleReference(rule: rule, check: check, flag: violation, kilnId: kiln.kilnId)
+    }
 
     @ViewBuilder private var header: some View {
-        CitationChip(id: violation.ruleId)
-        Text(rule.name)
+        CitationChip(id: violation.ruleId, action: showSource)
+        Text(check?.check ?? rule.name)
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(.ink)
     }
@@ -59,7 +74,6 @@ struct RuleDistanceBar: View {
             Capsule().fill(.surface2)
             BarFill(fraction: reduceMotion || appeared ? fraction : 0)
                 .fill(color)
-                .opacity(reduceMotion && !appeared ? 0 : 1)
             ThresholdTick(position: threshold / scale)
                 .fill(.ink)
                 .padding(.vertical, -Space.xxs)
@@ -75,10 +89,7 @@ struct RuleDistanceBar: View {
     }
 
     private var accessibilityText: String {
-        guard let m = violation.measuredDistanceM, let t = violation.thresholdM else {
-            return "\(rule.name). \(technologyLine). Rule \(violation.ruleId)."
-        }
-        return "\(rule.name), \(Int(m).grouped) metres. Rule \(violation.ruleId) requires \(Int(t).grouped) metres."
+        "\(check?.check ?? rule.name). Siting flag, needs inspection. \(legacyTechnology ? technologyLine : violation.compactLine(for: nil)). Rule \(violation.ruleId). \(check?.verification?.label ?? "Threshold verification unavailable"). \(violation.source)."
     }
 }
 
@@ -122,18 +133,14 @@ extension Violation {
     /// One plain line stating the measurement against the rule: "410 m from homes · rule requires 800 m".
     func factLine(for kiln: Kiln) -> String {
         let rule = Rule.named(ruleId)
-        guard let m = measuredDistanceM, let t = thresholdM else {
-            let type = kiln.typeIsCertain ? kiln.type.rawValue : "Likely \(kiln.type.rawValue)"
-            return "\(type) within 10 km of Delhi · rule requires zigzag\(kiln.typeIsCertain ? "" : " · confirm on site")"
-        }
-        return "\(Int(m).grouped)\u{00A0}m from \(rule.feature) · rule requires \(Int(t).grouped)\u{00A0}m"
+        guard let m = RuleCheck.metres(measuredDistanceM), let t = RuleCheck.metres(thresholdM) else { return compactLine(for: nil) }
+        return "\(m) from \(rule.feature) · rule requires \(t)"
     }
 
     /// Short form for list rows: "410 m · requires 800 m".
-    func compactLine(for kiln: Kiln) -> String {
-        guard let m = measuredDistanceM, let t = thresholdM else {
-            return "\(kiln.typeIsCertain ? "" : "likely ")\(kiln.type.rawValue) · zigzag required"
-        }
-        return "\(Int(m).grouped)\u{00A0}m · requires \(Int(t).grouped)\u{00A0}m"
+    func compactLine(for kiln: Kiln?) -> String {
+        let measurement = RuleCheck.metres(measuredDistanceM) ?? "Distance unavailable"
+        let threshold = RuleCheck.metres(thresholdM).map { "requires \($0)" } ?? "threshold unavailable"
+        return "\(measurement) · \(threshold)"
     }
 }

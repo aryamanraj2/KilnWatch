@@ -41,6 +41,18 @@ public struct AskStep: Codable, Sendable, Equatable {
     }
 }
 
+/// Response-only navigation. Request kiln context remains strictly a full kiln ID.
+public enum AskCitation: Hashable, Sendable {
+    case kiln(String), rule(String)
+    public init?(_ id: String) {
+        guard id == id.trimmingCharacters(in: .whitespacesAndNewlines) else { return nil }
+        if AskRequest.isFullKilnID(id) { self = .kiln(id) }
+        else if id.range(of: #"^(?:C|UP|HR)-[A-Z][A-Z0-9]*-[0-9]+K?\z"#, options: .regularExpression) != nil {
+            self = .rule(id)
+        } else { return nil }
+    }
+}
+
 public struct AskAnswer: Codable, Sendable, Equatable {
     public let answer: String
     public let citations: [String]
@@ -129,7 +141,7 @@ extension KilnWatchAPI {
         guard let answer = try? JSONDecoder().decode(AskAnswer.self, from: data),
               !answer.answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               !answer.disclaimer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              answer.citations.allSatisfy(AskRequest.isFullKilnID) else { throw .malformedResponse }
+              answer.citations.allSatisfy({ AskCitation($0) != nil }) else { throw .malformedResponse }
         return answer
     }
 }
