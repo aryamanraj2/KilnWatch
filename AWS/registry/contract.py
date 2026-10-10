@@ -70,15 +70,21 @@ def serialize(payload, status='flagged', review_state='pending', assessment=None
     record = json.loads(canonical(payload))
     record['status'] = status
     record['review_state'] = review_state
-    if assessment:
-        for key in ('exposure', 'violations', 'rules_assessment', 'type_verification'):
-            if key in assessment:
-                record[key] = assessment[key]
+    assessment = assessment or {}
+    for key in ('exposure', 'violations', 'rules_assessment', 'type_verification'):
+        if key in assessment:
+            record[key] = assessment[key]
+    # Trimmed per-rule statuses; rules_results itself stays internal (OSM feature names, coordinates, reasons).
+    record['rule_checks'] = [{'rule_id': r['rule_id'], 'check': r['check'], 'status': r['status'],
+                              'threshold_m': r.get('threshold_m'), 'measured_distance_m': r.get('measured_distance_m'),
+                              'verification': r['verification'], 'source': r['source']}
+                             for r in assessment.get('rules_results', [])]
     return record
 
 
 PUBLIC_KEYS = ('kiln_id', 'footprint', 'type', 'type_confidence', 'detection_confidence', 'type_verification',
-               'first_seen', 'last_seen', 'status', 'violations', 'rules_assessment', 'exposure', 'district', 'distance_m')
+               'first_seen', 'last_seen', 'status', 'violations', 'rules_assessment', 'exposure', 'rule_checks',
+               'district', 'distance_m')
 PUBLIC_EVIDENCE = ('before', 'after', 'before_metadata', 'after_metadata')
 
 

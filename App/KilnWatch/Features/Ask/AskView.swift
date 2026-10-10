@@ -1,24 +1,32 @@
 import KilnWatchCore
 import SwiftUI
 
-/// A conversation with the planner agent. Phase 0 plays scripted exchanges from the concept (p.13).
 struct AskView: View {
     @Environment(AppModel.self) private var model
-    @State private var exchanges: [Exchange] = []
+    @State private var samples: [Exchange] = []
     @FocusState private var composerFocused: Bool
+
+    private var offline: Bool {
+        model.usesPublicRegistry ? model.askConnectivity.isOffline || DemoOptions.string("askDemo") == "offline" : model.isOffline
+    }
+    private var sending: Bool { model.usesPublicRegistry ? model.ask.isSending : samples.contains { !$0.isDone } }
+    private var canSend: Bool { !offline && !sending && model.ask.validation == nil && (!model.usesPublicRegistry || model.ask.canSubmit()) }
 
     var body: some View {
         @Bindable var model = model
         NavigationStack(path: $model.askPath) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Space.xxl) {
-                    if exchanges.isEmpty {
-                        suggestions
-                    }
-                    ForEach($exchanges) { $exchange in
-                        ExchangeView(exchange: $exchange)
+                    if model.ask.exchanges.isEmpty && samples.isEmpty { suggestions }
+                    if model.usesPublicRegistry {
+                        ForEach(model.ask.exchanges) { exchange in
+                            LiveExchangeView(exchange: exchange, offline: offline)
+                        }
+                    } else {
+                        ForEach($samples) { $exchange in ExchangeView(exchange: $exchange) }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, Space.margin)
                 .padding(.vertical, Space.m)
             }
@@ -26,97 +34,200 @@ struct AskView: View {
             .scrollDismissesKeyboard(.interactively)
             .background(.canvas)
             .navigationTitle("Ask KilnWatch")
-            .safeAreaBar(edge: .bottom) { composer }
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { DataSourceLabel(text: model.dataSourceLabel) } }
+            .safeAreaBar(edge: .bottom) {
+                if let date = model.ask.submissionResumeDate {
+                    TimelineView(.periodic(from: date, by: 60)) { _ in composer }
+                } else { composer }
+            }
             .navigationDestination(for: String.self) { KilnView(id: $0) }
             .onAppear {
-                if DemoOptions.bool("askPlay"), exchanges.isEmpty { send(AskScript.planDay.question) }
-            }
-        }
-    }
-
-    // MARK: Empty state
-
-    private var suggestions: some View {
-        VStack(alignment: .leading, spacing: Space.m) {
-            Text("The planner searches the registry, orders stops and writes inspection sheets. Every answer cites the kilns and rules it used.")
-                .font(.body)
-                .foregroundStyle(.inkSecondary)
-            Text("Try").eyebrow()
-            VStack(spacing: Space.xs) {
-                ForEach(AskScript.all, id: \.question) { script in
-                    Button { send(script.question) } label: {
-                        HStack(alignment: .firstTextBaseline, spacing: Space.s) {
-                            Text(script.question)
-                                .font(.body)
-                                .foregroundStyle(.ink)
-                                .multilineTextAlignment(.leading)
-                            Spacer(minLength: Space.xs)
-                            Image(systemName: "arrow.up.right")
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.inkSecondary)
-                                .accessibilityHidden(true)
-                        }
-                        .frame(minHeight: 44)
-                        .card()
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(model.isOffline)
+                // Automatic playback is exclusively local sample data, never a live POST.
+                if DemoOptions.bool("askPlay"), model.isAskTest, model.ask.exchanges.isEmpty {
+                    model.askDraft = "How many kilns are flagged in Hapur?"; send()
+                } else if DemoOptions.bool("askPlay"), !model.usesPublicRegistry, samples.isEmpty {
+                    model.askDraft = AskScript.planDay.question; send()
                 }
             }
         }
     }
 
-    // MARK: Composer
+    private var suggestions: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            Text(model.usesPublicRegistry
+                 ? "Ask about satellite-flagged registry records. Each question is independent; earlier questions aren't sent to the server."
+                 : "Sample data · scripted answers demonstrate inspection planning and citation navigation.")
+                .font(.body).foregroundStyle(.inkSecondary)
+            Text("Try").eyebrow()
+            let questions = model.usesPublicRegistry
+                ? ["How many kilns are flagged in Hapur?", "What information is available in the registry?"]
+                : AskScript.all.map(\.question)
+            ForEach(questions, id: \.self) { question in
+                Button { model.askDraft = question; composerFocused = true } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: Space.s) {
+                        Text(question).font(.body).foregroundStyle(.ink).multilineTextAlignment(.leading)
+                        Spacer(minLength: Space.xs)
+                        Image(systemName: "arrow.up.right").font(.footnote.weight(.semibold)).foregroundStyle(.inkSecondary).accessibilityHidden(true)
+                    }
+                    .frame(minHeight: 44).card()
+                }
+                .buttonStyle(.plain).disabled(offline || sending)
+            }
+        }
+    }
 
     private var composer: some View {
         @Bindable var model = model
         return VStack(alignment: .leading, spacing: Space.xs) {
-            if model.isOffline {
-                QuietBanner(text: "Offline · Ask needs a connection", systemImage: "wifi.slash")
+            if offline { QuietBanner(text: "Offline · Ask needs a connection", systemImage: "wifi.slash") }
+            if model.isAskTest { Text("Sample data · local Ask test response").font(.footnote).foregroundStyle(.inkSecondary) }
+            #if DEBUG
+            if offline, DemoOptions.string("askDemo") == "offlineRecovery" {
+                Button("Restore test connection") { model.askConnectivity.restoreTestConnection() }.buttonStyle(.bordered)
             }
+            #endif
             HStack(alignment: .bottom, spacing: Space.xs) {
                 TextField("Ask about any kiln…", text: $model.askDraft, axis: .vertical)
-                    .lineLimit(1...4)
-                    .focused($composerFocused)
-                    .submitLabel(.send)
-                    .onSubmit { send(model.askDraft) }
-                    .padding(.vertical, Space.s)
-                Button { send(model.askDraft) } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.canvas)
-                        .frame(width: 36, height: 36)
-                        .background(.ink, in: .circle)
-                        .frame(width: 44, height: 44)
-                        .contentShape(.circle)
+                    .lineLimit(1...4).focused($composerFocused).submitLabel(.send)
+                    .onSubmit { send() }.padding(.vertical, Space.s)
+                    .accessibilityIdentifier("ask-composer")
+                    .disabled(offline)
+                Button { send() } label: {
+                    Image(systemName: "arrow.up").font(.body.weight(.semibold)).foregroundStyle(.canvas)
+                        .padding(Space.xxs).frame(minWidth: 36, minHeight: 36).background(.ink, in: .circle)
+                        .frame(minWidth: 44, minHeight: 44).contentShape(.circle)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Send")
-                .disabled(model.askDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .buttonStyle(.plain).accessibilityLabel("Send").accessibilityIdentifier("ask-send").disabled(!canSend)
             }
-            .padding(.leading, Space.m)
-            .padding(.trailing, Space.xxs)
+            .padding(.leading, Space.m).padding(.trailing, Space.xxs)
             .glassEffect(.regular, in: .rect(cornerRadius: 26, style: .continuous))
-            .disabled(model.isOffline)
+            if !model.askDraft.isEmpty {
+                Text("\(model.askDraft.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.count)/500 characters")
+                    .font(.caption.monospacedDigit()).foregroundStyle(.inkSecondary)
+                if let error = model.ask.validation { Text(error.message).font(.footnote).foregroundStyle(.ink) }
+            }
             Text("Answers cite registry records. Agents never record verdicts.")
-                .font(.footnote)
-                .foregroundStyle(.inkSecondary)
-                .padding(.horizontal, Space.xs)
+                .font(.footnote).foregroundStyle(.inkSecondary).padding(.horizontal, Space.xs)
         }
-        .padding(.horizontal, Space.margin)
-        .padding(.bottom, Space.xs)
+        .padding(.horizontal, Space.margin).padding(.bottom, Space.xs)
     }
 
-    private func send(_ text: String) {
-        let question = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !question.isEmpty else { return }
-        exchanges.append(Exchange(question: question, script: AskScript.matching(question)))
-        model.askDraft = ""
+    private func send() {
+        guard canSend else { return }
+        if model.usesPublicRegistry { _ = model.ask.send() }
+        else {
+            let question = model.askDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+            samples.append(Exchange(question: question, script: AskScript.matching(question)))
+            model.askDraft = ""
+        }
         composerFocused = false
     }
 }
 
-// MARK: - Exchange
+private struct QuestionBubble: View {
+    let question: String
+    var body: some View {
+        Text(question).font(.body).foregroundStyle(.ink)
+            .typesettingLanguage(.explicit(.init(identifier: "zxx")))
+            .padding(.horizontal, Space.m).padding(.vertical, Space.s)
+            .background(.surface2, in: .rect(cornerRadius: Radius.card, style: .continuous))
+            .frame(maxWidth: .infinity, alignment: .trailing).padding(.leading, Space.xl)
+            .accessibilityLabel("You asked: \(question)")
+    }
+}
+
+private struct LiveExchangeView: View {
+    let exchange: AskExchange
+    let offline: Bool
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            QuestionBubble(question: exchange.request.question)
+            switch exchange.state {
+            case .waiting:
+                HStack(spacing: Space.s) {
+                    ProgressView()
+                    Text("Waiting for an answer…").font(.body).foregroundStyle(.inkSecondary)
+                }
+                Button("Cancel question") { model.ask.cancel() }.buttonStyle(.bordered)
+            case .answered(let answer):
+                LiveToolCallTrace(steps: answer.steps)
+                if answer.fallback { Text("Registry fallback").eyebrow() }
+                CitationAnswerText(text: answer.answer.replacingOccurrences(of: "**", with: ""), citations: answer.uniqueCitations)
+                Text(answer.disclaimer).font(.footnote).foregroundStyle(.inkSecondary)
+            case .failed(let error, let retryAfter):
+                Text(error.message).font(.body).foregroundStyle(.ink)
+                if case .service(429, let detail) = error, detail?.code == "daily_cap_reached" {
+                    Text("The shared limit resets each day at midnight UTC.").font(.footnote).foregroundStyle(.inkSecondary)
+                }
+                if error.canRetry {
+                    TimelineView(.periodic(from: retryAfter, by: 1)) { context in
+                        Button("Retry") { _ = model.ask.retry(exchange.id) }
+                            .buttonStyle(.bordered).disabled(offline || model.ask.isSending || model.ask.submissionResumeDate != nil || context.date < retryAfter)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct LiveToolCallTrace: View {
+    let steps: [AskStep]
+    var body: some View {
+        if !steps.isEmpty {
+            DisclosureGroup {
+                VStack(alignment: .leading, spacing: Space.s) {
+                    ForEach(Array(steps.enumerated()), id: \.offset) { _, step in
+                        HStack(alignment: .top, spacing: Space.xs) {
+                            Image(systemName: step.ok ? "checkmark.circle" : "exclamationmark.circle").accessibilityHidden(true)
+                            VStack(alignment: .leading, spacing: Space.xxs) {
+                                Text(step.label).font(.footnote.weight(.semibold))
+                                Text(step.summary).font(.footnote)
+                                if !step.ok { Text("Tool input wasn't accepted").font(.footnote) }
+                            }
+                        }
+                        .foregroundStyle(.inkSecondary)
+                        .accessibilityElement(children: .combine)
+                    }
+                }.padding(.top, Space.xs)
+            } label: { Text(steps.count == 1 ? "1 step" : "\(steps.count) steps").font(.footnote.weight(.semibold)).foregroundStyle(.inkSecondary) }
+            .tint(.inkSecondary)
+        }
+    }
+}
+
+/// Native text wrapping preserves punctuation/newlines and supports long IDs at AX sizes.
+/// Only the server-returned citation list can create links or chips.
+private struct CitationAnswerText: View {
+    let text: String
+    let citations: [String]
+    @Environment(\.openURL) private var openURL
+    private var attributed: AttributedString {
+        var result = AttributedString(text)
+        for id in citations {
+            var search = result.startIndex..<result.endIndex
+            while let range = result[search].range(of: id) {
+                result[range].link = CitationChip.url(for: id)
+                result[range].font = .body.monospaced()
+                search = range.upperBound..<result.endIndex
+            }
+        }
+        return result
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: Space.s) {
+            Text(attributed).font(.body).foregroundStyle(.ink).tint(.clay)
+                .typesettingLanguage(.explicit(.init(identifier: "zxx")))
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityActions {
+                    ForEach(citations, id: \.self) { id in Button("Open \(id)") { openURL(CitationChip.url(for: id)) } }
+                }
+            ForEach(citations, id: \.self) { id in CitationChip(id: id) }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
 
 struct Exchange: Identifiable {
     let id = UUID()
@@ -130,118 +241,45 @@ struct Exchange: Identifiable {
 private struct ExchangeView: View {
     @Binding var exchange: Exchange
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
     var body: some View {
         VStack(alignment: .leading, spacing: Space.m) {
-            Text(exchange.question)
-                .font(.body)
-                .foregroundStyle(.ink)
-                .padding(.horizontal, Space.m)
-                .padding(.vertical, Space.s)
-                .background(.surface2, in: .rect(cornerRadius: Radius.card, style: .continuous))
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.leading, Space.xxxl)
-                .accessibilityLabel("You asked: \(exchange.question)")
-
+            QuestionBubble(question: exchange.question)
             ToolCallTrace(steps: exchange.script.steps, completed: exchange.completedSteps, isDone: exchange.isDone)
-
             if exchange.revealedTokens > 0 {
-                AnswerText(tokens: Array(exchange.script.tokens.prefix(exchange.revealedTokens)),
-                           fullText: exchange.script.plainAnswer)
+                let tokens = exchange.script.tokens
+                let text = reduceMotion ? exchange.script.plainAnswer : tokens.prefix(exchange.revealedTokens).map { token in
+                    switch token { case .word(let word): word; case .cite(let id, let trailing): id + trailing }
+                }.joined(separator: " ")
+                CitationAnswerText(text: text, citations: Array(Set(tokens.prefix(exchange.revealedTokens).compactMap(\.citation))).sorted())
+                    .accessibilityLabel(exchange.script.plainAnswer)
+            }
+            if exchange.isDone {
+                Text("Sample answer. Answers cite registry records. Agents never record verdicts.").font(.footnote).foregroundStyle(.inkSecondary)
             }
         }
         .task { await play() }
+        .onChange(of: reduceMotion) { _, enabled in if enabled { finish() } }
     }
-
-    /// Steps land one after another, then the answer streams word by word.
+    private func finish() {
+        exchange.completedSteps = exchange.script.steps.count
+        exchange.revealedTokens = exchange.script.tokens.count; exchange.isDone = true
+    }
     private func play() async {
-        guard !exchange.isDone, exchange.completedSteps == 0 else { return }
-        for _ in exchange.script.steps {
-            try? await Task.sleep(for: .milliseconds(550))
-            withAnimation(Motion.select.animation(reduceMotion: reduceMotion)) { exchange.completedSteps += 1 }
-        }
-        try? await Task.sleep(for: .milliseconds(250))
-        for _ in exchange.script.tokens {
-            try? await Task.sleep(for: .milliseconds(45))
-            withAnimation(.easeOut(duration: 0.2)) { exchange.revealedTokens += 1 }
-        }
-        exchange.isDone = true
-    }
-}
-
-/// Answer prose with inline citation chips, wrapped word by word.
-private struct AnswerText: View {
-    let tokens: [AskScript.Token]
-    let fullText: String
-
-    var body: some View {
-        FlowLayout(spacing: 4, lineSpacing: Space.xs) {
-            ForEach(Array(tokens.enumerated()), id: \.offset) { _, token in
-                switch token {
-                case .word(let word):
-                    Text(word).font(.body).foregroundStyle(.ink)
-                case .cite(let id, let trailing):
-                    HStack(spacing: 0) {
-                        CitationChip(id: id)
-                        if !trailing.isEmpty { Text(trailing).font(.body).foregroundStyle(.ink) }
-                    }
-                }
+        guard !exchange.isDone else { return }
+        if reduceMotion { finish(); return }
+        do {
+            while exchange.completedSteps < exchange.script.steps.count {
+                try await Task.sleep(for: .milliseconds(550))
+                guard !exchange.isDone else { return }
+                withAnimation(Motion.select.animation(reduceMotion: false)) { exchange.completedSteps += 1 }
             }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(fullText)
-        .accessibilityActions {
-            ForEach(Array(Set(tokens.compactMap(\.citation))).sorted(), id: \.self) { id in
-                Button(id.hasPrefix("KW-") ? "Open \(id)" : "Show rule \(id)") { openURL(CitationChip.url(for: id)) }
+            while exchange.revealedTokens < exchange.script.tokens.count {
+                try await Task.sleep(for: .milliseconds(45))
+                guard !exchange.isDone else { return }
+                exchange.revealedTokens += 1
             }
-        }
-    }
-
-    @Environment(\.openURL) private var openURL
-}
-
-/// Left-to-right wrapping layout that aligns each line on its first text baseline.
-private struct FlowLayout: Layout {
-    var spacing: CGFloat
-    var lineSpacing: CGFloat
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? .infinity
-        return arrange(subviews, width: width).size
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        for (index, origin) in arrange(subviews, width: bounds.width).origins.enumerated() {
-            subviews[index].place(at: CGPoint(x: bounds.minX + origin.x, y: bounds.minY + origin.y), proposal: .unspecified)
-        }
-    }
-
-    private func arrange(_ subviews: Subviews, width: CGFloat) -> (origins: [CGPoint], size: CGSize) {
-        var origins: [CGPoint] = []
-        var lines: [[Int]] = [[]]
-        var x: CGFloat = 0
-        for (i, view) in subviews.enumerated() {
-            let w = view.sizeThatFits(.unspecified).width
-            if x > 0, x + w > width { lines.append([]); x = 0 }
-            lines[lines.count - 1].append(i)
-            x += w + spacing
-        }
-        var y: CGFloat = 0
-        var maxX: CGFloat = 0
-        origins = Array(repeating: .zero, count: subviews.count)
-        for line in lines where !line.isEmpty {
-            let dims = line.map { subviews[$0].dimensions(in: .unspecified) }
-            let ascent = dims.map { $0[.firstTextBaseline] }.max() ?? 0
-            let descent = dims.map { $0.height - $0[.firstTextBaseline] }.max() ?? 0
-            var lineX: CGFloat = 0
-            for (i, d) in zip(line, dims) {
-                origins[i] = CGPoint(x: lineX, y: y + ascent - d[.firstTextBaseline])
-                lineX += d.width + spacing
-            }
-            maxX = max(maxX, lineX - spacing)
-            y += ascent + descent + lineSpacing
-        }
-        return (origins, CGSize(width: min(maxX, width), height: max(0, y - lineSpacing)))
+            exchange.isDone = true
+        } catch { /* View cancellation pauses the sample; re-entry resumes it. */ }
     }
 }
 

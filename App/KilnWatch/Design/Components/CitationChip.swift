@@ -7,17 +7,22 @@ struct CitationChip: View {
     @Environment(\.openURL) private var openURL
 
     static func url(for id: String) -> URL {
-        URL(string: "kilnwatch://\(id.hasPrefix("KW-") ? "kiln" : "rule")/\(id)")!
+        URL(string: "kilnwatch://\(id.hasPrefix("KW-") ? "kiln" : "rule")")!.appending(path: id)
     }
 
     var body: some View {
         Button { openURL(Self.url(for: id)) } label: {
             Text(id)
                 .font(.footnote.monospaced().weight(.medium))
+                .typesettingLanguage(.explicit(.init(identifier: "zxx")))
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.leading)
                 .foregroundStyle(.clay)
                 .padding(.horizontal, Space.xs)
                 .padding(.vertical, Space.xxs)
                 .background(.surface2, in: .capsule)
+                .frame(minHeight: 44, alignment: .leading)
+                .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(id)

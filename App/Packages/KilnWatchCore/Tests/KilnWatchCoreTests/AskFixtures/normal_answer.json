@@ -1,0 +1,14 @@
+{
+  "answer": "There are 39 kilns flagged in Hapur, all pending inspection. The data includes their IDs, locations, and detection dates, but siting rules, population exposure, and satellite images are not yet evaluated.",
+  "citations": [],
+  "steps": [
+    {
+      "tool": "list_flagged_kilns",
+      "label": "Searching flagged kilns",
+      "summary": "39 found",
+      "ok": true
+    }
+  ],
+  "fallback": false,
+  "disclaimer": "Answers cite registry records. Agents never record verdicts. Kilns are flagged by satellite and pending inspection."
+}

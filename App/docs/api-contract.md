@@ -341,7 +341,7 @@ separate publication policy covers those outcomes.
 **Projection (allowlist, `registry/contract.py` `public_view`):** `kiln_id`,
 `footprint`, `type`, `type_confidence`, `detection_confidence`, `type_verification`,
 `first_seen`, `last_seen`, `status`, `violations`, `rules_assessment`, `exposure`,
-`district`, `evidence` (`before`, `after` and their `*_metadata`: scene, attribution,
+`rule_checks` (R1, below), `district`, `evidence` (`before`, `after` and their `*_metadata`: scene, attribution,
 grid and checksums are public), plus `distance_m` on near-point results. Everything else
 is dropped, including `review_state`, `provenance` (input hash, import time) and the raw
 assessment. New internal fields stay private by default. The body decodes into the
@@ -444,12 +444,12 @@ kiln_id, lat, lon)`) is route-independent. The resident portal will later add it
 }
 ```
 
-- `answer` has passed the server's citation validator: every `KW-…` ID in it came from a
-  tool result in this request, it cites no rule IDs (no rules are evaluated), and it uses
-  no banned words.
+- `answer` has passed the server's citation validator: every `KW-…` ID and every rule ID
+  (for example `C-HAB-800`) in it came from a tool result in this request, and it uses no
+  banned words. Since R1, answers may cite rule IDs.
 - `citations`: the full IDs that appear in `answer`, in order of first appearance, de-duplicated.
 - `steps`: one per tool call, written by the server (never model text, never raw tool output).
-  `tool` is `list_flagged_kilns`, `kilns_near`, `kiln_detail` or `unknown`; `ok: false`
+  `tool` is `list_flagged_kilns`, `kilns_near`, `kiln_detail`, `get_evidence` (R1) or `unknown`; `ok: false`
   means the model sent invalid tool input. A `kiln_detail` that finds nothing has
   `summary: "Not found"` and `ok: true`.
 - `fallback: true`: the model failed validation twice. `answer` is fixed server text with no
@@ -482,3 +482,67 @@ Lambda exceeds its 28 s budget.
 
 **Cost at the cap (Nova 2 Lite):** typical $0.0027 × 50 × 30 ≈ $4, worst case
 $0.0312 × 50 × 30 ≈ $47 per 30 days.
+
+## R1: rules, exposure and rule checks (live, 2026-10-10)
+
+The rules engine (`kilnwatch-rules-v1`) and the HRSL exposure results are now in the
+registry for all 39 Hapur kilns. The public routes (`/public/kilns`, `/public/kilns/{kiln_id}`)
+and the inspector routes return them. Every flag is a **siting signal pending inspection**,
+never a finding. Present the kiln as "Flagged by satellite · pending inspection".
+
+**Now live for Hapur:**
+- `violations`: one item per rule with status `within_threshold` (shape unchanged; see
+  `Kiln` above). `evidence_url` is `null` for now.
+- `rules_assessment`: `partially_evaluated` for all 39 (some rules have no usable data, so
+  "no flags" is never a clean result). `not_evaluated` for kilns without an assessment.
+- `exposure`: `{"people", "children_under_five", "adults_over_sixty"}` integers, residents
+  within 800 m of the footprint edge. `null` means not assessed, never zero.
+
+### `rule_checks` (new)
+
+One object per rule in `rules_v1.json`, in that order. `[]` when the kiln has not been
+assessed (then `rules_assessment` is `not_evaluated` and `exposure` is `null`).
+
+```json
+{"rule_id": "C-HAB-800", "check": "Distance to habitation", "status": "within_threshold",
+ "threshold_m": 800, "measured_distance_m": 497, "verification": "secondary_sources",
+ "source": "Central 2022 rules; UP siting rules (2026 amendment)"}
+```
+
+| Field | Notes |
+|---|---|
+| `rule_id` | Stable rule ID, for example `C-HAB-800`, `UP-SCH-1K` |
+| `check` | Short human label of what was measured |
+| `status` | See the table below |
+| `threshold_m` | The threshold applied, in metres. `null` for rules without a distance threshold or not evaluated for lack of a layer (`C-TECH-10K`, `UP-MUN-5K`) |
+| `measured_distance_m` | Integer metres from the footprint edge to the nearest mapped feature, or `null` when nothing was found within the search distance or the rule was not evaluated |
+| `verification` | How well the threshold itself is sourced; see below |
+| `source` | The rules the threshold comes from |
+
+Feature names, feature coordinates and the engine's reasons stay internal.
+
+| `status` | Display |
+|---|---|
+| `within_threshold` | Siting flag: a mapped feature is inside the threshold; needs inspection. Also listed in `violations` |
+| `beyond_threshold` | The nearest mapped feature is beyond the threshold (railways, national highways, other kilns: layers complete enough for absence to mean something) |
+| `inconclusive` | No mapped feature inside the threshold, but the map is incomplete here (habitation, schools, orchards). **Not clear.** Never show it as a pass or a green state |
+| `not_evaluated` | No usable data (no boundary layer, kiln type unverified, or the threshold ring leaves the searched area) |
+| `not_applicable` | A state rule outside its state |
+
+| `verification` | Display |
+|---|---|
+| `secondary_sources` | Threshold quoted by court records, legal digests or news reports; the gazette text has not been read |
+| `unverified_compilation` | **Unverified threshold**, taken from an academic compilation |
+
+**Exposure attribution** (show with any exposure figure): "Modelled estimate of residents
+within 800 m of the kiln edge. Population: Meta and CIESIN High Resolution Settlement Layer
+(HRSL) v1.5.2, CC BY 4.0. Age groups are modelled shares of the same estimate."
+
+### Ask changes
+
+- Tool results now give the model siting flags, rule checks and exposure as explicit words.
+  The new tool `get_evidence(kiln_id)` returns the image dates, scenes and Copernicus
+  attribution, every rule check with its source, and the exposure. It never returns URLs,
+  polygons or feature coordinates. It appears in `steps` as
+  `{"tool": "get_evidence", "label": "Gathering evidence for KW-xxxx…", "summary": "Found", "ok": true}`.
+- Answers may cite rule IDs, but only ones a tool returned in the same request.

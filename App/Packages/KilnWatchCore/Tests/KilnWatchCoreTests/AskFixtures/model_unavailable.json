@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "model_unavailable",
+    "message": "The assistant model is temporarily unavailable.",
+    "retryable": false
+  }
+}

@@ -39,6 +39,7 @@ public struct KilnWatchAPI: Sendable {
     /// Protected clients keep their existing session and authentication behavior.
     public static func publicReadSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForResource = 40
         configuration.urlCache = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.httpCookieStorage = nil

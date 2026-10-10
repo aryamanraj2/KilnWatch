@@ -234,6 +234,36 @@ class RegistryWriteTests(unittest.TestCase):
         self.assertNotIn('rules_results', record)
         self.assertEqual(public_view(record)['violations'], record['violations'])
 
+    def test_public_rule_checks_are_trimmed(self):
+        kilns = [kiln('KW-' + 'a' * 32)]
+        out = engine.assess(kilns, layers(railways=[point(140)], schools=[],
+                                          habitation=[{'ref': 'osm:way/42', 'kind': 'building', 'name': 'SECRETVILLAGE',
+                                                       'geometry': point(0, 1200)['geometry']}]), 'UP')
+        body = {'rules_version': 'kilnwatch-rules-v1', 'assessed_at': '2026-10-10T06:00:00+00:00',
+                'inputs': {'kilns_sha256': 'k', 'layers_sha256': 'l', 'osm_base': 'b'}, 'assessments': out}
+        (_, patch), = assessment_patches(body)
+        view = public_view(serialize({'kiln_id': kilns[0]['kiln_id'], 'evidence': {}}, assessment=patch))
+        checks = {c['rule_id']: c for c in view['rule_checks']}
+        self.assertEqual(list(checks), [r['id'] for r in engine.load_rules()['rules']])
+        for c in checks.values():
+            self.assertEqual(set(c), {'rule_id', 'check', 'status', 'threshold_m', 'measured_distance_m', 'verification', 'source'})
+        self.assertEqual((checks['UP-RAIL-200']['status'], checks['UP-RAIL-200']['measured_distance_m']), ('within_threshold', 100))
+        self.assertEqual((checks['C-HAB-800']['status'], checks['C-HAB-800']['measured_distance_m']), ('inconclusive', 1160))
+        self.assertEqual(checks['UP-SCH-1K']['status'], 'inconclusive')
+        self.assertEqual((checks['C-TECH-10K']['status'], checks['C-TECH-10K']['threshold_m']), ('not_evaluated', None))
+        self.assertIsNone(checks['UP-SCH-1K']['measured_distance_m'])
+        text = str(view)
+        hab = by_rule(out[0])['C-HAB-800']['measured_to']
+        for leaked in ('SECRETVILLAGE', 'osm:way/42', 'reason', 'feature', str(hab['latitude']),
+                       'rules_results', 'rules_inputs', 'exposure_inputs'):
+            self.assertNotIn(leaked, text)
+
+    def test_unassessed_record_has_empty_rule_checks(self):
+        payload = {'kiln_id': 'KW-' + 'a' * 32, 'violations': [], 'rules_assessment': 'not_evaluated',
+                   'exposure': None, 'evidence': {}}
+        view = public_view(serialize(payload))
+        self.assertEqual((view['rule_checks'], view['rules_assessment'], view['exposure']), ([], 'not_evaluated', None))
+
 
 if __name__ == '__main__':
     unittest.main()

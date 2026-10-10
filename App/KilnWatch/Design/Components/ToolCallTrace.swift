@@ -21,14 +21,14 @@ struct ToolCallTrace: View {
     var body: some View {
         DisclosureGroup(isExpanded: $expanded) {
             VStack(alignment: .leading, spacing: Space.xs) {
-                ForEach(Array(steps.prefix(min(completed + 1, steps.count)).enumerated()), id: \.element.id) { index, step in
+                ForEach(Array(steps.prefix(min(completed + 1, steps.count)).enumerated()), id: \.offset) { index, step in
                     TraceRow(step: step, finished: index < completed)
                         .transition(.opacity)
                 }
             }
             .padding(.top, Space.xs)
         } label: {
-            Text(isDone ? "\(steps.count) steps" : "Working · \(steps[min(completed, steps.count - 1)].tool)")
+            Text(isDone ? "\(steps.count) steps" : (steps.isEmpty ? "No tool steps" : "Working · \(steps[min(completed, steps.count - 1)].tool)"))
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(.inkSecondary)
                 .contentTransition(.opacity)

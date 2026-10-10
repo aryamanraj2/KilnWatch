@@ -71,9 +71,14 @@ private struct KilnDetailView: View {
                 section("Check on site", id: "checks") {
                     SiteChecklist(kiln: kiln, sheet: model.stops.first { $0.kilnId == id }?.sheet).card()
                 }
+                } else {
+                    Text("Sign-in coming soon. Inspection actions aren't available yet.")
+                        .font(.footnote)
+                        .foregroundStyle(.inkSecondary)
+                        .id("checks")
+                }
                 Button {
-                    model.askDraft = "Explain the flags on \(kiln.kilnId)."
-                    model.tab = .ask
+                    model.askAboutKiln(kiln.kilnId)
                 } label: {
                     HStack {
                         Label("Ask about this kiln", systemImage: "text.bubble")
@@ -89,12 +94,6 @@ private struct KilnDetailView: View {
                     .card()
                 }
                 .buttonStyle(.plain)
-                } else {
-                    Text("Sign-in coming soon. Inspection actions aren't available yet.")
-                        .font(.footnote)
-                        .foregroundStyle(.inkSecondary)
-                        .id("checks")
-                }
             }
             .padding(.horizontal, Space.margin)
             .padding(.bottom, Space.xl)

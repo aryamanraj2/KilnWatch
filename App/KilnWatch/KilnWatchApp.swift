@@ -91,7 +91,13 @@ final class AppModel {
     var todayPath: [String] = []
     var kilnsPath: [String] = []
     var askPath: [String] = []
-    var askDraft = ""
+    let ask: AskConversation
+    let askConnectivity: AskConnectivity
+    var askDraft: String {
+        get { ask.draft }
+        set { ask.draft = newValue }
+    }
+    var isAskTest: Bool { DemoOptions.string("askDemo") != nil }
     var shownRule: Rule?
     let maps = MapsHandoff()
     private let api: KilnWatchAPI?
@@ -124,13 +130,15 @@ final class AppModel {
             configuredPublic = KilnWatchAPI(baseURL: url, session: KilnWatchAPI.publicReadSession())
         }
         #if DEBUG
-        if !useFixtures, let scenario = DemoOptions.string("publicDemo") {
+        if !useFixtures, let scenario = DemoOptions.string("publicDemo") ?? (DemoOptions.string("askDemo") != nil ? "loaded" : nil) {
             configuredPublic = PublicDemo.api(scenario: scenario)
             isPublicDemo = true
         } else { isPublicDemo = false }
         #else
         isPublicDemo = false
         #endif
+        ask = AskConversation(api: configuredPublic)
+        askConnectivity = AskConnectivity(observing: configuredPublic != nil && !isPublicDemo)
         publicAPI = configuredPublic
         usesPublicRegistry = configuredPublic != nil
         if let api { self.api = api }
@@ -320,6 +328,11 @@ final class AppModel {
         guard let stop = currentStop else { return }
         tab = .today; selectedStopId = stop.kilnId; todayPath = [stop.kilnId]
     }
+    func askAboutKiln(_ id: String) {
+        ask.prefill(kilnId: id)
+        askPath = []
+        tab = .ask
+    }
     func planRouteInAsk() {
         guard !usesPublicRegistry else { return }
         askDraft = "Plan today's inspection route. Leave the office at 9. Six hours. Schools first."
@@ -373,12 +386,7 @@ private struct MainTabs: View {
         TabView(selection: $model.tab) {
             Tab("Today", systemImage: "map", value: AppTab.today) { TodayView() }
             Tab("Kilns", systemImage: "list.bullet", value: AppTab.kilns) { KilnsView() }
-            Tab("Ask", systemImage: "text.bubble", value: AppTab.ask) {
-                if model.usesPublicRegistry {
-                    ContentUnavailableView("Ask is coming soon", systemImage: "text.bubble", description: Text("Registry answers and route planning will be available in a later update."))
-                        .background(.canvas)
-                } else { AskView() }
-            }
+            Tab("Ask", systemImage: "text.bubble", value: AppTab.ask) { AskView() }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
         .task { await model.loadData() }

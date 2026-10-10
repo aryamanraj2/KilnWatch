@@ -1,5 +1,7 @@
 # Rules and exposure results: deploy runbook (AWS teammate)
 
+**Status (2026-10-10): done.** `002_assessment.sql` is applied and the 39 Hapur assessments are written (prompt 31; see `local-verification.md`, "R1"). On macOS, build the §2 archive with `COPYFILE_DISABLE=1 tar --no-xattrs …`, or AppleDouble `._*.sql` files break `migrate`.
+
 This runbook puts the rules engine's results for the 39 Hapur kilns into the live registry: siting flags with measured distances, and the population within 800 m. It uses the same private path as the first import (`first-record-runbook.md` §6): workstation → private `imports/` prefix → SSM runner → RDS.
 
 **What changes on AWS:**

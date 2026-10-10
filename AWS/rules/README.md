@@ -49,6 +49,8 @@ Every flag is a siting signal pending inspection. Siting criteria govern the est
   - The public API path returns only `flagged` kilns, so once inspectors record verdicts, read from the registry instead.
 - `Violation.evidenceUrl` is optional in KilnWatchCore, so flags without an image decode.
 
+**Status (2026-10-10):** `migrate` and `apply-assessment` are done for the 39 Hapur kilns (prompt 31), and the public API now shows `rule_checks`. The assessor login and the PostGIS role test below are still open.
+
 Still to do on AWS (AWS teammate). Step by step: [`AWS/docs/rules-assessment-runbook.md`](../docs/rules-assessment-runbook.md).
 - Run `migrate`.
 - Create an assessor login with its secret.

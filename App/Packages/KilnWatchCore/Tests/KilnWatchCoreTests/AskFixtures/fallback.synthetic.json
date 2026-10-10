@@ -1,0 +1,16 @@
+{
+  "answer": "I couldn't produce a reliable answer to that. Here are the flagged kilns I looked up:",
+  "citations": [
+    "KW-00000000000000000000000000000001"
+  ],
+  "steps": [
+    {
+      "tool": "kiln_detail",
+      "label": "Looking up KW-00000000000000000000000000000001",
+      "summary": "Found",
+      "ok": true
+    }
+  ],
+  "fallback": true,
+  "disclaimer": "Answers cite registry records. Agents never record verdicts. Kilns are flagged by satellite and pending inspection."
+}

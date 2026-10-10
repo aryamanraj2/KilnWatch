@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "daily_cap_reached",
+    "message": "Ask has reached today's limit. Try again tomorrow.",
+    "retryable": false
+  }
+}

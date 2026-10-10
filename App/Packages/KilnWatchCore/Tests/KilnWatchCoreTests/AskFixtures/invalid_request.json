@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "invalid_request",
+    "message": "Send JSON with a question of at most 500 characters, an optional full kiln_id, and optional lat and lon together.",
+    "retryable": false
+  }
+}

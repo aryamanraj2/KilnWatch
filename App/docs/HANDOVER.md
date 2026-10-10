@@ -194,3 +194,13 @@ Evidence images live via CloudFront in the second account; runner kept for the r
 ## iOS runtime compatibility — 2026-10-10
 
 The app Debug/Release deployment targets and KilnWatchCore iOS minimum are now 26.1, using the existing Xcode 27 / iOS 27 SDK toolchain. Swift logic, appearance, signing and backend behavior are unchanged. Compatibility verification and actual runtime coverage are recorded in `screens/ios-26-compatibility/report.md`; physical-phone verification remains pending.
+
+
+## Phase 4B local iOS builder — 2026-10-10
+
+Live Ask is implemented with typed stateless POST handling, honest waiting/server traces, full-ID citations and live-detail prefill, Unicode/byte limits, offline recovery, manual errors and retained labelled Sample data. Final root build and 53-test core run passed with zero app/core warnings (one existing opt-in test skipped). Light/dark, AX3/AX5 and Reduce Motion local checks passed on iOS 27 Simulator; minimum remains 26.1. Live verification is deferred to the user by explicit request: zero POSTs confirmed, one conservatively reserved attempt retained privately, no answer claimed. See `App/docs/screens/phase-4/ask-report.md` for evidence, scan results, harness limitations and the incidental browser-inventory scope exception. No backend/API-contract edits, staging or commits by this lane. Paused for orchestrator review; prompts 19/20 not started.
+
+
+### Phase 4B live confirmation — 2026-10-10
+
+After explicit user reauthorization, one live Ask submission from the installed app succeeded for the Hapur count question: 39 flagged kilns, one full-ID citation, one server-written trace step and the disclaimer. The citation opened live detail with published imagery. Conservative count is 2 of 8, including the earlier unconfirmed reservation; no retries or counter reads. Updated evidence and scope are in `screens/phase-4/ask-report.md`. The selected-kiln contextual POST remains for the user to test. Implementation remains paused for orchestrator review; no prompts 19/20 started.

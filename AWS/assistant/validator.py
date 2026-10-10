@@ -16,15 +16,16 @@ def citations(answer):
     return list(dict.fromkeys(KILN_TOKEN.findall(answer)))
 
 
-def check(answer, known_ids):
+def check(answer, known_ids, known_rules=()):
     """Return None when the answer passes, else a reason the model can act on."""
     if not isinstance(answer, str) or not answer.strip():
         return 'Your answer was empty.'
     for token in citations(answer):
         if token not in known_ids:
             return f'Your answer cited {token}, which no tool returned in this request. Cite only full kiln IDs exactly as tools returned them.'
-    if RULE_ID.search(answer):
-        return 'Your answer cited a rule ID, but no siting rules have been evaluated.'
+    for rule in RULE_ID.findall(answer):
+        if rule not in known_rules:
+            return f'Your answer cited rule {rule}, which no tool returned in this request. Cite only rule IDs exactly as tools returned them.'
     if BANNED.search(answer):
         return 'Your answer used a banned word. Say "flagged by satellite, pending inspection" instead.'
     return None

@@ -12,6 +12,8 @@ enum PublicDemo {
         let detail: String?
         let list: Data
         let records: [String: Data]
+        let askScenario: String?
+        var askCalls = 0
         var listCalls = 0
         var detailCalls = 0
     }
@@ -22,6 +24,7 @@ enum PublicDemo {
         let records: [[String: Any]] = Fixtures.kilns.compactMap { kiln in
             guard let data = try? JSONEncoder.kilnWatch.encode(kiln),
                   var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+            if DemoOptions.string("askDemo") != nil, kiln.kilnId == "KW-0412" { object["kiln_id"] = "KW-00000000000000000000000000000001" }
             object["violations"] = []
             object["exposure"] = NSNull()
             object["rules_assessment"] = "not_evaluated"
@@ -32,7 +35,7 @@ enum PublicDemo {
         }
         let details = Dictionary(uniqueKeysWithValues: records.map { ($0["kiln_id"] as! String, (try? JSONSerialization.data(withJSONObject: $0)) ?? Data()) })
         let list = (try? JSONSerialization.data(withJSONObject: ["kilns": records, "next_cursor": NSNull()])) ?? Data()
-        let config = Configuration(scenario: scenario, detail: DemoOptions.string("publicDetail"), list: list, records: details)
+        let config = Configuration(scenario: scenario, detail: DemoOptions.string("publicDetail"), list: list, records: details, askScenario: DemoOptions.string("askDemo"))
         configurations.withLock { $0[host] = config }
         let session = URLSessionConfiguration.ephemeral
         session.protocolClasses = [PublicDemoProtocol.self]
@@ -42,6 +45,10 @@ enum PublicDemo {
     static func response(for request: URLRequest) -> (Int, Data) {
         configurations.withLock { configs in
             guard let host = request.url?.host, var config = configs[host] else { return (503, Data()) }
+            if request.url?.path == "/ask" {
+                config.askCalls += 1; configs[host] = config
+                return AskDemo.response(scenario: config.askScenario ?? "unavailable", call: config.askCalls)
+            }
             let isDetail = request.url?.path != "/public/kilns"
             if isDetail { config.detailCalls += 1 } else { config.listCalls += 1 }
             configs[host] = config
@@ -66,6 +73,7 @@ enum PublicDemo {
     static func isSlowDetail(_ request: URLRequest) -> Bool {
         configurations.withLock { configs in
             guard let host = request.url?.host else { return false }
+            if request.url?.path == "/ask" { return configs[host]?.askScenario == "waiting" }
             return request.url?.path != "/public/kilns" && configs[host]?.detail == "slow"
         }
     }
@@ -81,7 +89,7 @@ private final class PublicDemoProtocol: URLProtocol, @unchecked Sendable {
     override func startLoading() {
         let (code, body) = PublicDemo.response(for: request)
         if PublicDemo.isSlowDetail(request) {
-            DispatchQueue.global().asyncAfter(deadline: .now() + 2) { [weak self] in self?.deliver(code: code, body: body) }
+            DispatchQueue.global().asyncAfter(deadline: .now() + (request.url?.path == "/ask" ? 20 : 2)) { [weak self] in self?.deliver(code: code, body: body) }
         } else { deliver(code: code, body: body) }
     }
 
