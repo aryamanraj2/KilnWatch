@@ -152,6 +152,20 @@ Read `App/docs/integration-status.md` for the source inspection and first integr
 3. Resident portal on the public API (AWS teammate) is next. Phase 3 (real registry and evidence UI) follows on the user's request and can read the public API with no sign-in; inputs are the output names in the runbook's "Deployed state".
 4. Phase 4: registry-backed Ask/agent stream and real route planning. Phase 5: verdict capture, outbox sync trigger and Cognito sign-in. Phase 6: Hindi, accessibility and polish.
 
+## Rules engine v1 (local) — 2026-10-10
+
+`AWS/rules/` contains versioned thresholds with citations (`rules_v1.json`), an OSM/Overpass layer fetch, and a pure geodesic footprint-edge distance engine with 12 tests. The full AWS suite has 47 tests (47 OK, 9 skipped). Research found the UP First Amendment Rules, 2026 (3 Feb 2026): habitation 800 m, kiln spacing 1 km, and a new 5 km municipal-limits rule. This resolves the C-HAB/C-KILN concept conflict. The values come from secondary sources, not the gazette text. School, national-highway and railway thresholds come only from an academic compilation and are marked unverified. OSM habitation, school and orchard coverage around Hapur is sparse, so finding nothing there is `inconclusive`, never clear. The local Hapur run flagged 36 of 39 kilns: kiln spacing 28, habitation 14, highway 5, rail 5. A few near-zero distances (for example 4 m to NH9) suggest false-positive detections.
+
+**Follow-up, same day:**
+- Migration `002_assessment.sql` adds an assessor role limited to `candidates.assessment`.
+- `registry.cli validate-assessment` / `apply-assessment` validate the whole batch and write it all-or-nothing.
+- The Hapur assessment now carries real registry IDs. These were rebuilt from the local detections file plus the manifest, and matched all 5 recorded live kilns. It validates: 39 kilns, 52 flags.
+- KilnWatchCore `Violation.evidenceUrl` is now optional, with a new decode test. The kiln screen says "No rule flags measured" and adds a note when a kiln is partially evaluated.
+- The app fixtures use the v1 thresholds: no UP overrides, school/highway/rail sources marked "UP siting rules (2012)", and UP-MUN-5K added, so the rules count is now 8.
+- Python: 51 tests, OK, 10 skipped. The new PostGIS role test is among the skipped ones because this Windows machine has no PostGIS or Docker.
+- **Swift build and tests have not run** (no Xcode here). Run the prescribed `xcodebuild` and `swift test` on the Mac.
+- Nothing was migrated or written to RDS.
+
 ## Phase 3 (overnight run) — 2026-10-10
 
 **Partly done:** the no-login iOS app now loads 39 real Hapur kilns from the configured public API, with on-demand detail, honest missing evidence/rules/exposure, unverified type/model score, recoverable network states and a real Today map without fabricated routes. Fixture routing remains. Final core checks report 34 functions (33 passed, one existing opt-in skip; 55 executed cases); prescribed root iPhone 17 build and core checks have zero warnings. Light/dark, AX3/AX5 and Reduce Motion were verified. After three fix cycles, the detail marker still obscures its small footprint; navigation immediately after active search remains unverified. Published remote imagery awaits CloudFront; spoken VoiceOver, physical device and actual missing-config build remain unrun. No staging, commit, push, cloud or later-phase work; protected files and existing Phase 2 logs are preserved. See [morning report](screens/phase-3/overnight-report.md) and [file inventory](screens/phase-3/changed-files.md). The one-run agent exception has ended; normal no-agents rules resume.

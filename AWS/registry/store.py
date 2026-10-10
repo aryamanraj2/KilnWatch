@@ -1,7 +1,7 @@
 """Parameterized PostGIS import/read queries. DB-API connection owned by caller."""
 import json
 from contextlib import closing
-from .contract import canonical, digest, serialize
+from .contract import RULE_KEYS, assessment_patches, canonical, digest, serialize
 
 
 def persist(connection, records, input_hash, model_hash, evidence_hash=None):
@@ -39,6 +39,28 @@ WHERE e.metadata->>'published_url' IS NULL OR e.sha256=EXCLUDED.sha256''',
                         raise ValueError('published evidence differs; administrative review required')
         connection.commit()
         return counts
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        cursor.close()
+
+
+# Replaces only the rules keys, so exposure or later assessment fields written elsewhere survive.
+ASSESS = 'UPDATE kilnwatch.candidates SET assessment=(assessment' + ''.join(f" - '{k}'" for k in RULE_KEYS) + ')||%s::jsonb WHERE kiln_id=%s'
+
+
+def apply_assessments(connection, body):
+    """All-or-nothing write of rules-engine results; never touches status or review state."""
+    patches = assessment_patches(body)
+    cursor = connection.cursor()
+    try:
+        for kiln_id, patch in patches:
+            cursor.execute(ASSESS, (canonical(patch), kiln_id))
+            if cursor.rowcount != 1:
+                raise ValueError(f'unknown kiln_id {kiln_id}; nothing written')
+        connection.commit()
+        return {'assessed': len(patches), 'rules_version': body['rules_version']}
     except Exception:
         connection.rollback()
         raise

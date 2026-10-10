@@ -1,12 +1,13 @@
-"""python -m registry.cli {validate,import,migrate}; writes require explicit import/migrate."""
+"""python -m registry.cli {validate,import,migrate,validate-assessment,apply-assessment};
+writes require explicit import/migrate/apply-assessment."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
-from .contract import convert, serialize
+from .contract import assessment_patches, convert, serialize
 from .evidence import attach
-from .store import persist
+from .store import apply_assessments, persist
 from .db import connect_from_env
 
 
@@ -41,12 +42,13 @@ def migrate(connection):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['validate','import','migrate'])
+    parser.add_argument('command',choices=['validate','import','migrate','validate-assessment','apply-assessment'])
     parser.add_argument('--detections',type=Path)
     parser.add_argument('--district')
     parser.add_argument('--evidence',type=Path)
     parser.add_argument('--publication-receipt',type=Path)
     parser.add_argument('--preview',type=Path)
+    parser.add_argument('--assessment',type=Path,help='rules engine output (python -m rules.cli assess)')
     args=parser.parse_args()
     try:
         if args.command=='migrate':
@@ -54,6 +56,17 @@ def main():
             try: migrate(connection)
             finally: connection.close()
             print('{"migrations":"applied"}'); return
+        if args.command.endswith('-assessment'):
+            if not args.assessment: raise ValueError('--assessment required')
+            body=json.loads(args.assessment.read_text())
+            if args.command=='validate-assessment':
+                patches=assessment_patches(body)
+                print(json.dumps({'dry_run':True,'kilns':len(patches),'rules_version':body['rules_version'],
+                                  'flags':sum(len(p['violations']) for _,p in patches)})); return
+            connection=connect_from_env()
+            try: print(json.dumps(apply_assessments(connection,body)))
+            finally: connection.close()
+            return
         if not args.detections or not args.district: raise ValueError('--detections and --district required')
         records,sha,model,evidence=prepare(args.detections,args.district,args.evidence,args.publication_receipt)
         if args.preview: args.preview.write_text(json.dumps({'kilns':[serialize(r['payload']) for r in records]},indent=2)+'\n')

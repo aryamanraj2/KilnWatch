@@ -94,10 +94,10 @@ Lists the kilns in a district. `district` is required (for example `Hapur`). `st
   "last_seen": "2026-10-04T05:31:41Z",
   "violations": [
     { "rule_id": "C-HAB-800", "measured_distance_m": 410, "threshold_m": 800,
-      "source": "Central 2022 rules; UP siting rules",
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)",
       "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0412/C-HAB-800.png" },
     { "rule_id": "UP-SCH-1K", "measured_distance_m": 620, "threshold_m": 1000,
-      "source": "UP and Haryana siting rules",
+      "source": "UP siting rules (2012)",
       "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0412/UP-SCH-1K.png" },
     { "rule_id": "C-TECH-10K", "measured_distance_m": null, "threshold_m": null,
       "source": "Central 2022 rules",
@@ -120,6 +120,7 @@ Lists the kilns in a district. `district` is required (for example `Hapur`). `st
 | `type` | `FCBK`, `CFCBK` or `Zigzag` (exact case) |
 | `first_seen`, `last_seen` | Acquisition times of the first and latest scenes with a detection |
 | `violations[].measured_distance_m` | `null` for technology rules (C-TECH-10K) |
+| `violations[].evidence_url` | Optional: `null` until an evidence image for that measurement is published. The measurement stands without it |
 | `violations[].threshold_m` | The threshold actually applied, after any state override. `null` for technology rules |
 | `exposure` | People within 800 m of the footprint (HRSL), with the under-5 and over-60 layers |
 | `status` | `flagged`, `confirmed`, `compliant`, `not_a_kiln` or `closed`. Changes only through a verdict or an approved review |
@@ -253,7 +254,7 @@ Response: `201` on first receipt, `200` on a replay.
 ## Open questions for the backend owner
 
 1. **Footprint shape:** is this coordinate-object form OK, or do you prefer GeoJSON from `ST_AsGeoJSON`? If you prefer GeoJSON, the client would convert it.
-2. **C-HAB-800 in UP:** the rules table gives UP a 1,000 m habitation threshold, but concept p.13 shows KW-0412 (in Hapur, UP) at "410 m vs 800 m". The fixture follows p.13. Which threshold does the rules engine apply in UP, and is `threshold_m` on a violation the post-override value?
+2. **C-HAB-800 in UP (resolved 2026-10-10):** the UP First Amendment Rules, 2026 set a uniform 800 m from habitation and raised kiln spacing to 1 km, so UP has no override for either rule (`AWS/rules/rules_v1.json`). `threshold_m` on a violation is the value applied after any override.
 3. **School rule ID:** the p.4 table says `UP/HR-SCH-1K`, while p.13 cites `UP-SCH-1K`. We use `UP-SCH-1K` because deployment is UP only, and `HR-SCH-1K` would come with Haryana. Please confirm the IDs the rules engine writes.
 4. **District and measured feature coordinates:** the app accepts optional `district` and `violations[].measured_to` for display; absent metadata remains unknown. Please confirm server availability. District metadata never grants authorization.
 5. **ID token or access token** (see Auth).
@@ -281,8 +282,8 @@ clients must adopt these optionals before consuming candidate records.
 | Field | Candidate semantics |
 |---|---|
 | `exposure` | `null` when not assessed; when supplied, all three counts remain required integers |
-| `rules_assessment` | `not_evaluated`; legacy absence means assessment state unknown, never passed |
-| `violations` | Empty for an unassessed candidate; never a compliance conclusion |
+| `rules_assessment` | `not_evaluated` until the rules engine runs, then `evaluated` or `partially_evaluated` (some rules lacked data; see `AWS/rules/README.md`); legacy absence means assessment state unknown, never passed |
+| `violations` | Empty for an unassessed candidate; after assessment, the rules measured inside their threshold. Never a compliance conclusion, and an empty list after `partially_evaluated` is not a clean result |
 | `type_verification` | `unverified` for model candidates regardless of class score; no C-TECH-10K finding |
 | `evidence.before`, `.after` | Optional URL strings, preserving legacy shape; null until an object is actually published |
 | `evidence.before_metadata`, `.after_metadata` | Optional scene/grid/image metadata even when URL is unavailable |

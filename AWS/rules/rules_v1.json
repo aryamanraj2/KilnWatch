@@ -1,0 +1,127 @@
+{
+  "version": "kilnwatch-rules-v1",
+  "compiled_at": "2026-10-10",
+  "applicability": "Siting criteria govern where a kiln may be established. Courts have read the 2022 central rules as applying to kilns established on or after 22 February 2022, and the UP 2026 amendment regularises some kilns built before the 2012 rules. A measured distance inside a threshold is a siting flag that needs inspection, never a finding.",
+  "verification_levels": {
+    "secondary_sources": "Threshold quoted consistently by court records, legal digests or news reports of the notification; the gazette text itself has not been read.",
+    "unverified_compilation": "Threshold taken from an academic compilation that cites the rules; neither the gazette text nor a quotation of it has been found."
+  },
+  "absence_conclusive": "False where OpenStreetMap coverage of the feature is known to be incomplete in rural UP: a mapped feature inside the threshold is a flag, but no mapped feature proves nothing.",
+  "rules": [
+    {
+      "id": "C-HAB-800",
+      "absence_conclusive": false,
+      "check": "Distance to habitation",
+      "kind": "distance",
+      "layer": "habitation",
+      "threshold_m": 800,
+      "overrides": [],
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+      "verification": "secondary_sources",
+      "citations": [
+        "Environment (Protection) Amendment Rules, 2022, G.S.R. 143(E), 22 Feb 2022, Schedule I entry 74: 0.8 km from habitation and fruit orchards",
+        "Uttar Pradesh Brick Kiln (Site Standards for Establishment) (First Amendment) Rules, 2026, Notification No. 145/LXXXI-6-2026-94(Parya)-2011, 3 Feb 2026: uniform 800 m from habitation (previously 1 km in UP)"
+      ]
+    },
+    {
+      "id": "C-KILN-1K",
+      "check": "Distance to another kiln",
+      "kind": "distance",
+      "layer": "kilns",
+      "threshold_m": 1000,
+      "overrides": [],
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+      "verification": "secondary_sources",
+      "citations": [
+        "Environment (Protection) Amendment Rules, 2022, G.S.R. 143(E): 1 km from an existing brick kiln",
+        "Uttar Pradesh Brick Kiln (Site Standards for Establishment) (First Amendment) Rules, 2026: raised from 800 m to 1 km"
+      ]
+    },
+    {
+      "id": "C-ORCH-800",
+      "absence_conclusive": false,
+      "check": "Distance to an orchard",
+      "kind": "distance",
+      "layer": "orchards",
+      "threshold_m": 800,
+      "overrides": [],
+      "source": "Central 2022 rules",
+      "verification": "secondary_sources",
+      "citations": [
+        "Environment (Protection) Amendment Rules, 2022, G.S.R. 143(E): 0.8 km from fruit orchards"
+      ]
+    },
+    {
+      "id": "UP-SCH-1K",
+      "absence_conclusive": false,
+      "check": "Distance to a school",
+      "kind": "distance",
+      "layer": "schools",
+      "threshold_m": 1000,
+      "states": ["UP"],
+      "overrides": [],
+      "source": "UP siting rules (2012)",
+      "verification": "unverified_compilation",
+      "citations": [
+        "Uttar Pradesh Brick Kilns (Siting Criteria for Establishment) Rules, 2012, 27 Jun 2012, as compiled in Space to Policy (arXiv:2412.04065), Table 9"
+      ]
+    },
+    {
+      "id": "UP-NH-300",
+      "check": "Distance to a national highway",
+      "kind": "distance",
+      "layer": "national_highways",
+      "threshold_m": 300,
+      "states": ["UP"],
+      "overrides": [],
+      "source": "UP siting rules (2012)",
+      "verification": "unverified_compilation",
+      "citations": [
+        "Uttar Pradesh Brick Kilns (Siting Criteria for Establishment) Rules, 2012, as compiled in Space to Policy (arXiv:2412.04065), Table 9"
+      ]
+    },
+    {
+      "id": "UP-RAIL-200",
+      "check": "Distance to a railway line",
+      "kind": "distance",
+      "layer": "railways",
+      "threshold_m": 200,
+      "states": ["UP"],
+      "overrides": [],
+      "source": "UP siting rules (2012)",
+      "verification": "unverified_compilation",
+      "citations": [
+        "Uttar Pradesh Brick Kilns (Siting Criteria for Establishment) Rules, 2012, as compiled in Space to Policy (arXiv:2412.04065), Table 9"
+      ]
+    },
+    {
+      "id": "UP-MUN-5K",
+      "check": "Distance to a municipal council, corporation or nagar panchayat",
+      "kind": "distance",
+      "layer": "municipal_limits",
+      "threshold_m": 5000,
+      "states": ["UP"],
+      "overrides": [],
+      "source": "UP siting rules (2026 amendment)",
+      "verification": "secondary_sources",
+      "not_evaluated_reason": "No verified urban local body boundary layer yet",
+      "citations": [
+        "Uttar Pradesh Brick Kiln (Site Standards for Establishment) (First Amendment) Rules, 2026: no kiln within 5 km of a Municipal Council, Municipal Corporation or Nagar Panchayat"
+      ]
+    },
+    {
+      "id": "C-TECH-10K",
+      "check": "Technology within 10 km of a non-attainment city",
+      "kind": "technology",
+      "requirement": "Zigzag, vertical shaft or gas",
+      "threshold_m": null,
+      "overrides": [],
+      "source": "Central 2022 rules",
+      "verification": "unverified_compilation",
+      "not_evaluated_reason": "Kiln type is unverified and the non-attainment city list is not loaded",
+      "citations": [
+        "Environment (Protection) Amendment Rules, 2022, G.S.R. 143(E): technology requirement as summarised in the KilnWatch concept; clause not yet read"
+      ]
+    }
+  ]
+}

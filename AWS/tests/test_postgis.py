@@ -57,7 +57,7 @@ class PostGISTests(unittest.TestCase):
         # Roles are cluster-wide; this only ever runs against the disposable kilnwatch_test cluster.
         self.conn.rollback()
         with closing(self.conn.cursor()) as c:
-            for role in ('kilnwatch_api','kilnwatch_test_importer'):c.execute('DROP ROLE IF EXISTS '+role)
+            for role in ('kilnwatch_api','kilnwatch_test_importer','kilnwatch_test_assessor'):c.execute('DROP ROLE IF EXISTS '+role)
         self.conn.commit();self.conn.close()
     def count(self,table,where=''):
         with closing(self.conn.cursor()) as c:
@@ -163,6 +163,30 @@ class PostGISTests(unittest.TestCase):
                         "UPDATE kilnwatch.candidates SET assessment='{}'::jsonb"):self.denied(importer,sql)
         finally:importer.close()
         self.assertEqual(self.count('evidence'," WHERE metadata ? 'published_url'"),1)
+    def test_assessor_writes_rule_keys_only(self):
+        from registry.store import apply_assessments
+        persist(self.conn,records(),'b'*64,'a'*64)
+        kiln_id=records()[0]['payload']['kiln_id']
+        with closing(self.conn.cursor()) as c:
+            c.execute("UPDATE kilnwatch.candidates SET assessment='{\"exposure\":{\"people\":5}}'::jsonb")
+            c.execute("CREATE ROLE kilnwatch_test_assessor LOGIN PASSWORD 'synthetic-assessor' IN ROLE kilnwatch_assessor")
+        self.conn.commit();assessor=connect('kilnwatch_test_assessor','synthetic-assessor')
+        flag={'rule_id':'UP-RAIL-200','measured_distance_m':142,'threshold_m':200,'source':'UP siting rules (2012)',
+              'evidence_url':None,'measured_to':{'latitude':28.73,'longitude':77.78}}
+        def body(*ids):
+            return {'rules_version':'kilnwatch-rules-v1','assessed_at':'2026-10-10T06:00:00Z','inputs':{},
+                    'assessments':[{'kiln_id':i,'rules_version':'kilnwatch-rules-v1','rules_assessment':'partially_evaluated',
+                                    'violations':[flag],'rules_results':[{'rule_id':'UP-RAIL-200','status':'within_threshold'}]} for i in ids]}
+        try:
+            self.assertEqual(apply_assessments(assessor,body(kiln_id))['assessed'],1)
+            apply_assessments(assessor,body(kiln_id))
+            with self.assertRaises(ValueError):apply_assessments(assessor,body(kiln_id,'KW-'+'0'*32))
+            for sql in ("UPDATE kilnwatch.candidates SET status='confirmed'","UPDATE kilnwatch.candidates SET review_state='approved'",
+                        "UPDATE kilnwatch.candidates SET last_seen=now()","DELETE FROM kilnwatch.candidates"):self.denied(assessor,sql)
+        finally:assessor.close()
+        record=Registry(self.conn).detail(kiln_id,'Hapur')
+        self.assertEqual(record['violations'],[flag]);self.assertEqual(record['rules_assessment'],'partially_evaluated')
+        self.assertEqual(record['exposure'],{'people':5});self.assertEqual(record['status'],'flagged')
     def test_bootstrap_recovery_and_reader_is_select_only(self):
         spec=importlib.util.spec_from_file_location('bootstrap_reader',Path(__file__).resolve().parents[1]/'scripts'/'bootstrap_reader.py')
         boot=importlib.util.module_from_spec(spec);spec.loader.exec_module(boot);store={}

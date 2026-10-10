@@ -142,3 +142,45 @@ def convert(collection, district, input_sha256, imported_at):
             raise ValueError('conflicting duplicate observation')
         records[key] = {'observation_id': key, 'geometry': feature['geometry'], 'payload': record}
     return [records[k] for k in sorted(records)]
+
+
+RULE_KEYS = ('violations', 'rules_assessment', 'rules_results', 'rules_version', 'rules_inputs')
+RULE_STATUSES = ('within_threshold', 'beyond_threshold', 'inconclusive', 'not_evaluated', 'not_applicable')
+VIOLATION_KEYS = {'rule_id', 'measured_distance_m', 'threshold_m', 'source', 'evidence_url', 'measured_to'}
+
+
+def assessment_patches(body):
+    """Rules-engine output (AWS/rules) -> [(kiln_id, assessment keys)]. Validates the whole
+    batch before anything is written; only the rule keys are ever replaced."""
+    if not isinstance(body.get('rules_version'), str) or not isinstance(body.get('assessments'), list):
+        raise ValueError('expected rules engine output')
+    inputs = {k: body['inputs'].get(k) for k in ('kilns_sha256', 'layers_sha256', 'osm_base')}
+    inputs['assessed_at'] = timestamp(body['assessed_at'])
+    seen, out = set(), []
+    for a in body['assessments']:
+        if not isinstance(a.get('kiln_id'), str) or not ID.fullmatch(a['kiln_id']):
+            raise ValueError(f'not a registry kiln_id: {a.get("kiln_id")!r}')
+        if a['kiln_id'] in seen:
+            raise ValueError('duplicate kiln_id')
+        seen.add(a['kiln_id'])
+        if a['rules_assessment'] not in ('evaluated', 'partially_evaluated') or a['rules_version'] != body['rules_version']:
+            raise ValueError('invalid rules assessment/version')
+        for r in a['rules_results']:
+            if r['status'] not in RULE_STATUSES:
+                raise ValueError('unknown rule status')
+        for v in a['violations']:
+            if set(v) != VIOLATION_KEYS or not isinstance(v['rule_id'], str) or not isinstance(v['source'], str):
+                raise ValueError('violation does not match the kiln record')
+            number(v['measured_distance_m'], 0, 1e6)
+            number(v['threshold_m'], 0, 1e6)
+            if v['evidence_url'] is not None and not str(v['evidence_url']).startswith('https://'):
+                raise ValueError('evidence_url must be https or null')
+            if v['measured_to'] is not None:
+                coordinate([v['measured_to']['longitude'], v['measured_to']['latitude']])
+        flagged = sorted(r['rule_id'] for r in a['rules_results'] if r['status'] == 'within_threshold')
+        if flagged != sorted(v['rule_id'] for v in a['violations']):
+            raise ValueError('violations disagree with rule results')
+        out.append((a['kiln_id'], {'violations': a['violations'], 'rules_assessment': a['rules_assessment'],
+                                   'rules_results': a['rules_results'], 'rules_version': a['rules_version'],
+                                   'rules_inputs': inputs}))
+    return out
