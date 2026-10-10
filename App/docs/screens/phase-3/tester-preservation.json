@@ -1,0 +1,22 @@
+{
+  "head_unchanged": true,
+  "index_unchanged": true,
+  "protected_fingerprints_unchanged": true,
+  "protected_count": 67,
+  "deployment_value_hits": 0,
+  "public_config_ignored": true,
+  "generic_domain_files": [
+    "App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/detail.json",
+    "AWS/agentcore.tf",
+    "AWS/api.tf",
+    "AWS/bridge.tf",
+    "AWS/docs/first-record-runbook.md",
+    "AWS/iam.tf",
+    "AWS/scripts/package_api.py",
+    "AWS/training.tf",
+    "App/docs/api-contract.md",
+    "App/docs/prompts/12-overnight-phase-3.md",
+    "App/docs/research/agent-streaming.md",
+    "App/docs/research/auth.md"
+  ]
+}

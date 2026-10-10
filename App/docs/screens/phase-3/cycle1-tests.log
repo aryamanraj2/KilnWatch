@@ -1,0 +1,105 @@
+Building for debugging...
+[1 / 1]
+Build complete! (0.30 sec)
+Test Suite 'All tests' started at 2026-10-10 02:16:44.819.
+Test Suite 'All tests' passed at 2026-10-10 02:16:44.834.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.015) seconds
+◇ Test run started.
+↳ Testing Library Version: 2073
+↳ Target Platform: arm64e-apple-macos14.0
+➜ Test localRealDetectionContractDecodesThroughExistingClient() skipped.
+◇ Test legacySavedRouteKeepsStopsWithoutInventingMetadata() started.
+◇ Test navigationUsesAccessThenKilnFallbackAndServerOrder() started.
+◇ Test authoritativeEmptyInvalidatesSavedRouteOnly(code:) started.
+◇ Test recordedPublicBodiesDecode(name:) started.
+◇ Test evidenceLocalFixtureUsesTheImageLoadingPath() started.
+◇ Test publicDistrictPagingAndQueryEncoding() started.
+◇ Test pythonCandidateContractPreservesUnknownFactsAndProvenance() started.
+◇ Test unknownEmbeddedEnumsSurviveFullRouteCache() started.
+◇ Test successfulFlushRemovesVerdictAndPhotos() started.
+◇ Test kilnRoundTrips() started.
+◇ Test incompleteExposureCountsRemainMalformed() started.
+◇ Test publicCursorProtection(kind:) started.
+◇ Test failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test malformedOptionalGeometryAndAxisOrder() started.
+◇ Test queueSurvivesACrashAfterEnqueue() started.
+◇ Test publicCallsNeverAskForOrSendAToken() started.
+◇ Test apiDecodesPythonEnvelopeDetailAndEveryPage() started.
+◇ Test publicNearQueryUsesDocumentedKeys() started.
+◇ Test repeatedPaginationCursorFailsInsteadOfReturningPartialRegistry() started.
+◇ Test routeFixtureMetadataAndEmbeddedRecordsAgree() started.
+◇ Test transportFailureUsesCacheAndCorruptOrAbsentCacheRecovers() started.
+◇ Test unknownStatusAndTypeDecodeWithoutDroppingTheRecord() started.
+◇ Test failedFlushKeepsVerdictAndPhotos() started.
+◇ Test httpErrorsAreTyped(code:) started.
+◇ Test routeCacheRoundTrips() started.
+◇ Test datesAcceptOptionalFractionalSecondsAndOffsets() started.
+◇ Test successfulRefreshSavesFullResponse() started.
+◇ Test malformedBodyNamesTheKey() started.
+◇ Test fixturesMatchTheConcept() started.
+◇ Test malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument code → 404 to authoritativeEmptyInvalidatesSavedRouteOnly(code:) started.
+◇ Test fixtureDecodes(name:) started.
+◇ Test case passing 1 argument name → "page1" to recordedPublicBodiesDecode(name:) started.
+◇ Test publicFailuresRemainTyped(code:) started.
+◇ Test case passing 1 argument code → 200 to authoritativeEmptyInvalidatesSavedRouteOnly(code:) started.
+◇ Test case passing 1 argument name → "page2" to recordedPublicBodiesDecode(name:) started.
+◇ Test case passing 1 argument name → "near" to recordedPublicBodiesDecode(name:) started.
+◇ Test case passing 1 argument code → 401 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument name → "detail" to recordedPublicBodiesDecode(name:) started.
+◇ Test case passing 1 argument kind → "repeated" to publicCursorProtection(kind:) started.
+◇ Test case passing 1 argument code → 403 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument code → 503 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument kind → "empty" to publicCursorProtection(kind:) started.
+◇ Test case passing 1 argument code → 200 to failedRefreshPreservesValidCacheWithoutSampleFallback(code:) started.
+◇ Test case passing 1 argument kind → "emptyPage" to publicCursorProtection(kind:) started.
+◇ Test case passing 1 argument code → 404 to httpErrorsAreTyped(code:) started.
+◇ Test case passing 1 argument code → 503 to httpErrorsAreTyped(code:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "Polygon", coordinates: [[77.0, 28.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0, 28.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument code → 400 to publicFailuresRemainTyped(code:) started.
+◇ Test case passing 1 argument name → "route_today" to fixtureDecodes(name:) started.
+◇ Test case passing 1 argument name → "kilns" to fixtureDecodes(name:) started.
+◇ Test case passing 1 argument name → "rules" to fixtureDecodes(name:) started.
+◇ Test case passing 1 argument code → 404 to publicFailuresRemainTyped(code:) started.
+◇ Test case passing 1 argument code → 429 to publicFailuresRemainTyped(code:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0, 28.0, 0.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument code → 503 to publicFailuresRemainTyped(code:) started.
+◇ Test case passing 1 argument code → -1 to publicFailuresRemainTyped(code:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[181.0, 28.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[77.0, 91.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+◇ Test case passing 1 argument geometry → RouteGeometry(type: "LineString", coordinates: [[nan, 28.0], [78.0, 29.0]]) to malformedGeometryIsNeverMapped(geometry:) started.
+✔ Test pythonCandidateContractPreservesUnknownFactsAndProvenance() passed after 0.011 seconds.
+✔ Test kilnRoundTrips() passed after 0.011 seconds.
+✔ Test malformedOptionalGeometryAndAxisOrder() passed after 0.011 seconds.
+✔ Test navigationUsesAccessThenKilnFallbackAndServerOrder() passed after 0.011 seconds.
+✔ Test evidenceLocalFixtureUsesTheImageLoadingPath() passed after 0.011 seconds.
+✔ Test legacySavedRouteKeepsStopsWithoutInventingMetadata() passed after 0.011 seconds.
+✔ Test queueSurvivesACrashAfterEnqueue() passed after 0.011 seconds.
+✔ Test unknownEmbeddedEnumsSurviveFullRouteCache() passed after 0.011 seconds.
+✔ Test datesAcceptOptionalFractionalSecondsAndOffsets() passed after 0.011 seconds.
+✔ Test unknownStatusAndTypeDecodeWithoutDroppingTheRecord() passed after 0.011 seconds.
+✔ Test recordedPublicBodiesDecode(name:) with 4 test cases passed after 0.011 seconds.
+✔ Test fixturesMatchTheConcept() passed after 0.011 seconds.
+✔ Test malformedGeometryIsNeverMapped(geometry:) with 7 test cases passed after 0.011 seconds.
+✔ Test incompleteExposureCountsRemainMalformed() passed after 0.011 seconds.
+✔ Test fixtureDecodes(name:) with 3 test cases passed after 0.012 seconds.
+✔ Test malformedBodyNamesTheKey() passed after 0.012 seconds.
+✔ Test publicNearQueryUsesDocumentedKeys() passed after 0.012 seconds.
+✔ Test routeFixtureMetadataAndEmbeddedRecordsAgree() passed after 0.013 seconds.
+✔ Test repeatedPaginationCursorFailsInsteadOfReturningPartialRegistry() passed after 0.013 seconds.
+✔ Test httpErrorsAreTyped(code:) with 2 test cases passed after 0.014 seconds.
+✔ Test authoritativeEmptyInvalidatesSavedRouteOnly(code:) with 2 test cases passed after 0.014 seconds.
+✔ Test routeCacheRoundTrips() passed after 0.014 seconds.
+✔ Test publicCallsNeverAskForOrSendAToken() passed after 0.014 seconds.
+✔ Test publicDistrictPagingAndQueryEncoding() passed after 0.015 seconds.
+✔ Test failedFlushKeepsVerdictAndPhotos() passed after 0.015 seconds.
+✔ Test publicFailuresRemainTyped(code:) with 5 test cases passed after 0.015 seconds.
+✔ Test publicCursorProtection(kind:) with 3 test cases passed after 0.015 seconds.
+✔ Test successfulRefreshSavesFullResponse() passed after 0.015 seconds.
+✔ Test apiDecodesPythonEnvelopeDetailAndEveryPage() passed after 0.015 seconds.
+✔ Test failedRefreshPreservesValidCacheWithoutSampleFallback(code:) with 4 test cases passed after 0.015 seconds.
+✔ Test successfulFlushRemovesVerdictAndPhotos() passed after 0.015 seconds.
+✔ Test transportFailureUsesCacheAndCorruptOrAbsentCacheRecovers() passed after 0.016 seconds.
+✔ Test run with 33 tests in 0 suites passed after 0.016 seconds.

@@ -439,3 +439,146 @@ func localRealDetectionContractDecodesThroughExistingClient() async throws {
     let client = Stub { _ in (200, data) }
     #expect(try await client.api.kilns(district: "Hapur") == records)
 }
+
+// MARK: - Phase 3 public reads
+private func publicBody(_ name: String) throws -> Data {
+    let url = try #require(Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "PublicFixtures"))
+    return try Data(contentsOf: url)
+}
+
+@Test func publicCallsNeverAskForOrSendAToken() async throws {
+    let detail = try publicBody("detail")
+    let near = try publicBody("near")
+    let stub = Stub { request in
+        #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
+        #expect(request.value(forHTTPHeaderField: "Accept") == "application/json")
+        #expect(request.cachePolicy == .reloadIgnoringLocalCacheData)
+        #expect(request.url?.path.hasPrefix("/public/kilns") == true)
+        return (200, request.url?.path == "/public/kilns" ? near : detail)
+    }
+    let calls = Mutex(0)
+    let api = KilnWatchAPI(baseURL: stub.api.baseURL.deletingLastPathComponent(), session: stub.api.session, token: {
+        calls.withLock { $0 += 1 }; throw URLError(.userAuthenticationRequired)
+    })
+    #expect(try await api.publicKilns(district: "Hapur").count == 1)
+    #expect(try await api.publicKilns(latitude: 28.73, longitude: 77.78, radiusM: 100).count == 1)
+    #expect(try await api.publicKiln(id: "KW-6b3b38da681850e5af46b024f3d3f78e").typeConfidence == 0.324)
+    #expect(calls.withLock { $0 } == 0)
+}
+
+@Test func publicSessionDisablesResponseCookieAndCredentialStorage() {
+    let session = KilnWatchAPI.publicReadSession()
+    defer { session.invalidateAndCancel() }
+    let configuration = session.configuration
+    #expect(configuration.urlCache == nil)
+    #expect(configuration.requestCachePolicy == .reloadIgnoringLocalCacheData)
+    #expect(configuration.httpCookieStorage == nil)
+    #expect(!configuration.httpShouldSetCookies)
+    #expect(configuration.urlCredentialStorage == nil)
+    #expect(configuration.identifier == nil)
+}
+
+@Test func publicDistrictPagingAndQueryEncoding() async throws {
+    let first = try publicBody("page1")
+    let second = try publicBody("page2")
+    let page = try JSONDecoder.kilnWatch.decode(KilnList.self, from: first)
+    let calls = Mutex(0)
+    let stub = Stub { request in
+        let query = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!.queryItems!
+        #expect(query.first { $0.name == "district" }?.value == "Hapur & nearby / scan")
+        let index = calls.withLock { c in c += 1; return c }
+        if index == 1 { return (200, first) }
+        #expect(query.first { $0.name == "cursor" }?.value == page.nextCursor)
+        return (200, second.replacingJSONValue(key: "next_cursor", value: NSNull()))
+    }
+    let api = KilnWatchAPI(baseURL: stub.api.baseURL.deletingLastPathComponent(), session: stub.api.session)
+    #expect(try await api.publicKilns(district: "Hapur & nearby / scan").count == 4)
+    #expect(calls.withLock { $0 } == 2)
+}
+
+@Test func publicNearQueryUsesDocumentedKeys() async throws {
+    let body = try publicBody("near")
+    let stub = Stub { request in
+        let query = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!.queryItems!
+        #expect(Set(query.map(\.name)) == Set(["lat", "lon", "radius_m"]))
+        #expect(query.first { $0.name == "lat" }?.value == "28.73")
+        #expect(query.first { $0.name == "lon" }?.value == "77.78")
+        #expect(query.first { $0.name == "radius_m" }?.value == "2000.0")
+        return (200, body)
+    }
+    let api = KilnWatchAPI(baseURL: stub.api.baseURL.deletingLastPathComponent(), session: stub.api.session)
+    #expect(try await api.publicKilns(latitude: 28.73, longitude: 77.78, radiusM: 2000).count == 1)
+}
+
+@Test(arguments: [400, 404, 429, 503, -1])
+func publicFailuresRemainTyped(code: Int) async throws {
+    let stub = Stub { _ in (code, Data(#"{"error":"unavailable"}"#.utf8)) }
+    do {
+        _ = try await stub.api.publicKiln(id: "missing")
+        Issue.record("Expected public request failure")
+    } catch {
+        if code == -1 { guard case .transport = error else { Issue.record("Expected transport"); return } }
+        else {
+            guard case .status(let actual, _) = error else { Issue.record("Expected HTTP status"); return }
+            #expect(actual == code)
+            #expect(error.isSystemic == [429, 503].contains(code))
+        }
+    }
+}
+
+@Test(arguments: ["page1", "page2", "near", "detail"])
+func recordedPublicBodiesDecode(name: String) throws {
+    let data = try publicBody(name)
+    let kilns = name == "detail" ? [try JSONDecoder.kilnWatch.decode(Kiln.self, from: data)]
+                                : try JSONDecoder.kilnWatch.decode(KilnList.self, from: data).kilns
+    #expect(!kilns.isEmpty)
+    for kiln in kilns {
+        #expect(kiln.status == .flagged && kiln.typeVerification == "unverified")
+        #expect(kiln.exposure == nil && kiln.violations.isEmpty && kiln.rulesAssessment == "not_evaluated")
+        #expect(kiln.provenance == nil)
+        #expect(!kiln.typeMayBePresentedAsCertain)
+    }
+}
+
+@Test(arguments: ["repeated", "empty", "emptyPage"])
+func publicCursorProtection(kind: String) async throws {
+    let first = try publicBody("page1")
+    let stub = Stub { request in
+        let hasCursor = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!.queryItems!.contains { $0.name == "cursor" }
+        if !hasCursor { return (200, first) }
+        switch kind {
+        case "empty": return (200, first.replacingJSONValue(key: "next_cursor", value: ""))
+        case "emptyPage": return (200, first.replacingJSONValue(key: "kilns", value: []))
+        default: return (200, first)
+        }
+    }
+    do {
+        _ = try await stub.api.publicKilns(district: "Hapur")
+        Issue.record("Expected unsafe cursor rejection")
+    } catch { guard case .invalidPagination = error else { Issue.record("Expected pagination error"); return } }
+}
+
+private extension Data {
+    func replacingJSONValue(key: String, value: Any) -> Data {
+        var object = (try? JSONSerialization.jsonObject(with: self)) as? [String: Any] ?? [:]
+        object[key] = value
+        return (try? JSONSerialization.data(withJSONObject: object)) ?? Data()
+    }
+}
+
+@Test func evidenceLocalFixtureUsesTheImageLoadingPath() async throws {
+    let url = try #require(Bundle.module.url(forResource: "image", withExtension: "png", subdirectory: "PublicFixtures"))
+    let data = try await EvidenceImageData.load(from: url)
+    #expect(data.starts(with: [137, 80, 78, 71]))
+    // IHDR carries the actual 256 × 256 raster dimensions.
+    #expect(Array(data[16..<24]) == [0, 0, 1, 0, 0, 0, 1, 0])
+    let directory = tempDirectory()
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let invalid = directory.appending(path: "invalid.png")
+    try Data("not a PNG".utf8).write(to: invalid)
+    do {
+        _ = try await EvidenceImageData.load(from: invalid)
+        Issue.record("Expected invalid image failure")
+    } catch { #expect(error as? EvidenceImageError == .invalidPNG) }
+}

@@ -18,3 +18,6 @@ DerivedData/
 
 __pycache__/
 *.pyc
+
+# Public API deployment configuration stays local (the example is portable).
+/App/Config/Public.xcconfig

@@ -1,9 +1,10 @@
 import KilnWatchCore
 import SwiftUI
 
-/// People inside the 800 m buffer: one large figure, vulnerable groups below.
+/// Assessed population; a buffer label is only supplied for the fixture demonstration.
 struct ExposureBlock: View {
     let exposure: Exposure?
+    var bufferRadiusM: Int?
 
     @State private var appeared = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -26,7 +27,7 @@ struct ExposureBlock: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(
-            "\(exposure.people.grouped) people within 800 metres, including \(exposure.childrenUnderFive.grouped) children under 5 and \(exposure.adultsOverSixty.grouped) adults over 60."
+            "\(exposure.people.grouped) people\(bufferRadiusM.map { " within \($0) metres" } ?? ""), including \(exposure.childrenUnderFive.grouped) children under 5 and \(exposure.adultsOverSixty.grouped) adults over 60."
         )
         } else {
             Text("Population exposure not assessed")
@@ -40,7 +41,7 @@ struct ExposureBlock: View {
             .font(.largeTitle.weight(.semibold).monospacedDigit())
             .contentTransition(.numericText(value: Double(people)))
             .foregroundStyle(.ink)
-        Text("people within 800 m")
+        Text(bufferRadiusM.map { "people within \($0) m" } ?? "people")
             .font(.body)
             .foregroundStyle(.inkSecondary)
     }

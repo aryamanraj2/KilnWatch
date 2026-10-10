@@ -10,11 +10,11 @@ struct KilnsView: View {
     @State private var district = "Hapur"
 
     private var districts: [String] {
-        Array(Set(model.allKilns.map { $0.district ?? "District unavailable" })).sorted()
+        model.usesPublicRegistry ? [model.district] : Array(Set(model.allKilns.map { $0.district ?? "District unavailable" })).sorted()
     }
     private var results: [Kiln] {
         model.allKilns.filter { kiln in
-            (kiln.district ?? "District unavailable") == district
+            (model.usesPublicRegistry || (kiln.district ?? "District unavailable") == district)
                 && (status == nil || model.status(for: kiln) == status)
                 && (query.isEmpty
                     || kiln.kilnId.localizedStandardContains(query)
@@ -34,7 +34,7 @@ struct KilnsView: View {
                     }
                 } header: {
                     if !results.isEmpty {
-                        Text("\(district) · \(results.count) kilns").eyebrow()
+                        Text("\(model.usesPublicRegistry ? model.district : district) · \(results.count) kilns").eyebrow()
                     }
                 }
             }
@@ -42,7 +42,13 @@ struct KilnsView: View {
             .background(.canvas)
             .redacted(reason: model.isLoading ? .placeholder : [])
             .overlay {
-                if results.isEmpty {
+                if model.usesPublicRegistry, !registryLoaded {
+                    ScrollView {
+                        RegistryStateView(state: model.registryState, district: model.district,
+                                          retrying: model.registryRefreshing) { await model.loadRegistry(force: true) }
+                    }
+                    .background(.canvas)
+                } else if results.isEmpty {
                     ContentUnavailableView {
                         Label(query.isEmpty ? "No kilns with this status" : "No kilns match '\(query)'",
                               systemImage: "magnifyingglass")
@@ -54,6 +60,7 @@ struct KilnsView: View {
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Kiln or rule ID")
             .navigationTitle("Kilns")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) { DataSourceLabel(text: model.dataSourceLabel) }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Picker("District", selection: $district) {
@@ -83,6 +90,8 @@ struct KilnsView: View {
             }
         }
     }
+
+    private var registryLoaded: Bool { if case .loaded = model.registryState { return true }; return false }
 }
 
 private struct KilnRow: View {
@@ -91,21 +100,21 @@ private struct KilnRow: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        let layout = typeSize.isAccessibilitySize
+        let layout = typeSize.isAccessibilitySize || model.usesPublicRegistry
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: Space.xs))
             : AnyLayout(HStackLayout(alignment: .top, spacing: Space.s))
         layout {
             VStack(alignment: .leading, spacing: Space.xxs) {
-                KilnIDLabel(kiln: kiln)
+                KilnIDLabel(kiln: kiln, predictionOnly: model.usesPublicRegistry, abbreviatesID: model.usesPublicRegistry)
                 if let top = kiln.topViolation {
                     Text("\(Text(top.ruleId).monospaced()) · \(top.compactLine(for: kiln))")
                         .font(.subheadline)
                         .foregroundStyle(.ink)
                 }
             }
-            if !typeSize.isAccessibilitySize { Spacer(minLength: Space.xs) }
-            VStack(alignment: typeSize.isAccessibilitySize ? .leading : .trailing, spacing: Space.xxs) {
-                StatusBadge(status: model.status(for: kiln))
+            if !typeSize.isAccessibilitySize && !model.usesPublicRegistry { Spacer(minLength: Space.xs) }
+            VStack(alignment: typeSize.isAccessibilitySize || model.usesPublicRegistry ? .leading : .trailing, spacing: Space.xxs) {
+                StatusBadge(status: model.status(for: kiln), detailed: model.usesPublicRegistry)
                 Text(kiln.exposure.map { "\($0.people.grouped) people" } ?? "Exposure not assessed")
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.inkSecondary)
@@ -113,9 +122,10 @@ private struct KilnRow: View {
         }
         .padding(.vertical, Space.xxs)
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("kiln-row-\(kiln.kilnId)")
     }
 }
 
 #Preview {
-    KilnsView().environment(AppModel())
+    KilnsView().environment(AppModel(useFixtures: true))
 }

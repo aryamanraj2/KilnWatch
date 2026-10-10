@@ -28,19 +28,54 @@ public struct KilnWatchAPI: Sendable {
     /// Returns a Cognito JWT, refreshing it if needed.
     public var token: @Sendable () async throws -> String
 
-    public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String) {
+    /// Public reads need no token. Protected calls still fail unless a provider is supplied.
+    public init(baseURL: URL, session: URLSession = .shared, token: @escaping @Sendable () async throws -> String = { throw URLError(.userAuthenticationRequired) }) {
         self.baseURL = baseURL
         self.session = session
         self.token = token
     }
 
+    /// Public registry reads must reach the network and must not persist response bodies.
+    /// Protected clients keep their existing session and authentication behavior.
+    public static func publicReadSession() -> URLSession {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.httpCookieStorage = nil
+        configuration.httpShouldSetCookies = false
+        configuration.urlCredentialStorage = nil
+        return URLSession(configuration: configuration)
+    }
+
     public func kilns(district: String, status: KilnStatus? = nil) async throws(APIError) -> [Kiln] {
         var query = [URLQueryItem(name: "district", value: district)]
         if let status { query.append(URLQueryItem(name: "status", value: status.rawValue)) }
+        return try await list(path: "kilns", query: query, authorized: true)
+    }
+
+    /// Reads every public district page, with the same cursor safety as inspector reads.
+    public func publicKilns(district: String) async throws(APIError) -> [Kiln] {
+        try await list(path: "public/kilns", query: [URLQueryItem(name: "district", value: district)], authorized: false)
+    }
+
+    /// Nearby public results may include distance_m, which the kiln decoder safely ignores.
+    public func publicKilns(latitude: Double, longitude: Double, radiusM: Double) async throws(APIError) -> [Kiln] {
+        let query = [URLQueryItem(name: "lat", value: String(latitude)),
+                     URLQueryItem(name: "lon", value: String(longitude)),
+                     URLQueryItem(name: "radius_m", value: String(radiusM))]
+        return try await send(URLRequest(url: baseURL.appending(path: "public/kilns").appending(queryItems: query)), as: KilnList.self, authorized: false).kilns
+    }
+
+    public func publicKiln(id: String) async throws(APIError) -> Kiln {
+        try await send(URLRequest(url: baseURL.appending(path: "public/kilns").appending(path: id)), as: Kiln.self, authorized: false)
+    }
+
+    private func list(path: String, query: [URLQueryItem], authorized: Bool) async throws(APIError) -> [Kiln] {
+        var query = query
         var result: [Kiln] = []
         var seen: Set<String> = []
         while true {
-            let page = try await send(URLRequest(url: baseURL.appending(path: "kilns").appending(queryItems: query)), as: KilnList.self)
+            let page = try await send(URLRequest(url: baseURL.appending(path: path).appending(queryItems: query)), as: KilnList.self, authorized: authorized)
             result.append(contentsOf: page.kilns)
             guard let cursor = page.nextCursor else { return result }
             guard !cursor.isEmpty, !page.kilns.isEmpty, seen.insert(cursor).inserted else { throw .invalidPagination }
@@ -83,13 +118,18 @@ public struct KilnWatchAPI: Sendable {
         _ = try await perform(request, body: jpeg)
     }
 
-    private func send<T: Decodable>(_ request: URLRequest, as type: T.Type) async throws(APIError) -> T {
+    private func send<T: Decodable>(_ request: URLRequest, as type: T.Type, authorized: Bool = true) async throws(APIError) -> T {
         var request = request
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        do {
-            request.setValue("Bearer \(try await token())", forHTTPHeaderField: "Authorization")
-        } catch {
-            throw .token(error)
+        if authorized {
+            do {
+                request.setValue("Bearer \(try await token())", forHTTPHeaderField: "Authorization")
+            } catch {
+                throw .token(error)
+            }
+        } else {
+            request.setValue(nil, forHTTPHeaderField: "Authorization")
+            request.cachePolicy = .reloadIgnoringLocalCacheData
         }
         let data = try await perform(request, body: nil)
         do {

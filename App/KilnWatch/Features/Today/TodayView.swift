@@ -8,7 +8,10 @@ struct TodayView: View {
     var body: some View {
         @Bindable var model = model
         NavigationStack(path: $model.todayPath) {
-            RouteMap(zoom: zoom)
+            Group {
+                if model.usesPublicRegistry { PublicRegistryMap(zoom: zoom) }
+                else { RouteMap(zoom: zoom) }
+            }
                 .toolbarVisibility(.hidden, for: .navigationBar)
                 .navigationDestination(for: String.self) { id in
                     KilnView(id: id).navigationTransition(.zoom(sourceID: id, in: zoom))
@@ -142,11 +145,9 @@ private struct RouteMap: View {
             if let route = model.route, (route.legs ?? []).allSatisfy({ $0.geometry?.validatedCoordinates.isEmpty != false }) {
                 QuietBanner(text: "Road geometry unavailable · stops still usable", systemImage: "map")
             }
-            #if DEBUG
             if model.isSample || model.demo == .offline || model.demo == .saved {
                 QuietBanner(text: "Sample data · illustrative routing", systemImage: nil)
             }
-            #endif
         }
         .padding(.horizontal, Space.margin)
     }
@@ -294,11 +295,9 @@ private struct RouteListSheet: View {
                 } footer: {
                     Text("Opens the remaining stops in plan order. Offline navigation depends on Maps and any downloaded region.")
                 }
-                #if DEBUG
                 if model.isSample || model.demo == .offline || model.demo == .saved {
                     Text("Sample access points and linework are illustrative. Confirm entrances on site.").font(.footnote).foregroundStyle(.inkSecondary)
                 }
-                #endif
             }
             .navigationTitle("Route · \(model.stops.count) stops").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close", systemImage: "xmark", role: .close) { dismiss() } } }
@@ -306,4 +305,4 @@ private struct RouteListSheet: View {
     }
 }
 
-#Preview { TodayView().environment(AppModel()) }
+#Preview { TodayView().environment(AppModel(useFixtures: true)) }

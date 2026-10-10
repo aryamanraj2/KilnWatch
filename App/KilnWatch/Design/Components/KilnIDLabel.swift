@@ -6,6 +6,8 @@ struct KilnIDLabel: View {
     let kiln: Kiln
     var showsType = true
     var idFont: Font = .headline
+    var predictionOnly = false
+    var abbreviatesID = false
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
@@ -17,7 +19,7 @@ struct KilnIDLabel: View {
     }
 
     @ViewBuilder private var content: some View {
-        Text(kiln.kilnId)
+        Text(abbreviatesID && kiln.kilnId.count > 18 ? "\(kiln.kilnId.prefix(9))…\(kiln.kilnId.suffix(6))" : kiln.kilnId)
             .font(idFont.monospaced())
             .foregroundStyle(.ink)
         if showsType {
@@ -28,12 +30,14 @@ struct KilnIDLabel: View {
     }
 
     private var typeLine: String {
+        if predictionOnly { return "Predicted \(kiln.type.rawValue) · unverified" }
         let confidence = kiln.typeConfidence.formatted(.number.precision(.fractionLength(2)))
         return "\(kiln.typeIsCertain ? "" : "likely ")\(kiln.type.rawValue) · \(confidence)"
     }
 
     private var accessibilityText: String {
         guard showsType else { return "Kiln \(kiln.kilnId)" }
+        if predictionOnly { return "Kiln \(kiln.kilnId), predicted \(kiln.type.rawValue), unverified" }
         return "Kiln \(kiln.kilnId), \(kiln.typeIsCertain ? "" : "likely ")\(kiln.type.rawValue), confidence \(kiln.typeConfidence.formatted(.percent))"
     }
 }

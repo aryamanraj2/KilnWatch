@@ -22,6 +22,24 @@ enum AppTab: String, Hashable { case today, kilns, ask }
 /// `-verdictChoice confirmed`, `-autoplay carousel|hold`.
 enum DemoState: String { case live, loading, empty, offline, failure, noCache, corruptCache, saved, missingGeometry }
 
+enum RegistryState {
+    case loading, loaded, empty, offline, busy(retrying: Bool), unavailable, notFound, failure, interrupted
+
+    var message: String {
+        switch self {
+        case .loading: "Loading satellite records"
+        case .loaded: ""
+        case .empty: "No flagged kilns"
+        case .offline: "You're offline"
+        case .busy: "Busy, retrying"
+        case .unavailable: "KilnWatch data is temporarily unavailable"
+        case .notFound: "Kiln not found"
+        case .failure: "The records could not be loaded"
+        case .interrupted: "Loading interrupted"
+        }
+    }
+}
+
 enum TodayRouteState {
     case loading
     case loaded(Route, sample: Bool, warning: String?)
@@ -54,6 +72,16 @@ final class AppModel {
     var signedIn: Bool
     var tab: AppTab
     let demo: DemoState
+    let district: String
+    let usesPublicRegistry: Bool
+    let isPublicDemo: Bool
+    private let publicAPI: KilnWatchAPI?
+    private(set) var registryState: RegistryState = .loading
+    private(set) var registryRefreshing = false
+    private var didLoadRegistry = false
+    private(set) var detailStates: [String: RegistryState] = [:]
+    private var detailRecords: [String: Kiln] = [:]
+    private var detailRefreshing: Set<String> = []
     private(set) var kilns: [String: Kiln]
     private var verdictOverrides: [String: KilnStatus] = [:]
     private(set) var routeState: TodayRouteState = .loading
@@ -78,21 +106,41 @@ final class AppModel {
         if case .saved(_, offline: true) = routeState { return true }
         return false
     }
-    var isLoading: Bool { if case .loading = routeState { return true }; return false }
+    var isLoading: Bool {
+        if usesPublicRegistry { if case .loading = registryState { return true }; return false }
+        if case .loading = routeState { return true }; return false
+    }
     var hasRoute: Bool { !stops.isEmpty }
     var isSample: Bool { if case .loaded(_, sample: true, _) = routeState { return true }; return false }
     var allKilns: [Kiln] { kilns.values.sorted { $0.kilnId < $1.kilnId } }
 
-    init(api: KilnWatchAPI? = nil) {
+    init(api: KilnWatchAPI? = nil, useFixtures: Bool = false) {
         let environment = ProcessInfo.processInfo.environment
+        district = (Bundle.main.object(forInfoDictionaryKey: "KilnWatchDistrict") as? String).flatMap { $0.isEmpty ? nil : $0 } ?? "Hapur"
+        var configuredPublic: KilnWatchAPI?
+        if !useFixtures && !DemoOptions.bool("fixtures"),
+           let address = Bundle.main.object(forInfoDictionaryKey: "KilnWatchPublicAPIURL") as? String,
+           let url = URL(string: address), url.scheme == "https", let host = url.host, !host.isEmpty {
+            configuredPublic = KilnWatchAPI(baseURL: url, session: KilnWatchAPI.publicReadSession())
+        }
+        #if DEBUG
+        if !useFixtures, let scenario = DemoOptions.string("publicDemo") {
+            configuredPublic = PublicDemo.api(scenario: scenario)
+            isPublicDemo = true
+        } else { isPublicDemo = false }
+        #else
+        isPublicDemo = false
+        #endif
+        publicAPI = configuredPublic
+        usesPublicRegistry = configuredPublic != nil
         if let api { self.api = api }
         else if let address = environment["KILNWATCH_API_URL"], let url = URL(string: address),
                 url.scheme == "https", let host = url.host, !host.hasSuffix(".example"),
                 let token = environment["KILNWATCH_API_TOKEN"], !token.isEmpty {
             self.api = KilnWatchAPI(baseURL: url, token: { token })
         } else { self.api = nil }
-        kilns = self.api == nil ? Dictionary(Fixtures.kilns.map { ($0.kilnId, $0) }, uniquingKeysWith: { _, new in new }) : [:]
-        signedIn = DemoOptions.bool("signedIn")
+        kilns = configuredPublic == nil && self.api == nil ? Dictionary(Fixtures.kilns.map { ($0.kilnId, $0) }, uniquingKeysWith: { _, new in new }) : [:]
+        signedIn = usesPublicRegistry || DemoOptions.bool("signedIn")
         tab = AppTab(rawValue: DemoOptions.string("tab") ?? "") ?? .today
         demo = DemoState(rawValue: DemoOptions.string("demo") ?? "") ?? .live
         cache = demo == .live ? RouteCache() : RouteCache(directory: URL.kilnWatchStore.appending(path: "DebugRouteCache"))
@@ -100,18 +148,83 @@ final class AppModel {
         shownRule = DemoOptions.string("rule").map(Rule.named)
     }
 
-    func kiln(_ id: String) -> Kiln? { kilns[id] }
+    func kiln(_ id: String) -> Kiln? { detailRecords[id] ?? kilns[id] }
     func usesIllustrativeEvidence(for kiln: Kiln) -> Bool {
-        api == nil && Fixtures.kilns.contains(kiln)
+        !usesPublicRegistry && api == nil && Fixtures.kilns.contains(kiln)
     }
     func status(for kiln: Kiln) -> KilnStatus { verdictOverrides[kiln.kilnId] ?? kiln.status }
     func stopNumber(for id: String) -> Int? { stops.first { $0.kilnId == id }?.order }
     func recordVerdict(_ status: KilnStatus, for id: String) {
-        guard kilns[id] != nil else { return }
+        guard !usesPublicRegistry, kilns[id] != nil else { return }
         verdictOverrides[id] = status // Mock presentation only; wire record remains immutable.
     }
 
+    var dataSourceLabel: String { usesPublicRegistry && !isPublicDemo ? "Live data" : "Sample data" }
+    func isRefreshingDetail(_ id: String) -> Bool { detailRefreshing.contains(id) }
+
+    func loadData() async {
+        if usesPublicRegistry { await loadRegistry() }
+        else { await loadRoute() }
+    }
+
+    func loadRegistry(force: Bool = false) async {
+        guard let publicAPI, !registryRefreshing, force || !didLoadRegistry else { return }
+        registryRefreshing = true
+        registryState = .loading
+        // No saved registry: every failed refresh has an honest state instead of stale counts.
+        kilns = [:]
+        defer { registryRefreshing = false }
+        #if DEBUG
+        if DemoOptions.string("publicDemo") == "loading" { return }
+        #endif
+        guard let result = await publicRead(state: { registryState = $0 }, operation: { () async throws(APIError) -> [Kiln] in
+            try await publicAPI.publicKilns(district: district)
+        }) else { return }
+        kilns = Dictionary(result.map { ($0.kilnId, $0) }, uniquingKeysWith: { _, new in new })
+        registryState = result.isEmpty ? .empty : .loaded
+        didLoadRegistry = true
+    }
+
+    func loadDetail(_ id: String, force: Bool = false) async {
+        guard let publicAPI, !detailRefreshing.contains(id) else { return }
+        if !force, case .loaded = detailStates[id] { return }
+        detailRefreshing.insert(id)
+        detailStates[id] = .loading
+        defer { detailRefreshing.remove(id) }
+        guard let record = await publicRead(state: { detailStates[id] = $0 }, operation: { () async throws(APIError) -> Kiln in
+            try await publicAPI.publicKiln(id: id)
+        }) else { return }
+        guard record.kilnId == id else { detailStates[id] = .failure; return }
+        detailRecords[id] = record
+        detailStates[id] = .loaded
+    }
+
+    /// One bounded automatic backoff for throttling; view tasks own cancellation.
+    private func publicRead<T>(state: (RegistryState) -> Void, operation: () async throws(APIError) -> T) async -> T? {
+        for attempt in 0...1 {
+            do {
+                let result = try await operation()
+                guard !Task.isCancelled else { state(.interrupted); return nil }
+                return result
+            } catch {
+                guard !Task.isCancelled else { state(.interrupted); return nil }
+                switch error {
+                case .status(429, _) where attempt == 0:
+                    state(.busy(retrying: true))
+                    do { try await Task.sleep(for: .seconds(2)) } catch { state(.interrupted); return nil }
+                case .status(429, _): state(.busy(retrying: false)); return nil
+                case .status(503, _): state(.unavailable); return nil
+                case .status(404, _): state(.notFound); return nil
+                case .transport: state(.offline); return nil
+                default: state(.failure); return nil
+                }
+            }
+        }
+        return nil
+    }
+
     func loadRoute(force: Bool = false) async {
+        guard !usesPublicRegistry else { return }
         guard !refreshing, force || !didLoadRoute else { return }
         refreshing = true
         defer { refreshing = false }
@@ -151,11 +264,7 @@ final class AppModel {
         } catch is CancellationError { return }
         catch { routeState = .failure("The saved route could not be read. Reconnect and retry.") }
         guard let api else {
-            #if DEBUG
             apply(.loaded(Fixtures.route, sample: true, warning: nil))
-            #else
-            if route == nil { apply(.failure("Route service is not configured. Contact your department.")) }
-            #endif
             didLoadRoute = true
             return
         }
@@ -212,6 +321,7 @@ final class AppModel {
         tab = .today; selectedStopId = stop.kilnId; todayPath = [stop.kilnId]
     }
     func planRouteInAsk() {
+        guard !usesPublicRegistry else { return }
         askDraft = "Plan today's inspection route. Leave the office at 9. Six hours. Schools first."
         tab = .ask
     }
@@ -263,10 +373,15 @@ private struct MainTabs: View {
         TabView(selection: $model.tab) {
             Tab("Today", systemImage: "map", value: AppTab.today) { TodayView() }
             Tab("Kilns", systemImage: "list.bullet", value: AppTab.kilns) { KilnsView() }
-            Tab("Ask", systemImage: "text.bubble", value: AppTab.ask) { AskView() }
+            Tab("Ask", systemImage: "text.bubble", value: AppTab.ask) {
+                if model.usesPublicRegistry {
+                    ContentUnavailableView("Ask is coming soon", systemImage: "text.bubble", description: Text("Registry answers and route planning will be available in a later update."))
+                        .background(.canvas)
+                } else { AskView() }
+            }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
-        .task { await model.loadRoute() }
+        .task { await model.loadData() }
         .tabViewBottomAccessory(isEnabled: model.routeActive && model.currentStop != nil) { RouteAccessory() }
     }
 }

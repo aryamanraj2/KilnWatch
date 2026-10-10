@@ -374,3 +374,35 @@ the ID is unknown or the kiln is not flagged. A malformed ID or any query is 400
   reserved concurrency.
 - CORS is still the placeholder origin; the portal step sets the real `frontend_origin`.
 
+
+## Phase 3 iOS public configuration and presentation (2026-10-10)
+
+The app target's Debug and Release configurations use `App/Config/Base.xcconfig`,
+which optionally includes the ignored `Public.xcconfig`. Copy
+`Public.xcconfig.example` locally and set the public deployment URL using the
+xcconfig `https:/$()/` spelling (a literal double slash starts a comment).
+`PublicInfo.plist` supplies custom keys merged into the generated Info.plist:
+`KilnWatchPublicAPIURL` and `KilnWatchDistrict`. The default district is Hapur.
+Do not publish the local deployment configuration or its expanded build settings.
+
+A configured public URL takes priority over the inspector route/demo flow and
+requires no sign-in. The existing protected `KILNWATCH_API_URL` / token environment
+path is preserved. An empty or missing public configuration uses the existing
+fixtures, labelled Sample data. A live error never substitutes fixtures. The
+public list follows district pages with cursor protection; detail loads on demand.
+Both public methods omit Authorization and do not call the token provider.
+
+Public reads use a dedicated ephemeral session with URLCache, cookie and
+credential storage disabled; public requests bypass local caches. No kiln disk
+cache is added. Loading, authoritative empty, transport/offline,
+429 and 503 have explicit retry states. A 429 receives one automatic two-second
+backoff, then requires manual retry. Detail 404 is not found. Today shows the
+public candidate footprints/pins and says route planning is unavailable.
+
+Unverified predictions are labelled as predictions, with model score explained
+as shape matching rather than an accuracy or a rule check. Missing rules,
+exposure and evidence retain explicit unknown/unpublished copy. Public records
+have no mock imagery, inspection actions, route, or assumed siting buffer.
+Published before/after PNGs use integer device-pixel magnification and no image
+interpolation, with acquisition metadata, attribution and supplied pixel
+footprints. Live evidence delivery remains unverified until publication.
