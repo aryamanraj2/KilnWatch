@@ -100,6 +100,10 @@ final class AppModel {
     var isAskTest: Bool { DemoOptions.string("askDemo") != nil }
     var shownRule: RuleReference?
     let maps = MapsHandoff()
+    /// Live public mode only. Plans on an explicit tap, never on launch, tab switch or foreground.
+    let planner: RoutePlanner?
+    /// Browsing every flagged kiln while keeping the saved plan.
+    var showAllKilns = false
     private let api: KilnWatchAPI?
     private let cache: RouteCache
     private var didLoadRoute = false
@@ -130,7 +134,7 @@ final class AppModel {
             configuredPublic = KilnWatchAPI(baseURL: url, session: KilnWatchAPI.publicReadSession())
         }
         #if DEBUG
-        if !useFixtures, let scenario = DemoOptions.string("publicDemo") ?? (DemoOptions.string("askDemo") != nil || DemoOptions.string("rulesDemo") != nil ? "loaded" : nil) {
+        if !useFixtures, let scenario = DemoOptions.string("publicDemo") ?? (DemoOptions.string("askDemo") != nil || DemoOptions.string("rulesDemo") != nil || DemoOptions.string("planDemo") != nil ? "loaded" : nil) {
             configuredPublic = PublicDemo.api(scenario: scenario)
             isPublicDemo = true
         } else { isPublicDemo = false }
@@ -151,12 +155,20 @@ final class AppModel {
         signedIn = usesPublicRegistry || DemoOptions.bool("signedIn")
         tab = AppTab(rawValue: DemoOptions.string("tab") ?? "") ?? .today
         demo = DemoState(rawValue: DemoOptions.string("demo") ?? "") ?? .live
-        cache = demo == .live ? RouteCache() : RouteCache(directory: URL.kilnWatchStore.appending(path: "DebugRouteCache"))
+        // Public plans never share a file with the signed-in route; test plans never touch the live saved plan.
+        let routeCache = usesPublicRegistry ? RouteCache(directory: URL.kilnWatchStore.appending(path: isPublicDemo ? "DebugPublicPlan" : "PublicPlan"))
+            : demo == .live ? RouteCache() : RouteCache(directory: URL.kilnWatchStore.appending(path: "DebugRouteCache"))
+        cache = routeCache
+        #if DEBUG
+        if isPublicDemo && DemoOptions.bool("resetPlan") { try? routeCache.clear() } // Test plans only; never the live saved plan.
+        #endif
+        let planDistrict = district
+        planner = configuredPublic.map { RoutePlanner(api: $0, district: planDistrict, cache: routeCache) }
         if let id = DemoOptions.string("open") { open(kiln: id) }
         shownRule = DemoOptions.string("rule").map(RuleReference.catalog)
     }
 
-    func kiln(_ id: String) -> Kiln? { detailRecords[id] ?? kilns[id] }
+    func kiln(_ id: String) -> Kiln? { detailRecords[id] ?? kilns[id] ?? route?.kilns.first { $0.kilnId == id } }
     func usesIllustrativeEvidence(for kiln: Kiln) -> Bool {
         !usesPublicRegistry && api == nil && Fixtures.kilns.contains(kiln)
     }
@@ -171,14 +183,44 @@ final class AppModel {
     func isRefreshingDetail(_ id: String) -> Bool { detailRefreshing.contains(id) }
 
     func loadData() async {
-        if usesPublicRegistry { await loadRegistry() }
+        if usesPublicRegistry { await loadSavedPlan(); await loadRegistry() }
         else { await loadRoute() }
+    }
+
+    /// Disk only: launch shows the saved plan, if any, and never sends a plan request.
+    private func loadSavedPlan() async {
+        guard !didLoadRoute else { return }
+        didLoadRoute = true
+        do {
+            if let saved = try await RouteRefresh.saved(in: cache), !saved.stops.isEmpty { apply(.saved(saved, offline: false)) }
+            else { routeState = .empty }
+        } catch { routeState = .failure("The saved plan could not be read. Plan again to replace it.") }
+    }
+
+    /// One user-initiated plan. A failure keeps whatever plan is showing.
+    func planRoute() {
+        guard let planner, planner.canPlan() else { return }
+        Task {
+            if let result = await planner.plan() {
+                showAllKilns = false
+                apply(.loaded(result.route, sample: false, warning: result.cacheWarning))
+            } else if case .transport? = planner.failure, let route {
+                apply(.saved(route, offline: true))
+            }
+        }
+    }
+
+    private func syncSavedPlanConnectivity() {
+        guard usesPublicRegistry, case .saved(let route, let offline) = routeState else { return }
+        let registryOffline = if case .offline = registryState { true } else { false }
+        if registryOffline != offline { routeState = .saved(route, offline: registryOffline) }
     }
 
     func loadRegistry(force: Bool = false) async {
         guard let publicAPI, !registryRefreshing, force || !didLoadRegistry else { return }
         registryRefreshing = true
         registryState = .loading
+        defer { syncSavedPlanConnectivity() }
         // No saved registry: every failed refresh has an honest state instead of stale counts.
         kilns = [:]
         defer { registryRefreshing = false }
@@ -295,7 +337,8 @@ final class AppModel {
         routeState = state
         let available = stops
         if let route {
-            for kiln in route.kilns { kilns[kiln.kilnId] = kiln }
+            // Public plans read their own embedded records; the registry list stays the registry.
+            if !usesPublicRegistry { for kiln in route.kilns { kilns[kiln.kilnId] = kiln } }
             if let previous, previous.routeId != route.routeId || previous.generatedAt != route.generatedAt {
                 routeActive = false; currentStopId = nil
             }
@@ -405,10 +448,12 @@ private struct RouteAccessory: View {
             Button { model.openCurrentStop() } label: {
                 HStack(spacing: Space.xs) {
                     Image(systemName: "car.fill").foregroundStyle(.clay).accessibilityHidden(true)
+                    // Full registry IDs never truncate, so a long ID stays in the spoken label and the stop.
+                    let shortID = stop.kilnId.count <= 12 ? stop.kilnId : nil
                     if placement == .inline || typeSize > .large {
-                        Text("\(stop.kilnId) · \(model.timing(for: stop))").monospacedDigit()
+                        Text("\(shortID ?? "Stop \(stop.order)") · Est. \(Route.clock(stop.eta))").monospacedDigit()
                     } else {
-                        Text("Stop \(stop.order) of \(model.stops.count) · \(stop.kilnId) · \(model.timing(for: stop))")
+                        Text("Stop \(stop.order) of \(model.stops.count) · \(shortID.map { "\($0) · " } ?? "")\(model.arrival(for: stop, compact: true))")
                     }
                 }
                 .font(.subheadline.weight(.semibold))
@@ -419,7 +464,7 @@ private struct RouteAccessory: View {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Current stop \(stop.order) of \(model.stops.count), \(stop.kilnId), \(model.timing(for: stop))")
+            .accessibilityLabel("Current stop \(stop.order) of \(model.stops.count), \(stop.kilnId), \(model.arrival(for: stop, compact: false))")
             .accessibilityHint("Opens the kiln")
         }
     }

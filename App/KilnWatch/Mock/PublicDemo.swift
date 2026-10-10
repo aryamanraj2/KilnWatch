@@ -6,6 +6,7 @@ import Synchronization
 /// Isolated synthetic HTTP responses. Never used to replace a failed live response.
 /// -publicDemo loading|loaded|empty|offline|429|429Recovery|503
 /// -publicDetail offline|503|404|429|slow|recovery affects detail only.
+/// -planDemo recorded|noLegs|slow|cap|throttle|unavailable|unavailableFinal|noKilns|invalid|malformed|offline answers POST /routes/plan.
 enum PublicDemo {
     private struct Configuration: Sendable {
         let scenario: String
@@ -13,6 +14,7 @@ enum PublicDemo {
         let list: Data
         let records: [String: Data]
         let askScenario: String?
+        let planScenario: String?
         var askCalls = 0
         var listCalls = 0
         var detailCalls = 0
@@ -21,7 +23,7 @@ enum PublicDemo {
 
     static func api(scenario: String) -> KilnWatchAPI {
         let host = "\(UUID().uuidString.lowercased()).example"
-        let records: [[String: Any]] = DemoOptions.string("rulesDemo").map(R1Demo.records) ?? Fixtures.kilns.compactMap { kiln in
+        let records: [[String: Any]] = DemoOptions.string("planDemo").map { _ in PlanDemo.kilns } ?? DemoOptions.string("rulesDemo").map(R1Demo.records) ?? Fixtures.kilns.compactMap { kiln in
             guard let data = try? JSONEncoder.kilnWatch.encode(kiln),
                   var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
             if DemoOptions.string("askDemo") != nil, kiln.kilnId == "KW-0412" { object["kiln_id"] = "KW-00000000000000000000000000000001" }
@@ -35,7 +37,7 @@ enum PublicDemo {
         }
         let details = Dictionary(uniqueKeysWithValues: records.map { ($0["kiln_id"] as! String, (try? JSONSerialization.data(withJSONObject: $0)) ?? Data()) })
         let list = (try? JSONSerialization.data(withJSONObject: ["kilns": records, "next_cursor": NSNull()])) ?? Data()
-        let config = Configuration(scenario: scenario, detail: DemoOptions.string("publicDetail"), list: list, records: details, askScenario: DemoOptions.string("askDemo"))
+        let config = Configuration(scenario: scenario, detail: DemoOptions.string("publicDetail"), list: list, records: details, askScenario: DemoOptions.string("askDemo"), planScenario: DemoOptions.string("planDemo"))
         configurations.withLock { $0[host] = config }
         let session = URLSessionConfiguration.ephemeral
         session.protocolClasses = [PublicDemoProtocol.self]
@@ -49,6 +51,7 @@ enum PublicDemo {
                 config.askCalls += 1; configs[host] = config
                 return AskDemo.response(scenario: config.askScenario ?? "unavailable", call: config.askCalls)
             }
+            if request.url?.path == "/routes/plan" { return PlanDemo.response(scenario: config.planScenario ?? "unavailable") }
             let isDetail = request.url?.path != "/public/kilns"
             if isDetail { config.detailCalls += 1 } else { config.listCalls += 1 }
             configs[host] = config
@@ -74,6 +77,7 @@ enum PublicDemo {
         configurations.withLock { configs in
             guard let host = request.url?.host else { return false }
             if request.url?.path == "/ask" { return configs[host]?.askScenario == "waiting" }
+            if request.url?.path == "/routes/plan" { return configs[host]?.planScenario == "slow" }
             return request.url?.path != "/public/kilns" && configs[host]?.detail == "slow"
         }
     }
@@ -89,7 +93,7 @@ private final class PublicDemoProtocol: URLProtocol, @unchecked Sendable {
     override func startLoading() {
         let (code, body) = PublicDemo.response(for: request)
         if PublicDemo.isSlowDetail(request) {
-            DispatchQueue.global().asyncAfter(deadline: .now() + (request.url?.path == "/ask" ? 20 : 2)) { [weak self] in self?.deliver(code: code, body: body) }
+            DispatchQueue.global().asyncAfter(deadline: .now() + (request.url?.path == "/ask" ? 20 : request.url?.path == "/routes/plan" ? 4 : 2)) { [weak self] in self?.deliver(code: code, body: body) }
         } else { deliver(code: code, body: body) }
     }
 

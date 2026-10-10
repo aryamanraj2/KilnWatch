@@ -76,7 +76,7 @@ public struct AskServiceError: Codable, Sendable, Equatable {
     public let message: String
     public let retryable: Bool
 }
-private struct AskErrorEnvelope: Decodable { let error: AskServiceError }
+struct AskErrorEnvelope: Decodable { let error: AskServiceError }
 
 public enum AskInputError: Sendable, Equatable { case question, kiln, coordinates, bodySize }
 public enum AskError: Error, Sendable, Equatable {

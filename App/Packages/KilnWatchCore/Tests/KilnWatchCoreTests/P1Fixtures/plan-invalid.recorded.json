@@ -1,0 +1,7 @@
+{
+ "error": {
+  "code": "invalid_request",
+  "message": "Recorded message replaced during sanitization",
+  "retryable": false
+ }
+}

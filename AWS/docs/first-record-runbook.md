@@ -115,6 +115,9 @@ training tile or fabricate a date. `--index` chooses one sorted observation.
 The preparer refuses out-of-bounds, >1% nodata, different CRS/grid, inconsistent
 RGB band grid, missing radiometry or a historical timestamp not earlier than after.
 Before has no observed historical outline. Attribution is in the manifest.
+For every observation at once (E1), `AWS/scripts/prepare_all_evidence.py` takes the same
+arguments without `--index`, runs the preparer per index and writes one merged manifest; refused
+kilns are listed with the reason, never patched.
 
 Export creation/import times change on repeat; raw checksums may therefore change.
 IDs remain stable for identical scene/model/canonical footprint, including feature
@@ -364,6 +367,8 @@ CloudFront OAC signs requests to private S3; its bucket policy allows only
 Upload helper uses conditional writes with content-hashed keys; retries verify old
 bytes. HTTPS verification checks image content type and object SHA, creating a
 receipt. Before that proof the importer produces null URL fields, never placeholders.
+For the merged manifest (E1), upload every PNG it lists to `imports/<run>/evidence/` and fetch
+each by exact key on the runner; the receipt then covers all objects.
 On the runner, download the receipt and repeat the import with
 `--publication-receipt input/publication-receipt.json`. IDs/human state stay intact;
 metadata gains only verified distribution URLs. Verify requests for existing

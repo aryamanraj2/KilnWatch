@@ -9,7 +9,7 @@ struct TodayView: View {
         @Bindable var model = model
         NavigationStack(path: $model.todayPath) {
             Group {
-                if model.usesPublicRegistry { PublicRegistryMap(zoom: zoom) }
+                if model.usesPublicRegistry && (model.route == nil || model.showAllKilns) { PublicRegistryMap(zoom: zoom) }
                 else { RouteMap(zoom: zoom) }
             }
                 .toolbarVisibility(.hidden, for: .navigationBar)
@@ -68,8 +68,11 @@ private struct RouteMap: View {
         }
         .onChange(of: model.route, initial: true) { _, route in
             guard let route, fittedRoute != route else { return }
+            let appearing = fittedRoute == nil
             fittedRoute = route
             camera = model.overview
+            // ponytail: appearing with a plan already loaded fits before the map and carousel insets settle; refit once after layout.
+            if appearing { Task { try? await Task.sleep(for: .milliseconds(400)); if fittedRoute == route { moveCamera(model.overview) } } }
             #if DEBUG
             if DemoOptions.string("selected") != nil { fly(to: model.selectedStopId) }
             #endif
@@ -112,10 +115,11 @@ private struct RouteMap: View {
             GlassEffectContainer(spacing: Space.xs) {
                 HStack(alignment: .top, spacing: Space.xs) {
                     VStack(alignment: .leading, spacing: Space.xxs) {
-                        Text(model.route.map { "Today · \($0.district)" } ?? "Today").font(.headline)
+                        Text(model.routeTitle).font(.headline)
                         Text(model.routeSummary).font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
-                            .redacted(reason: model.isLoading ? .placeholder : [])
+                            .redacted(reason: model.route == nil && model.isLoading ? .placeholder : [])
+                        if model.usesPublicRegistry { Text("Visited in road order").font(.footnote).foregroundStyle(.secondary) }
                     }
                     .padding(.horizontal, Space.m).padding(.vertical, Space.s)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -123,6 +127,10 @@ private struct RouteMap: View {
                     .accessibilityElement(children: .combine).accessibilityAddTraits(.isHeader)
                     VStack(spacing: Space.xs) {
                         Button("Route list", systemImage: "list.number") { showList = true }.disabled(!model.hasRoute)
+                        if model.usesPublicRegistry {
+                            Button("All flagged kilns", systemImage: "flag") { model.showAllKilns = true }
+                                .accessibilityHint("Shows every flagged kiln. The saved plan is kept.")
+                        }
                         Button(imagery ? "Standard map" : "Satellite imagery", systemImage: imagery ? "map" : "globe.asia.australia") { imagery.toggle() }
                             .sensoryFeedback(.selection, trigger: imagery)
                         Button("My location", systemImage: "location") {
@@ -135,7 +143,7 @@ private struct RouteMap: View {
             }
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             if model.isOffline { QuietBanner(text: "Offline · showing saved route", systemImage: "wifi.slash") }
-            else if case .saved = model.routeState { QuietBanner(text: "Saved route · awaiting refresh", systemImage: "clock") }
+            else if case .saved = model.routeState, !model.usesPublicRegistry { QuietBanner(text: "Saved route · awaiting refresh", systemImage: "clock") }
             if let date = model.savedDate { QuietBanner(text: date, systemImage: nil) }
             if let notice = location.notice { QuietBanner(text: notice, systemImage: "location") }
             if case .loaded(_, _, let warning?) = model.routeState { QuietBanner(text: warning, systemImage: "exclamationmark.circle") }
@@ -148,6 +156,8 @@ private struct RouteMap: View {
             if model.isSample || model.demo == .offline || model.demo == .saved {
                 QuietBanner(text: "Sample data · illustrative routing", systemImage: nil)
             }
+            if model.isPublicDemo { QuietBanner(text: "Sample data · recorded test plan", systemImage: nil) }
+            if let message = model.planner?.failureMessage { QuietBanner(text: message, systemImage: "exclamationmark.circle") }
         }
         .padding(.horizontal, Space.margin)
     }
@@ -168,7 +178,7 @@ private struct RouteMap: View {
                                 .buttonStyle(.secondary)
                                 .accessibilityLabel("Navigate to \(stop.kilnId)")
                             }
-                            .containerRelativeFrame(.horizontal) { width, _ in max(0, width - Space.margin * 3) }
+                            .containerRelativeFrame(.horizontal) { width, _ in max(0, width - Space.margin) }
                             .id(stop.kilnId)
                         }
                     }
@@ -232,15 +242,39 @@ private struct StopCard: View {
         VStack(alignment: .leading, spacing: Space.xs) {
             HStack(alignment: .firstTextBaseline, spacing: Space.xs) {
                 Text(stop.order, format: .number).font(.subheadline.weight(.semibold).monospacedDigit()).foregroundStyle(.inkSecondary)
-                KilnIDLabel(kiln: kiln)
+                KilnIDLabel(kiln: kiln, idFont: model.usesPublicRegistry ? .footnote.weight(.semibold) : .headline, predictionOnly: model.usesPublicRegistry)
             }
-            if let top = kiln.violations.first(where: { stop.sheet.rulesFlagged.contains($0.ruleId) }) {
-                Text(top.factLine(for: kiln)).font(.subheadline).foregroundStyle(.ink).fixedSize(horizontal: false, vertical: true)
-            }
-            Text("\(stop.sheet.peopleExposed.grouped) people within 800 m").font(.subheadline.monospacedDigit()).foregroundStyle(.inkSecondary)
-            Text(model.route?.driveSeconds(for: stop.kilnId) == nil ? model.timing(for: stop) : "ETA \(model.time(stop.eta)) · \(model.timing(for: stop))").font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
+            StopSheetSummary(stop: stop, kiln: kiln)
+            Text(model.arrival(for: stop, compact: true)).font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
+                .accessibilityLabel(model.arrival(for: stop, compact: false))
         }
         .card(floating: true).accessibilityElement(children: .combine).accessibilityHint("Opens the kiln and its inspection sheet")
+    }
+}
+
+/// The plan's inspection sheet for one stop: status, flags measured against thresholds, modelled people and on-site checks.
+private struct StopSheetSummary: View {
+    let stop: Stop
+    let kiln: Kiln
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        StatusBadge(status: model.status(for: kiln), detailed: model.usesPublicRegistry)
+        if stop.sheet.rulesFlagged.isEmpty {
+            Text("No rule flags measured").font(.subheadline).foregroundStyle(.inkSecondary)
+            if let note = kiln.assessmentNote { Text(note).font(.footnote).foregroundStyle(.inkSecondary).fixedSize(horizontal: false, vertical: true) }
+        } else {
+            ForEach(stop.sheet.rulesFlagged, id: \.self) { rule in
+                let line = kiln.violations.first { $0.ruleId == rule }.map { $0.compactLine(for: kiln) } ?? "Measurement unavailable"
+                Text("\(Text(rule).monospaced()) · \(line)").font(.subheadline.monospacedDigit()).foregroundStyle(.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        Text("\(stop.sheet.peopleExposed.grouped) people within 800 m\(model.usesPublicRegistry ? " · modelled" : "")")
+            .font(.subheadline.monospacedDigit()).foregroundStyle(.inkSecondary)
+        if !stop.sheet.onSiteChecks.isEmpty {
+            Text("Check on site: \(stop.sheet.onSiteChecks.joined(separator: " · "))").font(.footnote).foregroundStyle(.inkSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }
 
@@ -274,11 +308,10 @@ private struct RouteListSheet: View {
                                     let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .firstTextBaseline))
                                     layout {
                                         Text(stop.order, format: .number).font(.body.weight(.semibold).monospacedDigit()).foregroundStyle(.inkSecondary)
-                                        KilnIDLabel(kiln: kiln)
+                                        KilnIDLabel(kiln: kiln, idFont: model.usesPublicRegistry ? .footnote.weight(.semibold) : .headline, predictionOnly: model.usesPublicRegistry)
                                     }
-                                    Text(model.route?.driveSeconds(for: stop.kilnId) == nil ? model.timing(for: stop) : "ETA \(model.time(stop.eta)) · \(model.timing(for: stop))").font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
-                                    Text("\(stop.sheet.peopleExposed.grouped) people · \(stop.sheet.rulesFlagged.joined(separator: ", "))").font(.subheadline).foregroundStyle(.ink)
-                                    Text(stop.sheet.onSiteChecks.joined(separator: " · ")).font(.footnote).foregroundStyle(.inkSecondary)
+                                    Text(model.arrival(for: stop, compact: false)).font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
+                                    StopSheetSummary(stop: stop, kiln: kiln)
                                     if let note = stop.access?.note { Text(note).font(.footnote).foregroundStyle(.inkSecondary) }
                                     if stop.access?.coordinate.isValid != true { Text("No access point · Navigate will ask before using the kiln location").font(.footnote).foregroundStyle(.inkSecondary) }
                                 }.padding(.vertical, Space.xxs)
@@ -288,12 +321,38 @@ private struct RouteListSheet: View {
                             .accessibilityAddTraits(model.selectedStopId == stop.kilnId ? .isSelected : [])
                         }
                     }
-                } footer: { Text("Stop order and ETAs are supplied with the plan. Opening Maps does not complete an inspection.") }
+                } header: {
+                    Text("Visited in road order")
+                } footer: {
+                    Text(model.usesPublicRegistry
+                         ? "Stops were chosen by most people within 800 m, then ordered by driving time. Arrival times and totals are estimates. Opening Maps does not complete an inspection. \(Exposure.attribution)"
+                         : "Stop order is supplied with the plan. Arrival times are estimates. Opening Maps does not complete an inspection.")
+                }
+                if let notes = model.route?.notes, !notes.isEmpty {
+                    Section("Plan notes") {
+                        ForEach(Array(notes.enumerated()), id: \.offset) { _, note in Text(note).font(.subheadline).foregroundStyle(.ink) }
+                    }
+                }
                 Section {
                     Button("Open whole route in Maps", systemImage: "arrow.triangle.turn.up.right.diamond") { model.maps.wholeRoute(model: model) }
                         .disabled(!model.hasRoute)
                 } footer: {
                     Text("Opens the remaining stops in plan order. Offline navigation depends on Maps and any downloaded region.")
+                }
+                if let planner = model.planner {
+                    Section {
+                        Button { model.planRoute() } label: {
+                            if planner.isPlanning { Label { Text("Planning") } icon: { ProgressView() } }
+                            else { Label("Plan again", systemImage: "arrow.clockwise") }
+                        }
+                        .disabled(!planner.canPlan())
+                        .accessibilityHint("Sends one plan request. It counts toward a shared daily limit.")
+                        if let message = planner.failureMessage {
+                            Label(message, systemImage: "exclamationmark.circle").font(.subheadline).foregroundStyle(.ink)
+                        }
+                    } footer: {
+                        Text("A new plan replaces this one only if it succeeds.")
+                    }
                 }
                 if model.isSample || model.demo == .offline || model.demo == .saved {
                     Text("Sample access points and linework are illustrative. Confirm entrances on site.").font(.footnote).foregroundStyle(.inkSecondary)

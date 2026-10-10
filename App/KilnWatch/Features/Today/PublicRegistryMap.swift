@@ -2,7 +2,7 @@ import KilnWatchCore
 import MapKit
 import SwiftUI
 
-/// Public candidates have footprints and locations, but no route or inspection actions.
+/// Public candidates have footprints and locations. Planning a route is an explicit, cost-bearing tap.
 struct PublicRegistryMap: View {
     let zoom: Namespace.ID
     @Environment(AppModel.self) private var model
@@ -46,7 +46,7 @@ struct PublicRegistryMap: View {
                 .mapStyle(.standard(emphasis: .muted, pointsOfInterest: .excludingAll))
                 .mapControls { MapScaleView() }
                 .safeAreaInset(edge: .top) { header }
-                .safeAreaInset(edge: .bottom) { routeNotice }
+                .safeAreaInset(edge: .bottom) { planPanel }
                 .onChange(of: model.allKilns, initial: true) { _, records in fit(records) }
                 .accessibilityIdentifier("public-kiln-map")
             } else {
@@ -86,20 +86,38 @@ struct PublicRegistryMap: View {
         .padding(.horizontal, Space.margin)
     }
 
-    private var routeNotice: some View {
+    private var planPanel: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Space.xs) {
-                Label("Route planning isn't available yet", systemImage: "map")
-                    .font(.headline).foregroundStyle(.ink)
+            VStack(alignment: .leading, spacing: Space.s) {
+                StatusBadge(status: .flagged, detailed: true)
                 Text("Showing satellite-flagged kilns in \(model.district). Tap a pin to view its record.")
                     .font(.subheadline).foregroundStyle(.inkSecondary)
-                StatusBadge(status: .flagged, detailed: true)
+                if let message = model.planner?.failureMessage {
+                    Label(message, systemImage: "exclamationmark.circle").font(.subheadline).foregroundStyle(.ink)
+                } else if case .failure(let message) = model.routeState {
+                    Label(message, systemImage: "exclamationmark.circle").font(.subheadline).foregroundStyle(.ink)
+                }
+                if let route = model.route {
+                    Button("Show saved plan") { model.showAllKilns = false }.buttonStyle(.primary)
+                    Text("\(route.dayLabel()) · \(model.routeSummary)").font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
+                } else if let planner = model.planner {
+                    Button { model.planRoute() } label: {
+                        if planner.isPlanning {
+                            HStack(spacing: Space.xs) { ProgressView().tint(.canvas); Text("Planning route") }
+                        } else { Text(planner.failure?.canRetry == true ? "Try again" : "Plan tomorrow in \(model.district)") }
+                    }
+                    .buttonStyle(.primary)
+                    .disabled(!planner.canPlan())
+                    .accessibilityHint("Sends one plan request. It counts toward a shared daily limit.")
+                    Text("Up to 8 stops · most people within 800 m · visited in road order")
+                        .font(.footnote).foregroundStyle(.inkSecondary)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .scrollBounceBehavior(.basedOnSize)
         .fixedSize(horizontal: false, vertical: !typeSize.isAccessibilitySize)
-        .frame(maxHeight: typeSize.isAccessibilitySize ? 260 : nil)
+        .frame(maxHeight: typeSize.isAccessibilitySize ? 320 : nil)
         .card(floating: true)
         .padding(.horizontal, Space.margin)
         .padding(.bottom, Space.xs)

@@ -9,7 +9,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "KilnWatchCore", resources: [.process("Fixtures")]),
-        .testTarget(name: "KilnWatchCoreTests", dependencies: ["KilnWatchCore"], resources: [.copy("BridgeFixtures"), .copy("PublicFixtures"), .copy("AskFixtures"), .copy("R1Fixtures")]),
+        .testTarget(name: "KilnWatchCoreTests", dependencies: ["KilnWatchCore"], resources: [.copy("BridgeFixtures"), .copy("PublicFixtures"), .copy("AskFixtures"), .copy("R1Fixtures"), .copy("P1Fixtures")]),
     ],
     swiftLanguageModes: [.v6]
 )

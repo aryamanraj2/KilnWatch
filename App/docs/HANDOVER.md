@@ -209,3 +209,8 @@ After explicit user reauthorization, one live Ask submission from the installed 
 ## Prompt 19: rules and exposure UI — 2026-10-10
 
 Kiln detail shows live siting flags (measured against threshold, verification label, source), every supplied rule check, and HRSL modelled exposure with attribution; the Kilns list shows the top flag and the modelled residents. Partial assessment is never shown as clear; unknown statuses show as unavailable. The orchestrator reviewed it: 63 core tests passed, the root build succeeded, the leak scan found 0 hits, and the screenshots were reviewed. See `screens/phase-4c/rules-exposure-report.md`. Next for iOS: prompt 20 (live Today on `POST /routes/plan`, live since P1).
+
+
+## Prompt 20: live Today route — 2026-10-10
+
+In live mode, Today plans a route on a tap ("Plan tomorrow in Hapur") through `POST /routes/plan`, shows it in the existing route UI with estimate-labelled times, verbatim plan and access notes, and the empty-flag stop as "No rule flags measured". It caches the plan and reopens it on launch with no POST. Failures keep the saved plan, with typed wording for each error. Core tests: 73 passed. Root build succeeded with zero warnings. Leak scan: 0. Live `POST /routes/plan` used 1 of 3 (8 stops, all in the registry, legs drawn; Maps opened); `POST /ask` 0. Dark, AX and Reduce Motion captures were skipped at the user's request. See `screens/phase-4d/live-today-report.md`. Paused for orchestrator review.

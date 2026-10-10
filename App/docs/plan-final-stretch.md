@@ -14,9 +14,10 @@ Product language everywhere: "Flagged by satellite · pending inspection". Rule 
 | Step | Status |
 |---|---|
 | Phase 4A Ask backend, CDN (second account), answer-style fixes 16d–16f | Live |
-| 18: iOS live Ask | **In progress** (iOS orchestrator) |
-| R1, P1, E1, P2, H1 | Not started (AWS orchestrator; R1 is prompt 31) |
-| 19, 20 | Waiting on R1 and P1 |
+| 18: iOS live Ask; 19: iOS rules and exposure UI | Done |
+| R1 (31, 31b), P1 (32, 32b) | Live |
+| E1 (33) | Live: before/after images for all 39 Hapur kilns. Ask follow-up: "which kilns have images?" falls back (39 IDs exceed the answer limit); fold a count-not-list fix into P2 |
+| 20 (iOS live Today), P2, H1 | Next; see `prompts/34-orchestrator-handover.md` |
 | M1: better model | ML team mate training; not blocking |
 
 ## 1. Concept vs today
@@ -26,7 +27,7 @@ Product language everywhere: "Flagged by satellite · pending inspection". Rule 
 | Detector (p.3–8) | 39 Hapur candidates in RDS | Optional: 1–2 more NCR scans for breadth | ML team mate, then an import |
 | Rules engine, cited JSON (p.6–7, 11) | Built locally by the teammates; **not in RDS** | **R1** | AWS |
 | Population exposure, HRSL (p.7, 12) | Built locally; **not in RDS** | **R1** | AWS |
-| Evidence images (p.13) | **1 of 39** kilns live through CloudFront (second account) | **E1:** cut before/after pairs for the rest | AWS (+ the ML team mate's evidence scripts) |
+| Evidence images (p.13) | **39 of 39** kilns live through CloudFront (second account), E1 | Done | AWS |
 | Agent 1, inspection planner (p.9) | **Ask live** with 3 search tools and the validator | R1 adds rule/exposure facts plus `get_evidence`; **P1** adds `plan_route`; **P2** adds `inspection_sheet` | AWS |
 | Agent 2, change triage (p.10) | Not built | Stretch only (needs a second scene and a diff) | — |
 | Agent 3, resident assistant (p.10) | Same Lambda as Ask (shared by design) | The portal calls `/ask`; **H1** adds `lang: "hi"` | AWS teammate + AWS |

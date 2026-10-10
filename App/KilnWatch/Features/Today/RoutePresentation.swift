@@ -4,32 +4,23 @@ import MapKit
 import SwiftUI
 
 extension AppModel {
-    func time(_ date: Date) -> String {
-        var style = Date.FormatStyle.dateTime.hour().minute()
-        style.timeZone = TimeZone(identifier: "Asia/Kolkata")!
-        return date.formatted(style)
-    }
-    func timing(for stop: Stop) -> String {
-        if let seconds = route?.driveSeconds(for: stop.kilnId), let minutes = Int(exactly: (seconds / 60).rounded(.up)) {
-            return "\(minutes)\u{00A0}min drive"
-        }
-        return "ETA \(time(stop.eta))"
+    /// Arrival times are estimates everywhere: "Est. 09:13" or "Estimated arrival 09:13".
+    func arrival(for stop: Stop, compact: Bool) -> String {
+        route?.arrival(for: stop, compact: compact) ?? "\(compact ? "Est." : "Estimated arrival") \(Route.clock(stop.eta))"
     }
     var routeSummary: String {
         guard let route else { return isLoading ? "Loading route" : "No route" }
-        var parts = ["\(stops.count) stops"]
-        if let seconds = route.predictedSeconds, let minutes = Int(exactly: (seconds / 60).rounded(.up)) {
-            parts.append("\(minutes / 60)\u{00A0}h \(minutes % 60)\u{00A0}m")
-        }
-        if let departure = route.depart { parts.append("leave \(time(departure))") }
-        return parts.joined(separator: " · ")
+        return route.summary(stopCount: stops.count)
     }
+    /// The plan's own day, for example "Tomorrow · Hapur", never an assumed "Today".
+    var routeTitle: String { route.map { "\($0.dayLabel()) · \($0.district)" } ?? "Today" }
     var savedDate: String? {
         guard case .saved(let route, _) = routeState else { return nil }
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Asia/Kolkata")!
         let planDate = route.depart ?? route.stops.first?.eta ?? route.generatedAt
-        guard !calendar.isDate(planDate, inSameDayAs: .now) else { return nil }
+        // A public plan is never refreshed automatically, so its saved date always shows.
+        guard usesPublicRegistry || !calendar.isDate(planDate, inSameDayAs: .now) else { return nil }
         var style = Date.FormatStyle.dateTime.day().month().year()
         style.timeZone = calendar.timeZone
         return "Saved plan · \(planDate.formatted(style))"

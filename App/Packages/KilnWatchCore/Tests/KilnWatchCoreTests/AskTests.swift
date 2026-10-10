@@ -6,7 +6,7 @@ import Testing
 private func askFixture(_ name: String) throws -> Data {
     try Data(contentsOf: #require(Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "AskFixtures")))
 }
-private struct AskStub {
+struct AskStub {
     typealias Handler = @Sendable (URLRequest) -> (Int, Data)
     static let handlers = Mutex<[String: Handler]>([:])
     let api: KilnWatchAPI
@@ -19,7 +19,7 @@ private struct AskStub {
         })
     }
 }
-private final class AskStubProtocol: URLProtocol, @unchecked Sendable {
+final class AskStubProtocol: URLProtocol, @unchecked Sendable {
     private let stopped = Mutex(false)
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -35,7 +35,7 @@ private final class AskStubProtocol: URLProtocol, @unchecked Sendable {
         }
     }
 }
-private func readBody(_ request: URLRequest) -> Data {
+func readBody(_ request: URLRequest) -> Data {
     if let data = request.httpBody { return data }
     guard let stream = request.httpBodyStream else { return Data() }
     stream.open(); defer { stream.close() }

@@ -987,3 +987,76 @@ validator `pass` on the first answer (no regeneration), no fallback.
 | Plan a route starting near 28.7306, 77.7759 with 4 stops | `plan_route` | Pass: 4 stops, every time estimated, people and flags exact |
 
 **Log privacy:** both log groups hold counts and latencies only; no kiln IDs, coordinates, districts or question text.
+
+# E1: evidence for all Hapur kilns (33, 2026-10-10)
+
+Before/after Sentinel-2 evidence is now published for all 39 Hapur kilns (was 1). Same preparer,
+grid, rendering and attribution as the first pair; no detection or inference was run. Local
+outputs, the contact sheet, SSM scripts and outputs, and response bodies are in the ignored
+`.local/e1/` and `.local/phase-4/live/e1/`.
+
+## Cut and review
+
+- Input check: `hapur.geojson` SHA-256 `b1e9d177…13d0` equals the first manifest's `input_sha256`;
+  39 observations convert.
+- New `AWS/scripts/prepare_all_evidence.py` runs `Model/scripts/prepare_evidence.py` once per
+  sorted index (same `--scenes`, `--before-scene`, `--district Hapur`) and merges the one-entry
+  manifests into one. Refused kilns are skipped with the preparer's reason; a kiln whose before cut
+  alone is refused keeps its after image with before null.
+- Result: **39 of 39** with after, **39 of 39** with before (`S2A_T43RGM_20231205T053206_L2A`),
+  **0 skipped**, 78 distinct PNGs, nodata fraction 0.0 on all 78. `registry.cli validate`: 39
+  records, evidence manifest SHA-256 `ffb98cb6…a90d`.
+- Reproducibility: the `KW-6b3b38…` entry is identical to the published one (before `77aa718e…`,
+  after `a0a6c2ca…`).
+- Review of the contact sheet (all 39 pairs, footprint outlined on the after image): every pair
+  shows the same place (roads, rail and villages line up); no blank tiles, black edges or cloud
+  over a kiln. Several 2023-12-05 before images have light winter haze; one has a thin cloud wisp
+  near its top edge, away from the kiln. Field colours differ by season. No change or kiln
+  interpretation is asserted.
+- Tests: `test_prepare_all_evidence.py` (4: relative paths and input hash carried through,
+  duplicate observation rejected, mixed exports rejected, a refused kiln reported with its reason).
+  `unittest discover -s AWS/tests`: **145 run, 135 passed, 10 skipped** (was 141 / 131 / 10).
+
+## Publish and verify
+
+- `upload_evidence.py`: 78 objects under `evidence/` (content-hashed, conditional). The two
+  existing `KW-6b3b38…` objects kept their original upload time (verified, not rewritten).
+- `verify_publication.py` through the evidence CDN: HTTPS, `image/png`, checksums match for all
+  **78** objects; receipt `verified: true`.
+- Denial probe: a direct S3 URL for a PNG **403**; a non-PNG `evidence/` path through the CDN
+  **403**; an `imports/` path through the CDN **403**; a PNG control through the CDN 200.
+
+## Re-import (SSM, runbook §6/§7)
+
+Inputs went to `imports/e1/` (83 keys) and were fetched by exact key on the runner. The archive was
+built with `COPYFILE_DISABLE=1 tar --no-xattrs` (no `._*` entries).
+
+| Read-only check (rolled back) | Before | After |
+|---|---|---|
+| Candidates / observations | 39 / 39 | 39 / 39 |
+| `status`/`review_state` | flagged/pending 39 | flagged/pending 39 |
+| Hapur kilns, with violations, with exposure | 39 / 36 / 39 | 39 / 36 / 39 |
+| Evidence rows (after, before), with URLs | 1 / 1 | 39 / 39 |
+| Kilns with evidence URLs | 1 | 39 |
+| Checksum of all candidate rows (status, review, dates, assessment) | unchanged | unchanged |
+| Checksum of all observation rows | unchanged | unchanged |
+| Import runs | 1 | 2 |
+
+All 39 input observations already existed before the import. `validate` then `import` with
+`--evidence` and `--publication-receipt`: `candidates_inserted: 0`, `observations_inserted: 0`,
+39 records. R1's rules and exposure are unchanged. The runner work folder and `imports/e1/` were
+removed (0 keys left); the runner stays up.
+
+## Live checks
+
+- Public Hapur list: 39 kilns, **39 with both** before and after, 0 after only, 0 none. Three
+  random kilns: all 6 URLs 200, `image/png`, SHA-256 equal to the manifest. The list body (CDN host
+  replaced by a placeholder) is saved for the iOS team.
+- Ask (counter 59 of 100 before, 61 after), both **200**:
+
+| Question | Tools | Outcome |
+|---|---|---|
+| Which flagged kilns in Hapur have satellite images? | `list_flagged_kilns` | **Fallback.** With all 39 published the model tries to list all 39 IDs and hits `maxTokens` (600) twice (1,229 output tokens over two answers). Follow-up for Ask: give a count when every returned kiln has images |
+| Show me the evidence for KW-e730cb05… | `get_evidence` | Pass. Exact attributions "Contains modified Copernicus Sentinel data 2023" and "… 2026"; rule checks and exposure correct. **Weak:** leaves out the two acquisition dates |
+
+**Log privacy:** two log lines with counts and latencies only.

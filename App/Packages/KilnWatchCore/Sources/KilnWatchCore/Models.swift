@@ -203,11 +203,13 @@ public struct Route: Codable, Hashable, Sendable {
     /// Planning limit, not a prediction.
     public let budgetMin: Int?
     public let legs: [RouteLeg]?
+    /// Plain server notes from `POST /routes/plan`, shown verbatim in order. Absent in older caches.
+    public let notes: [String]?
 
     public init(district: String, generatedAt: Date, stops: [Stop], kilns: [Kiln],
-                routeId: String? = nil, depart: Date? = nil, budgetMin: Int? = nil, legs: [RouteLeg]? = nil) {
+                routeId: String? = nil, depart: Date? = nil, budgetMin: Int? = nil, legs: [RouteLeg]? = nil, notes: [String]? = nil) {
         self.district = district; self.generatedAt = generatedAt; self.stops = stops; self.kilns = kilns
-        self.routeId = routeId; self.depart = depart; self.budgetMin = budgetMin; self.legs = legs
+        self.routeId = routeId; self.depart = depart; self.budgetMin = budgetMin; self.legs = legs; self.notes = notes
     }
 }
 
