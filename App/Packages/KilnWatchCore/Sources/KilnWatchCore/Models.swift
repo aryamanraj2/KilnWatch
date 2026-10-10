@@ -62,7 +62,8 @@ public struct Violation: Codable, Hashable, Sendable {
     public let thresholdM: Double?
     /// Legal source, for example "Central 2022 rules".
     public let source: String
-    public let evidenceUrl: URL
+    /// Nil until an evidence image for this measurement is published; the measurement still stands.
+    public let evidenceUrl: URL?
     /// Supplied feature coordinate; absent when unknown.
     public let measuredTo: Coordinate?
 }

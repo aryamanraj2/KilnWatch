@@ -5,26 +5,16 @@
       "check": "Distance to habitation",
       "threshold_m": 800,
       "requirement": null,
-      "overrides": [
-        {
-          "state": "UP",
-          "threshold_m": 1000
-        }
-      ],
-      "source": "Central 2022 rules; UP siting rules"
+      "overrides": [],
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)"
     },
     {
       "id": "C-KILN-1K",
       "check": "Distance to another kiln",
       "threshold_m": 1000,
       "requirement": null,
-      "overrides": [
-        {
-          "state": "UP",
-          "threshold_m": 800
-        }
-      ],
-      "source": "Central 2022 rules; UP siting rules"
+      "overrides": [],
+      "source": "Central 2022 rules; UP siting rules (2026 amendment)"
     },
     {
       "id": "C-ORCH-800",
@@ -40,7 +30,7 @@
       "threshold_m": 1000,
       "requirement": null,
       "overrides": [],
-      "source": "UP and Haryana siting rules"
+      "source": "UP siting rules (2012)"
     },
     {
       "id": "UP-NH-300",
@@ -48,7 +38,7 @@
       "threshold_m": 300,
       "requirement": null,
       "overrides": [],
-      "source": "UP siting rules"
+      "source": "UP siting rules (2012)"
     },
     {
       "id": "UP-RAIL-200",
@@ -56,7 +46,15 @@
       "threshold_m": 200,
       "requirement": null,
       "overrides": [],
-      "source": "UP siting rules"
+      "source": "UP siting rules (2012)"
+    },
+    {
+      "id": "UP-MUN-5K",
+      "check": "Distance to a municipal council, corporation or nagar panchayat",
+      "threshold_m": 5000,
+      "requirement": null,
+      "overrides": [],
+      "source": "UP siting rules (2026 amendment)"
     },
     {
       "id": "C-TECH-10K",

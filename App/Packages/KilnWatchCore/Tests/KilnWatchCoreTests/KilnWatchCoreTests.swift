@@ -23,7 +23,7 @@ func fixtureDecodes(name: String) throws {
     #expect(kiln.violations[0].measuredDistanceM == 410 && kiln.violations[2].measuredDistanceM == nil)
     #expect(Fixtures.route.stops.map(\.order) == Array(1...9))
     #expect(Fixtures.route.stops.map(\.kilnId) == Fixtures.route.kilns.map(\.kilnId))
-    #expect(Fixtures.rules.count == 7)
+    #expect(Fixtures.rules.count == 8)
 }
 
 @Test func kilnRoundTrips() throws {
@@ -538,6 +538,22 @@ func recordedPublicBodiesDecode(name: String) throws {
         #expect(kiln.provenance == nil)
         #expect(!kiln.typeMayBePresentedAsCertain)
     }
+}
+
+@Test func rulesEngineFlagWithoutEvidenceImageDecodes() throws {
+    // Shape written by AWS/rules: a measured flag before any evidence image is published.
+    let json = try #require(String(data: publicBody("detail"), encoding: .utf8))
+        .replacingOccurrences(of: #""violations": [], "rules_assessment": "not_evaluated""#, with: #"""
+            "violations": [{"rule_id": "UP-RAIL-200", "measured_distance_m": 142, "threshold_m": 200,
+            "source": "UP siting rules (2012)", "evidence_url": null,
+            "measured_to": {"latitude": 28.684635, "longitude": 77.758507}}],
+            "rules_assessment": "partially_evaluated"
+            """#)
+    let kiln = try JSONDecoder.kilnWatch.decode(Kiln.self, from: Data(json.utf8))
+    #expect(kiln.rulesAssessment == "partially_evaluated")
+    let flag = try #require(kiln.violations.first)
+    #expect(flag.ruleId == "UP-RAIL-200" && flag.measuredDistanceM == 142 && flag.thresholdM == 200)
+    #expect(flag.evidenceUrl == nil && flag.measuredTo?.latitude == 28.684635)
 }
 
 @Test(arguments: ["repeated", "empty", "emptyPage"])

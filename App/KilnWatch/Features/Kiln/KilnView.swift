@@ -48,9 +48,15 @@ private struct KilnDetailView: View {
                     VStack(alignment: .leading, spacing: Space.l) {
                         if kiln.rulesAssessment == "not_evaluated" || (kiln.rulesAssessment == nil && kiln.violations.isEmpty) {
                             Text("Rules not evaluated").font(.body).foregroundStyle(.inkSecondary)
+                        } else if kiln.violations.isEmpty {
+                            Text("No rule flags measured").font(.body).foregroundStyle(.inkSecondary)
                         }
                         ForEach(kiln.violations, id: \.ruleId) { violation in
                             RuleDistanceBar(violation: violation, kiln: kiln, color: model.status(for: kiln).color)
+                        }
+                        if kiln.rulesAssessment == "partially_evaluated" {
+                            Text("Some rules could not be checked from map data. Check on site.")
+                                .font(.footnote).foregroundStyle(.inkSecondary)
                         }
                     }
                     .card()

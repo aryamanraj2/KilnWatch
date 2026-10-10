@@ -445,7 +445,7 @@ struct RuleSheet: View {
                         Text("Legal source").eyebrow()
                         Text(rule.source).font(.body).foregroundStyle(.ink)
                     }
-                    Text("Policy compilation from the Space to Policy study. Rule IDs and applied thresholds await backend confirmation.")
+                    Text("Thresholds from the 2022 central rules and UP siting rules, including the 2026 amendment, compiled October 2026. Not yet checked against the gazette text.")
                         .font(.footnote)
                         .foregroundStyle(.inkSecondary)
                 }

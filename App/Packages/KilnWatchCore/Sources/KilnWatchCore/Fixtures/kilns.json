@@ -36,7 +36,7 @@
           "rule_id": "C-HAB-800",
           "measured_distance_m": 410,
           "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0412/C-HAB-800.png",
           "measured_to": {
             "latitude": 28.718411441441443,
@@ -47,7 +47,7 @@
           "rule_id": "UP-SCH-1K",
           "measured_distance_m": 620,
           "threshold_m": 1000,
-          "source": "UP and Haryana siting rules",
+          "source": "UP siting rules (2012)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0412/UP-SCH-1K.png",
           "measured_to": {
             "latitude": 28.711850990990992,
@@ -110,7 +110,7 @@
           "rule_id": "C-HAB-800",
           "measured_distance_m": 520,
           "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0388/C-HAB-800.png",
           "measured_to": {
             "latitude": 28.743512072072075,
@@ -121,7 +121,7 @@
           "rule_id": "UP-SCH-1K",
           "measured_distance_m": 780,
           "threshold_m": 1000,
-          "source": "UP and Haryana siting rules",
+          "source": "UP siting rules (2012)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0388/UP-SCH-1K.png",
           "measured_to": {
             "latitude": 28.735231891891893,
@@ -184,7 +184,7 @@
           "rule_id": "C-HAB-800",
           "measured_distance_m": 690,
           "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0451/C-HAB-800.png",
           "measured_to": {
             "latitude": 28.766494864864864,
@@ -194,8 +194,8 @@
         {
           "rule_id": "C-KILN-1K",
           "measured_distance_m": 640,
-          "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "threshold_m": 1000,
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0451/C-KILN-1K.png",
           "measured_to": {
             "latitude": 28.766176396396396,
@@ -251,7 +251,7 @@
           "rule_id": "UP-SCH-1K",
           "measured_distance_m": 840,
           "threshold_m": 1000,
-          "source": "UP and Haryana siting rules",
+          "source": "UP siting rules (2012)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0433/UP-SCH-1K.png",
           "measured_to": {
             "latitude": 28.69954972972973,
@@ -314,7 +314,7 @@
           "rule_id": "C-HAB-800",
           "measured_distance_m": 610,
           "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0467/C-HAB-800.png",
           "measured_to": {
             "latitude": 28.732885315315315,
@@ -325,7 +325,7 @@
           "rule_id": "UP-NH-300",
           "measured_distance_m": 240,
           "threshold_m": 300,
-          "source": "UP siting rules",
+          "source": "UP siting rules (2012)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0467/UP-NH-300.png",
           "measured_to": {
             "latitude": 28.730528648648647,
@@ -381,7 +381,7 @@
           "rule_id": "UP-SCH-1K",
           "measured_distance_m": 910,
           "threshold_m": 1000,
-          "source": "UP and Haryana siting rules",
+          "source": "UP siting rules (2012)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0402/UP-SCH-1K.png",
           "measured_to": {
             "latitude": 28.692703873873874,
@@ -455,7 +455,7 @@
           "rule_id": "C-HAB-800",
           "measured_distance_m": 730,
           "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0479/C-HAB-800.png",
           "measured_to": {
             "latitude": 28.75804963963964,
@@ -466,7 +466,7 @@
           "rule_id": "UP-RAIL-200",
           "measured_distance_m": 150,
           "threshold_m": 200,
-          "source": "UP siting rules",
+          "source": "UP siting rules (2012)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0479/UP-RAIL-200.png",
           "measured_to": {
             "latitude": 28.754355405405406,
@@ -528,8 +528,8 @@
         {
           "rule_id": "C-KILN-1K",
           "measured_distance_m": 690,
-          "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "threshold_m": 1000,
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0395/C-KILN-1K.png",
           "measured_to": {
             "latitude": 28.785394864864863,
@@ -585,7 +585,7 @@
           "rule_id": "C-HAB-800",
           "measured_distance_m": 760,
           "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0420/C-HAB-800.png",
           "measured_to": {
             "latitude": 28.71534072072072,
@@ -648,7 +648,7 @@
           "rule_id": "C-HAB-800",
           "measured_distance_m": 450,
           "threshold_m": 800,
-          "source": "Central 2022 rules; UP siting rules",
+          "source": "Central 2022 rules; UP siting rules (2026 amendment)",
           "evidence_url": "https://cdn.kilnwatch.example/evidence/KW-0356/C-HAB-800.png",
           "measured_to": {
             "latitude": 28.691866216216216,

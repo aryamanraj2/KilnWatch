@@ -62,6 +62,7 @@ extension Rule {
         case "UP-SCH-1K": "a school"
         case "UP-NH-300": "a national highway"
         case "UP-RAIL-200": "a railway line"
+        case "UP-MUN-5K": "municipal limits"
         default: "the measured feature"
         }
     }
