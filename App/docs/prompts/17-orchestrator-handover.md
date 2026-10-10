@@ -149,15 +149,28 @@ Scope: handover 14 §3.2, with these updates:
 - **Live calls from the builder:** a handful against the real `/ask` is fine, at about $0.003 each, but they count toward the 50/day cap. Tell the builder to read today's counter first and use at most about 10.
 - After 18, offer an optional polish prompt (like 13) and then a **commit** on the user's go, with a leak scan first.
 
+## 5a. Teammates pushed a rules engine and exposure (read `AWS/rules/README.md` and `HANDOVER.md`)
+
+- **New since `fb60572`:** `AWS/rules/`, with cited v1 thresholds in `rules_v1.json`.
+  - A UP 2026 amendment sets habitation at 800 m and kiln spacing at 1 km. That settles the old 800 vs 1,000 m conflict, but only from **secondary sources**. School, highway and rail thresholds are marked unverified.
+  - **HRSL population exposure** within 800 m.
+  - `registry.cli validate-assessment` / `apply-assessment`, and migration `002_assessment.sql`, which adds an assessor role.
+  - App fixtures and `Violation.evidenceUrl` (now optional) changed.
+- **Local Hapur result:** 36 of 39 kilns flagged, 52 flags in total, with a median exposure of 4,228 people. Some near-zero distances suggest false-positive detections.
+- **None of this is in RDS yet** (no migration or apply was run). The live API still returns `rules_assessment: not_evaluated` and `exposure: null`.
+- **Rechecked on the Mac after the merge** (the teammate couldn't, because they're on Windows): root build succeeded, core `swift test` passed 35 tests, and Python ran 91 tests with 10 skips.
+- **When the assessment is applied to RDS** (a separate, explicitly approved deploy step, through the runner and SSM), Ask must change at the same time, or it will contradict the data:
+  - `tools.trim` must pass the violations (rule ID, distance, status) and the exposure counts;
+  - the validator must allow rule IDs **that appear in this request's tool results**;
+  - the system prompt's "rules not evaluated / exposure not assessed / never cite a rule ID" lines must become conditional;
+  - the iOS "Rules not evaluated" and "Population exposure not assessed" states must render real data.
+
+  Product language stays: "flagged by satellite, pending inspection" and "siting signal", never a legal verdict. Ask the user whether to do this before or after prompt 18. My recommendation: **after**. Ship iOS Ask on the current live data first, then a combined "apply assessment + Ask and app update" step.
+
 ## 6. Git state
 
-- `main` is at `fb60572`, pushed. **Nothing from Phase 4 is committed.**
-- Pending:
-  - **modified:** `AWS/api.tf`, `AWS/variables.tf`, `AWS/docs/local-verification.md`, `App/docs/HANDOVER.md`, `App/docs/api-contract.md`;
-  - **staged:** prompt 14;
-  - **untracked:** prompts 15, 16, 16b and 17, `AWS/assistant*`, `AWS/scripts/package_assistant.py`, `AWS/tests/test_assistant.py`, `AWS/tests/public_hapur.json`.
-- `App/docs/screens/phase-2/*.log` are old and untracked; leave them.
-- Recommend a **commit after the 16b review** (a backend checkpoint), but only on the user's go and after the leak scan.
+- **Phase 4A is committed and pushed** (`2e7470f`, rebased on the teammates' rules-engine commits; the leak scan of the outgoing diff was clean).
+- Only `App/docs/screens/phase-2/*.log` are untracked; they're old, so leave them.
 
 ## 7. Open items
 
@@ -191,4 +204,4 @@ Scope: handover 14 §3.2, with these updates:
 
 1. Confirm you've read this file, plus 14 and 11 (at least §1, §1a and §7 of 11), and checked `git status` and `log`.
 2. 16b is already reviewed (§2). Don't redo the review; at most, rerun the tests and the leak scan.
-3. Then, on the user's go, offer a backend commit, and write **prompt 18** (Phase 4B iOS Ask) with its full pre-prompt.
+3. Phase 4A is already committed and pushed. Raise §5a in one line (recommend: rules and exposure go live after iOS Ask), then write **prompt 18** (Phase 4B iOS Ask, with the small backend Step 0 from §5) and its full pre-prompt.
