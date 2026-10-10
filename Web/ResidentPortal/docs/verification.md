@@ -50,7 +50,7 @@ No deployment, commit, push, retraining or R2 connection was performed. The user
 
 ## Continuation: local R2 preparation (10 October 2026)
 
-User authorization: continue building; public backend “Not ready — prepare locally.” Current checks pass under Node 24.21.0:
+User authorization: continue building; public backend “Not ready — prepare locally.” The first continuation passed these checks under Node 24.21.0:
 
 - **35 unit/behavior tests**, including bilingual published-mode draft wording and image-dimension mismatch rejection. jsdom image tests supply decoded dimensions explicitly; browser tests decode actual generated PNGs.
 - **14 sample-mode browser journeys**: seven Chromium, then seven WebKit, preserving the original flows, downloads, privacy assertions, automated accessibility checks and print-action coverage.
@@ -59,3 +59,14 @@ User authorization: continue building; public backend “Not ready — prepare l
 - `git diff --check` passes; changes remain confined to `Web/ResidentPortal/`. No dependencies added. New test output uses ignored paths; the original reviewed artifacts above are preserved.
 
 The original PDF visual review and performance sample above remain historical evidence; no fresh visual PDF review, native browser zoom or spoken screen-reader proof is claimed for this continuation. Mock browser refusals do not prove the backend publication boundary. Real records, evidence delivery, public CORS and deployed negative-access checks remain pending. See [R2 local preparation](R2-local-preparation.md).
+
+## Second continuation: response and paging boundaries (10 October 2026)
+
+The user requested continued work on `webApp` according to the plan. Public backend approval/readiness is still pending, so work stays local and within R2 preparation.
+
+- **52 unit/behavior tests pass**, including streamed byte limits with missing/understated Content-Length, early cancellation of oversized declared bodies, UTF-8 Hindi characters split across chunks, corrupt UTF-8, body-read cancellation/timeout, initial-page order/radius/duplicate handling, and later-page snapshot consistency.
+- **14 live-mode browser journeys pass**, seven Chromium then seven WebKit, using intercepted fictional API responses. The new journeys prove duplicate handling, rejection of snapshot/record/distance drift, retained list/selection, recovery with corrected pages, and oversized-response UI/input preservation. Actual intercepted redirect refusal passes in Chromium; unit tests verify Fetch's redirect policy. The WebKit interceptor rejects redirect fulfillment, so its browser redirect behavior is unverified.
+- **14 sample-mode browser journeys pass**, seven Chromium then seven WebKit. Together with live-mode coverage, **28 browser journeys pass**. Outputs use `.cache/sample-review/`, preserving the original reviewed `docs/screens/` files.
+- Strict TypeScript and production build pass under Node 24.21.0. Main JS 434.79 kB / 130.22 kB gzip; no production build warnings. The browser runner retains the existing NO_COLOR/FORCE_COLOR environment warning. `git diff --check` passes.
+
+Native 200% zoom was attempted through the computer-use tool, which returned **“Computer Use was not approved to use Google Chrome”** before a usable browser session. No UI workaround was used; native zoom and spoken screen-reader checks remain open. No actual service/publication/CORS, new PDF visual review, new performance measurement, deployment, commit, push, backend/app/model edit, or teammate communication is claimed.

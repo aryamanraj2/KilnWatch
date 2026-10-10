@@ -34,7 +34,7 @@ npm run test:e2e:live -- --project=webkit
 
 Browser checks use one worker, no retries, and a local Vite server. Engines are run sequentially. On this workstation browsers were downloaded to the ignored `.cache/ms-playwright`; set `PLAYWRIGHT_BROWSERS_PATH=.cache/ms-playwright` when running tests. Do not install a second cache unnecessarily. The browser suite creates a small set of review artifacts under `docs/screens/`; failure traces and reports are ignored under `test-results/`.
 
-`test:e2e:live` starts a separate Vite server on port 5174 in live mode and intercepts every test API/image request with fictional contract responses and generated 256-pixel PNGs. It does not contact AWS, change `.env`, or establish public publication approval. Set `KW_ARTIFACT_DIR=test-results/sample-review` on sample-suite runs to keep regenerated review files separate from the previously reviewed `docs/screens/` artifacts.
+`test:e2e:live` starts a separate Vite server on port 5174 in live mode and intercepts every test API/image request with fictional contract responses and generated 256-pixel PNGs. It does not contact AWS, change `.env`, or establish public publication approval. Set `KW_ARTIFACT_DIR=.cache/sample-review` on sample-suite runs to keep regenerated review files separate from the previously reviewed `docs/screens/` artifacts and Playwright's cleared result directory.
 
 `npm run preview` serves the production `dist/` build locally. No script deploys, commits, or pushes. Tests use fictional personal details only. The production build has no source maps and no development fault controls.
 
@@ -50,6 +50,8 @@ The default is `fixture`. To make it explicit, copy `.env.example` to ignored `.
 | `VITE_FIXTURE_SCENARIO` | Optional development-only failure case, listed below. |
 
 Live configuration is exercised by unit tests and local browser journeys, **not completed R2 integration**. It never falls back to fixtures. The user authorized local preparation; do not configure a real endpoint until the public projection and service are approved/ready.
+
+The public client enforces a 1,000,000-byte streamed JSON limit, rejects invalid UTF-8 and API redirects, and verifies page order, supplied distances within the query radius, and snapshot consistency. Configure the final HTTPS API prefix directly. Backend distance rounding and ID ordering must agree with the [proposed contract](docs/public-api-contract.md) before live connection.
 
 For local failure review, start in development mode at one of these URLs, then choose a sample area and search:
 

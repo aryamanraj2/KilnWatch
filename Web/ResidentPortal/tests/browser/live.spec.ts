@@ -148,3 +148,53 @@ test('later-page failure retains loaded results; bitmap failure can retry; unapp
   await page.route(`${api}/public/kilns/PUBLIC-TEST-1`, route => route.fulfill({ json: { ...records[0], evidence: { before: null, after: { ...records[0].evidence.after, url: 'https://private.example.test/secret.png' } } } }));
   await page.reload(); await expect(page.getByText('This image could not be loaded.', { exact: true })).toBeVisible(); expect(blocked).toEqual([]);
 });
+
+test('overlapping pages deduplicate, reject changed snapshots, and recover without losing selection', async ({ page }) => {
+  await mockPublicService(page);
+  for (const variant of ['snapshot', 'order', 'distance', 'revision']) {
+    let valid = false;
+    const firstPage = responsePage(false);
+    const nextPage = responsePage(true);
+    await page.route(`${api}/public/kilns?**`, route => {
+      if (!new URL(route.request().url()).searchParams.has('cursor')) return route.fulfill({ json: { ...firstPage, items: [firstPage.items[0], firstPage.items[0]] } });
+      if (valid) return route.fulfill({ json: { ...nextPage, items: [...firstPage.items, ...nextPage.items] } });
+      const invalid = variant === 'snapshot' ? { ...nextPage, updated_at: '2026-10-02T06:00:00Z' }
+        : variant === 'order' ? { ...nextPage, items: [{ ...nextPage.items[0], distance_m: 200 }] }
+        : { ...nextPage, items: [{ ...firstPage.items[0], distance_m: variant === 'distance' ? 310 : firstPage.items[0].distance_m,
+          kiln: { ...records[0], revision: variant === 'revision' ? 'changed-record' : records[0].revision } }] };
+      return route.fulfill({ json: invalid });
+    });
+    await page.goto('/'); await search(page); await expect(page.getByText('1 results loaded')).toBeVisible();
+    await expect(page.locator('.result-list li')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Load more records' }).click();
+    await expect(page.getByRole('alert')).toContainText('Results changed while loading');
+    await expect(page.getByText('1 results loaded')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Select PUBLIC-TEST-1', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    valid = true; await page.getByRole('button', { name: 'Load more records' }).click();
+    await expect(page.getByText('2 results loaded')).toBeVisible(); await expect(page.getByRole('alert')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Select PUBLIC-TEST-1', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await page.unroute(`${api}/public/kilns?**`);
+  }
+});
+
+test('oversized responses preserve input; Chromium also refuses redirected reads', async ({ page }, info) => {
+  await mockPublicService(page);
+  // Playwright WebKit cannot fulfill intercepted requests with a redirect status.
+  // Exercise redirect refusal in Chromium and request-policy unit tests instead.
+  if (info.project.name === 'chromium') {
+    const redirected: string[] = [];
+    await page.route('https://private.example.test/**', route => { redirected.push(route.request().url()); return route.fulfill({ json: responsePage(false) }); });
+    await page.route(`${api}/public/kilns?**`, route => route.fulfill({ status: 302, headers: { location: 'https://private.example.test/redirect' } }));
+    await page.goto('/'); await search(page); await expect(page.getByRole('alert')).toContainText('The service is unavailable');
+    expect(redirected).toEqual([]); await expect(page.getByLabel('Latitude', { exact: true })).toHaveValue('28.73000');
+    await expect(page.locator('.result-list li')).toHaveCount(0);
+    await page.unroute(`${api}/public/kilns?**`);
+  } else { await page.goto('/'); }
+  const large = { ...responsePage(false), padding: 'आ'.repeat(350_000) };
+  await page.route(`${api}/public/kilns?**`, route => route.fulfill({ json: large }));
+  if (info.project.name === 'chromium') await page.getByRole('button', { name: 'Try again', exact: true }).click();
+  else await search(page);
+  await expect(page.getByRole('alert')).toContainText('This response could not be read safely');
+  await expect(page.getByLabel('Longitude', { exact: true })).toHaveValue('77.68000');
+  await expect(page.locator('.result-list li')).toHaveCount(0); await expect(page.locator('main')).not.toContainText('SAMPLE-KW');
+});

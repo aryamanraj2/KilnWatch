@@ -28,6 +28,8 @@ Next R1 work is a spoken VoiceOver or equivalent walkthrough, native browser 200
 
 Local preparation corrects fixture-specific wording in public-mode search, evidence alt text, rule assessments, explanations, exports, attribution and privacy notices. Address lookup is disabled in public mode until a provider exists; manual coordinates and opt-in location work. Decoded image dimensions must match metadata before an image can be used for comparison. Public mode still has an illustrative geographic diagram, no basemap/geocoder, and deterministic explanations, no live assistant. The contract is still a proposal; these tests cannot prove the server publication boundary.
 
+The next local continuation tightened streamed JSON byte limits/UTF-8 handling, refused API redirects, validated nearby order/radius, and prevented overlapping or inconsistent pages from changing already displayed records. Invalid later pages preserve the list/selection and can recover with a corrected page. Current unit/behavior count is 52; live-mode journeys are seven per engine. Chrome computer-use access was denied when attempting the native 200% zoom check; the manual gap remains. Details and browser-specific limits are in [R2 local preparation](R2-local-preparation.md).
+
 The [AWS teammate / ML team mate checklist](aws-integration-request.md) is prepared but has not been sent. It distinguishes public publication/search/detail/rule/image inputs from model provenance and interpretation. [Public API](public-api-contract.md) and [hosting](hosting-proposal.md) documents are proposals, not deployed infrastructure. Recheck current teammate reports when integration is authorized; this work did not query the AWS account.
 
 ## Preservation and stop

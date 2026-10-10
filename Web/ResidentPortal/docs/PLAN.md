@@ -2,6 +2,8 @@
 
 Prepared 10 October 2026. **R1 built; verification gate has explicit manual gaps. R2 frontend preparation is locally implemented.** The user authorized continuation, then confirmed the public backend is not ready and requested local preparation. See [verification](verification.md), [handover](HANDOVER.md), and [R2 local preparation](R2-local-preparation.md). R2 has no live connection or deployed acceptance proof.
 
+Further local continuation closes streamed-response byte limits and nearby-page consistency gaps, with bounded UTF-8 decoding, redirect refusal, first-page deduplication and retained results/selection on invalid later pages. Native 200% zoom remains unverified because Chrome computer-use access was denied. The approved public service remains the next R2 integration input; R3/R4 are not begun.
+
 This document translates the [resident portal master brief](../../../App/docs/prompts/09-resident-portal-master-brief.md) into an ordered delivery plan. It began as the planning-only deliverable; local R1 and authorized R2 frontend preparation now exist. Deployed R2 acceptance and R3–R4 remain later gates. Work sequentially, with no parallel agents.
 
 ## 1. Outcome and boundaries

@@ -16,6 +16,53 @@ export function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> 
     signal?.addEventListener('abort', abort, { once: true });
   });
 }
+async function readJSON(response: Response): Promise<unknown> {
+  const limit = 1_000_000; // Decoded response bytes, including UTF-8 Hindi text.
+  const declaredSize = Number(response.headers.get('content-length'));
+  if (declaredSize > limit || !response.body) {
+    await response.body?.cancel().catch(() => {});
+    throw new DataError('malformed');
+  }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8', { fatal: true });
+  const parts: string[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > limit) throw new DataError('malformed');
+      try { parts.push(decoder.decode(value, { stream: true })); }
+      catch { throw new DataError('malformed'); }
+    }
+    try { return JSON.parse(parts.join('') + decoder.decode()); }
+    catch { throw new DataError('malformed'); }
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally { reader.releaseLock(); }
+}
+function compareResults(a: Page['items'][number], b: Page['items'][number]): number {
+  return a.distance_m - b.distance_m || (a.kiln.id < b.kiln.id ? -1 : a.kiln.id > b.kiln.id ? 1 : 0);
+}
+function ordered(items: Page['items']): boolean {
+  return items.every((item, index) => index === 0 || compareResults(items[index - 1], item) <= 0);
+}
+function appendItems(previous: Page['items'], next: Page['items']): Page['items'] {
+  const byId = new Map<string, Page['items'][number]>();
+  for (const item of [...previous, ...next]) {
+    const existing = byId.get(item.kiln.id);
+    if (existing) {
+      if (existing.distance_m !== item.distance_m || existing.kiln.revision !== item.kiln.revision) throw new DataError('pagination');
+      continue; // Keep the already displayed record when pages overlap.
+    }
+    byId.set(item.kiln.id, item);
+  }
+  const items = [...byId.values()];
+  if (items.length > 100 || !ordered(items)) throw new DataError('pagination');
+  return items;
+}
 export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
   async function read(path: string, signal?: AbortSignal): Promise<unknown> {
     let base: URL;
@@ -29,7 +76,7 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
       let timedOut = false;
       const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 10000);
       try {
-        const res = await fetcher(`${base.href.replace(/\/$/, '')}${path}`, { signal: controller.signal, credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer', headers: { Accept: 'application/json' } });
+        const res = await fetcher(`${base.href.replace(/\/$/, '')}${path}`, { signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', headers: { Accept: 'application/json' } });
         if (res.status === 404) throw new DataError('not_found');
         if (!res.ok) {
           if (attempt === 0 && [408, 429, 502, 503, 504].includes(res.status)) {
@@ -41,9 +88,7 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
           throw new DataError(res.status === 429 ? 'throttled' : 'unavailable');
         }
         if (!res.headers.get('content-type')?.includes('application/json')) throw new DataError('malformed');
-        const body = await res.text();
-        if (body.length > 1_000_000) throw new DataError('malformed');
-        try { return JSON.parse(body); } catch { throw new DataError('malformed'); }
+        return await readJSON(res);
       } catch (e) {
         if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
         if (timedOut) throw new DataError('timeout');
@@ -69,14 +114,15 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
         const offset = Number(cursor ?? 0);
         if (!Number.isInteger(offset) || offset < 0 || offset > 100) throw new DataError('pagination');
         const known = distance(f.CENTER, query.center) + query.radius_m <= 5500 && cfg.scenario !== 'unknown';
-        const hits = cfg.scenario === 'empty' || cfg.scenario === 'unknown' ? [] : f.kilns.map(kiln => ({ kiln, distance_m: distance(query.center, kiln.centroid) })).filter(x => x.distance_m <= query.radius_m).sort((a, b) => a.distance_m - b.distance_m || a.kiln.id.localeCompare(b.kiln.id));
+        const hits = cfg.scenario === 'empty' || cfg.scenario === 'unknown' ? [] : f.kilns.map(kiln => ({ kiln, distance_m: distance(query.center, kiln.centroid) })).filter(x => x.distance_m <= query.radius_m).sort(compareResults);
         const next = offset + 3 < hits.length ? String(offset + 3) : null;
         return { items: hits.slice(offset, offset + 3), next_cursor: next, complete: !next, revision: 'sample-1', coverage: known ? 'known' : 'unknown', updated_at: cfg.scenario === 'stale' ? '2025-01-01T00:00:00Z' : f.UPDATED, distance_basis: 'centroid' };
       }
       const params = new URLSearchParams({ longitude: String(query.center[0]), latitude: String(query.center[1]), radius_m: String(query.radius_m), limit: '3', ...(cursor ? { cursor } : {}) });
       const result = pageSchema.safeParse(await read(`/public/kilns?${params}`, signal));
-      if (!result.success) throw new DataError('malformed');
-      return result.data;
+      if (!result.success || !ordered(result.data.items) || result.data.items.some(item => item.distance_m > query.radius_m)) throw new DataError('malformed');
+      try { return { ...result.data, items: appendItems([], result.data.items) }; }
+      catch { throw new DataError('malformed'); }
     },
     async detail(id: string, signal?: AbortSignal): Promise<Kiln> {
       if (!/^[A-Za-z0-9-]{1,100}$/.test(id)) throw new DataError('not_found');
@@ -96,8 +142,7 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
 }
 export const client = makeClient(config);
 export function mergePages(previous: Page, next: Page, seenCursors: Set<string>): Page {
-  if (previous.revision !== next.revision || previous.coverage !== next.coverage || (next.next_cursor && seenCursors.has(next.next_cursor)) || (!next.items.length && next.next_cursor)) throw new DataError('pagination');
-  const items = [...new Map([...previous.items, ...next.items].map(i => [i.kiln.id, i])).values()];
-  if (items.length > 100) throw new DataError('pagination');
+  if (previous.revision !== next.revision || previous.coverage !== next.coverage || previous.distance_basis !== next.distance_basis || Date.parse(previous.updated_at) !== Date.parse(next.updated_at) || (next.next_cursor && seenCursors.has(next.next_cursor)) || (!next.items.length && next.next_cursor) || !ordered(previous.items) || !ordered(next.items)) throw new DataError('pagination');
+  const items = appendItems(previous.items, next.items);
   return { ...next, items };
 }
