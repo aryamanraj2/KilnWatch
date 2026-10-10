@@ -1,0 +1,11 @@
+# AWS teammate: choose account/profile and encrypted locked state before planning.
+aws_region = "ap-south-1"
+project_name = "kilnwatch"
+environment = "hackathon"
+bucket_name_prefix = "replace-with-approved-prefix"
+frontend_origin = ""
+enable_agentcore = false
+enable_sagemaker_training_job = false
+enable_amplify = false
+create_demo_ecs_service = false
+create_registry_runner = false # true only for an approved temporary SSM execution path

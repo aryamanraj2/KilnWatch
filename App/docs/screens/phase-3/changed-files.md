@@ -1,0 +1,94 @@
+# Phase 3 changed files
+
+Paths are repository-relative. Each intended modified/new file has one line. Existing untracked Phase 2 logs are excluded because they were preserved.
+
+- `.gitignore` — Ignore private public-API configuration.
+- `App/Config/Base.xcconfig` — Portable empty defaults, optional private include and Info.plist wiring.
+- `App/Config/Public.xcconfig.example` — Empty public URL and Hapur example.
+- `App/Config/PublicInfo.plist` — Expose public URL/district to the app.
+- `App/KilnWatch/Design/Components/BeforeAfterComparator.swift` — Real pixel-crisp evidence loader/comparator and honest states; illustrative gate retained.
+- `App/KilnWatch/Design/Components/ExposureBlock.swift` — Missing real exposure never becomes zero or a fixed-radius claim.
+- `App/KilnWatch/Design/Components/KilnIDLabel.swift` — Unverified prediction and accessible full ID.
+- `App/KilnWatch/Design/Components/RegistryStateView.swift` — Loading/error/Retry views and explicit source indicator.
+- `App/KilnWatch/Features/Kiln/KilnView.swift` — Live detail, honest assessments/dates/score and footprint/location map.
+- `App/KilnWatch/Features/Kilns/KilnsView.swift` — Live district list, search/filter and source/network states.
+- `App/KilnWatch/Features/Today/PublicRegistryMap.swift` — Real bounds, footprints and accessible compact pins; no fabricated route.
+- `App/KilnWatch/Features/Today/TodayView.swift` — Choose public map or retained fixture route.
+- `App/KilnWatch/KilnWatchApp.swift` — Configuration/public state flow, detail/backoff/cancellation and stateless session.
+- `App/KilnWatch/Mock/EvidenceAfter.png` — Synthetic local 256 px comparator test image.
+- `App/KilnWatch/Mock/EvidenceBefore.png` — Synthetic local 256 px comparator test image.
+- `App/KilnWatch/Mock/PublicDemo.swift` — Isolated DEBUG list/detail/evidence failure simulations.
+- `App/Packages/KilnWatchCore/Package.swift` — Bundle public response/image test resources.
+- `App/Packages/KilnWatchCore/Sources/KilnWatchCore/EvidenceImageData.swift` — Bounded HTTPS/local PNG loading and validation.
+- `App/Packages/KilnWatchCore/Sources/KilnWatchCore/KilnWatchAPI.swift` — Token-free public paging/near/detail, typed failures and stateless cache policy.
+- `App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/KilnWatchCoreTests.swift` — Public auth/query/paging/errors/decoding/image/session regressions.
+- `App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/README.md` — Public capture provenance and synthetic-image disclosure.
+- `App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/detail.json` — Captured small public reference detail body.
+- `App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/image.png` — Synthetic PNG loader regression resource.
+- `App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/near.json` — Captured public near-point body with distance_m.
+- `App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/page1.json` — Captured first district page.
+- `App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/page2.json` — Captured second district page.
+- `App/docs/HANDOVER.md` — Append this run and remaining work; retain historical sections.
+- `App/docs/api-contract.md` — Public configuration, no-login data/error behavior and DEBUG hooks.
+- `App/docs/screens/phase-3/503-ax3.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/503-ax5.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/503-dark.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/503-light.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/builder-notes.md` — Milestone implementation and three review/fix cycles.
+- `App/docs/screens/phase-3/changed-files.md` — Complete one-line file inventory.
+- `App/docs/screens/phase-3/cycle1-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/cycle1-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/cycle2-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/cycle2-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/cycle3-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/cycle3-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/detail-ax3.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/detail-ax5.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/detail-bottom-dark.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/detail-bottom-light.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/detail-top-dark.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/detail-top-light.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/kilns-ax3.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/kilns-ax5.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/kilns-dark.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/kilns-light.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/m1-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m1-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m2-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m2-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m3-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m3-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m4-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m4-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m5-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/m5-tests.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/offline-dark.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/offline-light.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/overnight-report.md` — Morning verdict, evidence, defaults, limitations and stop point.
+- `App/docs/screens/phase-3/synthetic-evidence-failed.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/synthetic-evidence-loaded.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/synthetic-evidence-loading.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/tester-ax3-final.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-ax3-prepolish.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-ax5-final.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-ax5-prepolish.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-build-final.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-build.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-core-final.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-core.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-live-final.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-notes.md` — Exact acceptance results, harness history and inspected screenshot links.
+- `App/docs/screens/phase-3/tester-preservation.json` — Sanitized preservation/privacy verification.
+- `App/docs/screens/phase-3/tester-status.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-ui-cycle2.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-ui-final-dark.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-ui-final-light.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/tester-ui-initial.log` — Sanitized milestone/build/core/XCTest verification log; failures and scope recorded in tester notes.
+- `App/docs/screens/phase-3/today-ax3.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/today-ax5.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/today-dark.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/today-light.png` — Final inspected Simulator screenshot (see tester notes for source/appearance).
+- `App/docs/screens/phase-3/ui-checks.swift` — Saved temporary XCTest acceptance source.
+- `KilnWatch.xcodeproj/project.pbxproj` — Minimal Debug/Release base xcconfig wiring.
+
+Local-only, git-ignored: `App/Config/Public.xcconfig` — actual public URL and Hapur configuration, intentionally excluded from the deliverable.

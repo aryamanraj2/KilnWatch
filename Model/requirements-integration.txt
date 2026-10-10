@@ -1,0 +1,7 @@
+ultralytics==8.4.174
+rasterio==1.4.4
+shapely==2.1.2
+pyproj==3.7.2
+Pillow==12.3.0
+numpy==2.5.3
+torch==2.14.1

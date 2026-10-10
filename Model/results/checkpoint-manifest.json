@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "artifact": "best.pt",
+  "sha256": "3bcbcd0af696278d894ab6f463c81a742c596192d0493a470f0d03ac4b61f799",
+  "bytes": 19713480,
+  "task": "obb",
+  "classes": {
+    "0": "CFCBK",
+    "1": "FCBK",
+    "2": "Zigzag"
+  },
+  "model_version": "baseline:3bcbcd0af696",
+  "checkpoint_ultralytics": "8.4.174",
+  "checkpoint_saved_at": "2026-10-09T13:20:49.546036+00:00",
+  "loader_ultralytics": "8.4.174",
+  "loader_torch": "2.14.1",
+  "training": {
+    "model": "yolo11s-obb.pt",
+    "name": "baseline",
+    "epochs": 20,
+    "imgsz": 128,
+    "batch": 64,
+    "fraction": 1.0
+  },
+  "checkpoint_epoch": -1,
+  "limitations": [
+    "Stripped epoch=-1 does not establish completed epoch count.",
+    "Type predictions remain unverified regardless of class score.",
+    "args stores optimizer=auto and warmup_bias_lr=0.1; checkpoint stores resolved MuSGD and OBB-adjusted 0.0.",
+    "Saved Kaggle version/run identity missing; external scores have no weights checksum."
+  ],
+  "external_run_identity": null,
+  "external_scores_sha256": null,
+  "supplied_args_sha256": "495598de9bbc87cd5928c965c6d145c60e50c7643d4889b242a908145f56afad",
+  "supplied_save_dir": "/kaggle/working/runs/obb/runs/kilnwatch/baseline",
+  "supplied_metadata_config_matches": true,
+  "supplied_scores_sha256": "8ac9b684b62db6094f6d5a65b7bdf094bd72ea70d811af4ecf0d0bf1b4c7c504",
+  "supplied_scores_match_checked_in_baseline": true
+}

@@ -1,0 +1,70 @@
+{
+  "rules": [
+    {
+      "id": "C-HAB-800",
+      "check": "Distance to habitation",
+      "threshold_m": 800,
+      "requirement": null,
+      "overrides": [
+        {
+          "state": "UP",
+          "threshold_m": 1000
+        }
+      ],
+      "source": "Central 2022 rules; UP siting rules"
+    },
+    {
+      "id": "C-KILN-1K",
+      "check": "Distance to another kiln",
+      "threshold_m": 1000,
+      "requirement": null,
+      "overrides": [
+        {
+          "state": "UP",
+          "threshold_m": 800
+        }
+      ],
+      "source": "Central 2022 rules; UP siting rules"
+    },
+    {
+      "id": "C-ORCH-800",
+      "check": "Distance to an orchard",
+      "threshold_m": 800,
+      "requirement": null,
+      "overrides": [],
+      "source": "Central 2022 rules"
+    },
+    {
+      "id": "UP-SCH-1K",
+      "check": "Distance to a school",
+      "threshold_m": 1000,
+      "requirement": null,
+      "overrides": [],
+      "source": "UP and Haryana siting rules"
+    },
+    {
+      "id": "UP-NH-300",
+      "check": "Distance to a national highway",
+      "threshold_m": 300,
+      "requirement": null,
+      "overrides": [],
+      "source": "UP siting rules"
+    },
+    {
+      "id": "UP-RAIL-200",
+      "check": "Distance to a railway line",
+      "threshold_m": 200,
+      "requirement": null,
+      "overrides": [],
+      "source": "UP siting rules"
+    },
+    {
+      "id": "C-TECH-10K",
+      "check": "Within 10 km of a non-attainment city",
+      "threshold_m": null,
+      "requirement": "Zigzag, vertical shaft or gas",
+      "overrides": [],
+      "source": "Central 2022 rules"
+    }
+  ]
+}

@@ -1,5 +1,23 @@
-__pycache__/
-*.pyc
-runs/
+.DS_Store
+xcuserdata/
+.build/
+.swiftpm/
+DerivedData/
+
+# Local model/integration artifacts and credentials
 *.pt
 *.geojson
+.venv*/
+.local/
+.env
+*.tfvars
+!terraform.tfvars.example
+
+/args.yaml
+/scores.json
+
+__pycache__/
+*.pyc
+
+# Public API deployment configuration stays local (the example is portable).
+/App/Config/Public.xcconfig

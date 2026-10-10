@@ -1,0 +1,57 @@
+{
+  "kilns": [
+    {
+      "detection_confidence": 0.95,
+      "district": "Hapur",
+      "evidence": {
+        "after": null,
+        "before": null
+      },
+      "exposure": null,
+      "first_seen": "2026-10-05T05:41:03.148000Z",
+      "footprint": {
+        "centroid": {
+          "latitude": 28.7305,
+          "longitude": 77.7805
+        },
+        "polygon": [
+          {
+            "latitude": 28.73,
+            "longitude": 77.78
+          },
+          {
+            "latitude": 28.73,
+            "longitude": 77.781
+          },
+          {
+            "latitude": 28.731,
+            "longitude": 77.781
+          },
+          {
+            "latitude": 28.731,
+            "longitude": 77.78
+          }
+        ]
+      },
+      "kiln_id": "KW-73e7427d4c43543b819d04513005ca82",
+      "last_seen": "2026-10-05T05:41:03.148000Z",
+      "provenance": {
+        "acquired_at": "2026-10-05T05:41:03.148000Z",
+        "confidence_semantics": "predicted_class_score_shared",
+        "imported_at": "2026-10-09T15:00:00Z",
+        "input_sha256": "d14f87353d2c6c59b8b3ca9439a8fe199bbcae81b228bc43cb7af26a2e4e5611",
+        "model_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "model_version": "synthetic-unit-test",
+        "scene_id": "SYNTHETIC-B"
+      },
+      "rules_assessment": "not_evaluated",
+      "type": "Hoffmann",
+      "type_confidence": 0.95,
+      "type_verification": "unverified",
+      "violations": [],
+      "status": "flagged",
+      "review_state": "pending"
+    }
+  ],
+  "next_cursor": null
+}

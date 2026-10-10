@@ -1,0 +1,736 @@
+Command line invocation:
+    /Applications/Xcode-beta.app/Contents/Developer/usr/bin/xcodebuild -project /tmp/KilnWatchPhase3Checks/Phase3Checks.xcodeproj -scheme Phase3Checks -destination "platform=iOS Simulator,id=E098270B-C0FA-49DA-9CE6-ADE9B2F1AAC6" -derivedDataPath /tmp/KilnWatchPhase3Derived -parallel-testing-enabled NO "-only-testing:Phase3Checks/Phase3Checks/testLiveListDetailAndToday" "-only-testing:Phase3Checks/Phase3Checks/testRequiredScreenshots" test
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  KilnWatchCore: /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/Packages/KilnWatchCore @ local
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+warning: Building targets in manual order is deprecated - choose Dependency Order in scheme settings instead, or set DISABLE_MANUAL_TARGET_ORDER_BUILD_WARNING in any of the targets in the current scheme to suppress this warning
+note: Target dependency graph (5 targets)
+    Target 'Phase3Checks' in project 'Phase3Checks'
+        ➜ Explicit dependency on target 'KilnWatch' in project 'Phase3Checks'
+    Target 'KilnWatch' in project 'Phase3Checks'
+        ➜ Explicit dependency on target 'KilnWatchCore-product' in project 'KilnWatchCore'
+    Target 'KilnWatchCore-product' in project 'KilnWatchCore'
+        ➜ Explicit dependency on target 'KilnWatchCore' in project 'KilnWatchCore'
+        ➜ Explicit dependency on target 'KilnWatchCore_KilnWatchCore' in project 'KilnWatchCore'
+    Target 'KilnWatchCore' in project 'KilnWatchCore'
+        ➜ Explicit dependency on target 'KilnWatchCore_KilnWatchCore' in project 'KilnWatchCore'
+    Target 'KilnWatchCore_KilnWatchCore' in project 'KilnWatchCore' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/KilnWatch/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ExecuteExternalTool /Applications/Xcode-beta.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+Build description signature: 772eaa8c258ba9d6aaffd5c66cbd9666
+Build description path: /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/XCBuildData/772eaa8c258ba9d6aaffd5c66cbd9666.xcbuilddata
+ProcessInfoPlistFile /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore.bundle/Info.plist /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/KilnWatchCore.build/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore-b.build/empty-KilnWatchCore_KilnWatchCore.plist (in target 'KilnWatchCore_KilnWatchCore' from project 'KilnWatchCore')
+    cd /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/Packages/KilnWatchCore
+    builtin-infoPlistUtility /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/KilnWatchCore.build/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore-b.build/empty-KilnWatchCore_KilnWatchCore.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatchCore_KilnWatchCore.bundle/Info.plist
+
+ClangStatCache /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk /tmp/KilnWatchPhase3Derived/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache
+    cd /tmp/KilnWatchPhase3Checks/Phase3Checks.xcodeproj
+    /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -o /tmp/KilnWatchPhase3Derived/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache
+
+ProcessInfoPlistFile /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/Info.plist /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/Config/PublicInfo.plist (in target 'KilnWatch' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-infoPlistUtility /Users/aryamanjaiswal/Downloads/Github_pulls/KilnWatch/App/Config/PublicInfo.plist -producttype com.apple.product-type.application -genpkginfo /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/KilnWatch.build/assetcatalog_generated_info.plist -scanforprivacyfile /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/KilnWatchCore_KilnWatchCore.bundle -o /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/Info.plist
+
+CopySwiftLibs /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app (in target 'KilnWatch' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/KilnWatch.debug.dylib --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/Frameworks --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/PlugIns --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/SystemExtensions --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/KilnWatch.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/KilnWatch.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ProcessInfoPlistFile /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Info.plist /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/empty-Phase3Checks.plist (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-infoPlistUtility /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/empty-Phase3Checks.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/ProductTypeInfoPlistAdditions.plist -o /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Info.plist
+
+SwiftDriver Phase3Checks normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-SwiftDriver -- /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Phase3Checks -Onone @/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -target arm64-apple-ios27.0-simulator -g -module-cache-path /tmp/KilnWatchPhase3Derived/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/KilnWatchPhase3Derived/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -parse-as-library -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/KilnWatchPhase3Derived/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache -output-file-map /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/KilnWatchPhase3Derived/ModuleCache.noindex -sdk-module-cache-path /tmp/KilnWatchPhase3Derived/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /tmp/KilnWatchPhase3Derived/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -emit-const-values -const-gather-protocols-list /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-generated-files.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-own-target-headers.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks-363d3cccabe4356cf580e1c5cc9edffb-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-project-headers.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources-normal/arm64 -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources/arm64 -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-Swift.h -working-directory /tmp/KilnWatchPhase3Checks -experimental-emit-module-separately -disable-cmo
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ Phase3Checks (in target 'Phase3Checks' from project 'Phase3Checks')
+
+SwiftCompile normal arm64 (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    
+
+SwiftCompile normal arm64 Compiling\ Phase3Checks.swift /tmp/KilnWatchPhase3Checks/Tests/Phase3Checks.swift (in target 'Phase3Checks' from project 'Phase3Checks')
+
+SwiftCompile normal arm64 /tmp/KilnWatchPhase3Checks/Tests/Phase3Checks.swift (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-SwiftPerFileCompile Phase3Checks.swift
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for Phase3Checks (in target 'Phase3Checks' from project 'Phase3Checks')
+
+SwiftDriver\ Compilation\ Requirements Phase3Checks normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Phase3Checks -Onone @/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -target arm64-apple-ios27.0-simulator -g -module-cache-path /tmp/KilnWatchPhase3Derived/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/KilnWatchPhase3Derived/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -parse-as-library -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/KilnWatchPhase3Derived/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache -output-file-map /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/KilnWatchPhase3Derived/ModuleCache.noindex -sdk-module-cache-path /tmp/KilnWatchPhase3Derived/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /tmp/KilnWatchPhase3Derived/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -emit-const-values -const-gather-protocols-list /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-generated-files.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-own-target-headers.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks-363d3cccabe4356cf580e1c5cc9edffb-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-project-headers.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources-normal/arm64 -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources/arm64 -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-Swift.h -working-directory /tmp/KilnWatchPhase3Checks -experimental-emit-module-separately -disable-cmo
+
+Copy /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.swiftsourceinfo (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.swiftsourceinfo /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+Copy /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks.swiftmodule/arm64-apple-ios-simulator.abi.json /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.abi.json (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.abi.json /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+SwiftDriverJobDiscovery normal arm64 Compiling Phase3Checks.swift (in target 'Phase3Checks' from project 'Phase3Checks')
+
+SwiftDriver\ Compilation Phase3Checks normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-Swift-Compilation -- /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Phase3Checks -Onone @/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -target arm64-apple-ios27.0-simulator -g -module-cache-path /tmp/KilnWatchPhase3Derived/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/KilnWatchPhase3Derived/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -parse-as-library -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/KilnWatchPhase3Derived/SDKStatCaches.noindex/iphonesimulator27.0-24A5380g-3243818bda632a4370e1cc7a9fd181c5.sdkstatcache -output-file-map /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/KilnWatchPhase3Derived/ModuleCache.noindex -sdk-module-cache-path /tmp/KilnWatchPhase3Derived/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /tmp/KilnWatchPhase3Derived/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -emit-const-values -const-gather-protocols-list /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-generated-files.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-own-target-headers.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks-363d3cccabe4356cf580e1c5cc9edffb-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks-project-headers.hmap -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources-normal/arm64 -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources/arm64 -Xcc -I/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks-Swift.h -working-directory /tmp/KilnWatchPhase3Checks -experimental-emit-module-separately -disable-cmo
+
+Ld /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Phase3Checks normal (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios27.0-simulator -bundle -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk -O0 -Xlinker -no_warn_duplicate_libraries -L/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -L/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk/Developer/Library/Frameworks -filelist /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.LinkFileList -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -Xlinker -object_path_lto -Xlinker /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.swiftmodule -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks.xctest-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks.xctest-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Phase3Checks
+
+CopySwiftLibs /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Phase3Checks --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Frameworks --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/PlugIns --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/SystemExtensions --scan-folder /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ExtractAppIntentsMetadata (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name Phase3Checks --sdk-root /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk --xcode-version 27A5218g --platform-family iOS --deployment-target 27.0 --bundle-identifier com.kilnwatch.phase3checks --output /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest --target-triple arm64-apple-ios27.0-simulator --binary-file /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest/Phase3Checks --dependency-file /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks_dependency_info.dat --stringsdata-file /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.SwiftFileList --metadata-file-list /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks.DependencyMetadataFileList --static-metadata-file-list /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Phase3Checks.DependencyStaticMetadataFileList --swift-const-vals-list /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/Phase3Checks.build/Debug-iphonesimulator/Phase3Checks.build/Objects-normal/arm64/Phase3Checks.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --no-app-shortcuts-localization
+2026-10-10 02:43:38.730 appintentsmetadataprocessor[9904:21800252] Starting appintentsmetadataprocessor export
+2026-10-10 02:43:38.734 appintentsmetadataprocessor[9904:21800252] warning: Metadata extraction skipped, no AppIntents.framework dependency found
+
+CodeSign /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app/PlugIns/Phase3Checks.xctest
+
+CodeSign /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app (in target 'Phase3Checks' from project 'Phase3Checks')
+    cd /tmp/KilnWatchPhase3Checks
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app
+/tmp/KilnWatchPhase3Derived/Build/Products/Debug-iphonesimulator/Phase3Checks-Runner.app: replacing existing signature
+
+PruneExplicitPrecompiledModules /tmp/KilnWatchPhase3Derived/SDKExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /tmp/KilnWatchPhase3Derived/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+2026-10-10 02:43:40.672791+0530 Phase3Checks-Runner[9908:21800423] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-10-10 02:43:44.386.
+Test Suite 'Phase3Checks.xctest' started at 2026-10-10 02:43:44.388.
+Test Suite 'Phase3Checks' started at 2026-10-10 02:43:44.388.
+Test Case '-[Phase3Checks.Phase3Checks testLiveListDetailAndToday]' started.
+    t =     0.00s Start Test at 2026-10-10 02:43:44.390
+    t =     0.22s Set Up
+    t =     0.24s Open com.kilnwatch.inspector
+    t =     0.24s     Launch com.kilnwatch.inspector
+2026-10-10 02:43:44.858 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-10 02:43:44.858 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: no debugger version
+objc[9908]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x10a2e8398) and /Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x10a3bc310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+    t =     0.89s         Setting up automation session
+    t =     3.18s         Wait for com.kilnwatch.inspector to idle
+    t =     5.98s Waiting 25.0s for "HAPUR · 39 KILNS" StaticText to exist
+    t =     7.03s     Checking `Expect predicate `existsNoRetry == 1` for object "HAPUR · 39 KILNS" StaticText`
+    t =     7.03s         Checking existence of `"HAPUR · 39 KILNS" StaticText`
+    t =     7.23s Waiting 12.0s for "Live data" StaticText to exist
+    t =     8.28s     Checking `Expect predicate `existsNoRetry == 1` for object "Live data" StaticText`
+    t =     8.28s         Checking existence of `"Live data" StaticText`
+    t =     8.33s Get all elements bound by index for: Descendants matching type Any
+    t =     8.43s Find the Any (Element at index 0)
+    t =     8.47s Find the Any (Element at index 1)
+    t =     8.50s Find the Any (Element at index 2)
+    t =     8.53s Find the Any (Element at index 3)
+    t =     8.56s Find the Any (Element at index 4)
+    t =     8.59s Find the Any (Element at index 5)
+    t =     8.62s Find the Any (Element at index 6)
+    t =     8.65s Find the Any (Element at index 7)
+    t =     8.68s Find the Any (Element at index 8)
+    t =     8.71s Find the Any (Element at index 9)
+    t =     8.74s Find the Any (Element at index 10)
+    t =     8.77s Find the Any (Element at index 11)
+    t =     8.80s Find the Any (Element at index 12)
+    t =     8.83s Find the Any (Element at index 13)
+    t =     8.86s Find the Any (Element at index 14)
+    t =     8.89s Find the Any (Element at index 15)
+    t =     8.92s Find the Any (Element at index 16)
+    t =     8.95s Find the Any (Element at index 17)
+    t =     8.99s Find the Any (Element at index 18)
+    t =     9.02s Find the Any (Element at index 19)
+    t =     9.05s Find the Any (Element at index 20)
+    t =     9.08s Find the Any (Element at index 21)
+    t =     9.11s Find the Any (Element at index 22)
+    t =     9.14s Find the Any (Element at index 23)
+    t =     9.18s Find the Any (Element at index 24)
+    t =     9.21s Find the Any (Element at index 25)
+    t =     9.24s Find the Any (Element at index 26)
+    t =     9.27s Find the Any (Element at index 27)
+    t =     9.30s Find the Any (Element at index 28)
+    t =     9.34s Find the Any (Element at index 29)
+    t =     9.37s Find the Any (Element at index 30)
+    t =     9.40s Find the Any (Element at index 31)
+    t =     9.44s Find the Any (Element at index 32)
+    t =     9.47s Find the Any (Element at index 33)
+    t =     9.50s Find the Any (Element at index 34)
+    t =     9.54s Find the Any (Element at index 35)
+    t =     9.57s Find the Any (Element at index 36)
+    t =     9.60s Find the Any (Element at index 37)
+    t =     9.64s Find the Any (Element at index 38)
+    t =     9.67s Find the Any (Element at index 39)
+    t =     9.71s Find the Any (Element at index 40)
+    t =     9.74s Find the Any (Element at index 41)
+    t =     9.78s Find the Any (Element at index 42)
+    t =     9.81s Find the Any (Element at index 43)
+    t =     9.87s Find the Any (Element at index 44)
+    t =     9.91s Find the Any (Element at index 45)
+    t =     9.94s Find the Any (Element at index 46)
+    t =     9.98s Find the Any (Element at index 47)
+    t =    10.01s Find the Any (Element at index 48)
+    t =    10.05s Find the Any (Element at index 49)
+    t =    10.08s Find the Any (Element at index 50)
+    t =    10.12s Find the Any (Element at index 51)
+    t =    10.15s Find the Any (Element at index 52)
+    t =    10.19s Find the Any (Element at index 53)
+    t =    10.23s Find the Any (Element at index 54)
+    t =    10.26s Find the Any (Element at index 55)
+    t =    10.30s Find the Any (Element at index 56)
+    t =    10.34s Find the Any (Element at index 57)
+    t =    10.37s Find the Any (Element at index 58)
+    t =    10.42s Find the Any (Element at index 59)
+    t =    10.45s Find the Any (Element at index 60)
+    t =    10.49s Find the Any (Element at index 61)
+    t =    10.53s Find the Any (Element at index 62)
+    t =    10.57s Find the Any (Element at index 63)
+    t =    10.61s Find the Any (Element at index 64)
+    t =    10.65s Find the Any (Element at index 65)
+    t =    10.69s Find the Any (Element at index 66)
+    t =    10.73s Find the Any (Element at index 67)
+    t =    10.76s Find the Any (Element at index 68)
+    t =    10.80s Find the Any (Element at index 69)
+    t =    10.84s Find the Any (Element at index 70)
+    t =    10.88s Find the Any (Element at index 71)
+    t =    10.92s Find the Any (Element at index 72)
+    t =    10.96s Find the Any (Element at index 73)
+    t =    11.00s Find the Any (Element at index 74)
+    t =    11.04s Find the Any (Element at index 75)
+    t =    11.08s Find the Any (Element at index 76)
+    t =    11.12s Find the Any (Element at index 77)
+    t =    11.16s Find the Any (Element at index 78)
+    t =    11.20s Find the Any (Element at index 79)
+    t =    11.25s Find the Any (Element at index 80)
+    t =    11.29s Find the Any (Element at index 81)
+    t =    11.33s Find the Any (Element at index 82)
+    t =    11.37s Find the Any (Element at index 83)
+    t =    11.41s Find the Any (Element at index 84)
+    t =    11.45s Find the Any (Element at index 85)
+    t =    11.49s Find the Any (Element at index 86)
+    t =    11.53s Find the Any (Element at index 87)
+    t =    11.57s Find the Any (Element at index 88)
+    t =    11.62s Find the Any (Element at index 89)
+    t =    11.66s Find the Any (Element at index 90)
+    t =    11.71s Find the Any (Element at index 91)
+    t =    11.75s Find the Any (Element at index 92)
+    t =    11.79s Find the Any (Element at index 93)
+    t =    11.83s Find the Any (Element at index 94)
+    t =    11.87s Find the Any (Element at index 95)
+    t =    11.91s Find the Any (Element at index 96)
+    t =    11.95s Find the Any (Element at index 97)
+    t =    12.00s Find the Any (Element at index 98)
+    t =    12.04s Find the Any (Element at index 99)
+    t =    12.08s Find the Any (Element at index 100)
+    t =    12.13s Find the Any (Element at index 101)
+    t =    12.18s Find the Any (Element at index 102)
+    t =    12.22s Find the Any (Element at index 103)
+    t =    12.27s Find the Any (Element at index 104)
+    t =    12.32s Find the Any (Element at index 105)
+    t =    12.36s Find the Any (Element at index 106)
+    t =    12.41s Find the Any (Element at index 107)
+    t =    12.46s Find the Any (Element at index 108)
+    t =    12.50s Find the Any (Element at index 109)
+    t =    12.55s Find the Any (Element at index 110)
+    t =    12.60s Find the Any (Element at index 111)
+    t =    12.65s Find the Any (Element at index 112)
+    t =    12.70s Find the Any (Element at index 113)
+    t =    12.75s Find the Any (Element at index 114)
+    t =    12.80s Find the Any (Element at index 115)
+    t =    12.85s Find the Any (Element at index 116)
+    t =    12.90s Find the Any (Element at index 117)
+    t =    12.97s Find the Any (Element at index 118)
+    t =    13.02s Find the Any (Element at index 119)
+    t =    13.07s Find the Any (Element at index 120)
+    t =    13.12s Find the Any (Element at index 121)
+    t =    13.17s Find the Any (Element at index 122)
+    t =    13.22s Find the Any (Element at index 123)
+    t =    13.27s Find the Any (Element at index 124)
+    t =    13.32s Find the Any (Element at index 125)
+    t =    13.38s Find the Any (Element at index 126)
+    t =    13.43s Find the Any (Element at index 127)
+    t =    13.48s Find the Any (Element at index 128)
+    t =    13.53s Find the Any (Element at index 129)
+    t =    13.58s Find the Any (Element at index 130)
+    t =    13.63s Find the Any (Element at index 131)
+    t =    13.68s Find the Any (Element at index 132)
+    t =    13.73s Find the Any (Element at index 133)
+    t =    13.79s Find the Any (Element at index 134)
+    t =    13.85s Find the Any (Element at index 135)
+    t =    13.90s Find the Any (Element at index 136)
+    t =    13.95s Find the Any (Element at index 137)
+    t =    14.01s Find the Any (Element at index 138)
+    t =    14.09s Find the Any (Element at index 139)
+    t =    14.14s Find the Any (Element at index 140)
+    t =    14.19s Find the Any (Element at index 141)
+    t =    14.25s Find the Any (Element at index 142)
+    t =    14.31s Find the Any (Element at index 143)
+    t =    14.36s Find the Any (Element at index 144)
+    t =    14.42s Find the Any (Element at index 145)
+    t =    14.48s Find the Any (Element at index 146)
+    t =    14.53s Find the Any (Element at index 147)
+    t =    14.58s Find the Any (Element at index 148)
+    t =    14.64s Find the Any (Element at index 149)
+    t =    14.70s Find the Any (Element at index 150)
+    t =    14.75s Find the Any (Element at index 151)
+    t =    14.81s Find the Any (Element at index 152)
+    t =    14.87s Find the Any (Element at index 153)
+    t =    14.93s Find the Any (Element at index 154)
+    t =    14.98s Find the Any (Element at index 155)
+    t =    15.04s Find the Any (Element at index 156)
+    t =    15.10s Find the Any (Element at index 157)
+    t =    15.16s Find the Any (Element at index 158)
+    t =    15.22s Find the Any (Element at index 159)
+    t =    15.28s Find the Any (Element at index 160)
+    t =    15.34s Find the Any (Element at index 161)
+    t =    15.40s Find the Any (Element at index 162)
+    t =    15.46s Find the Any (Element at index 163)
+    t =    15.52s Find the Any (Element at index 164)
+    t =    15.57s Find the Any (Element at index 165)
+    t =    15.64s Find the Any (Element at index 166)
+    t =    15.72s Find the Any (Element at index 167)
+    t =    15.78s Find the Any (Element at index 168)
+    t =    15.84s Find the Any (Element at index 169)
+    t =    15.90s Checking existence of `"Record verdict" Button`
+    t =    15.95s Checking existence of `"Ask about this kiln" Button`
+    t =    15.99s Checking existence of `SearchField (First Match)`
+    t =    16.02s Tap SearchField (First Match)
+    t =    16.02s     Wait for com.kilnwatch.inspector to idle
+    t =    16.02s     Find the SearchField (First Match)
+    t =    16.06s     Check for interrupting elements affecting "Kiln or rule ID" SearchField
+    t =    16.11s     Synthesize event
+    t =    16.43s     Wait for com.kilnwatch.inspector to idle
+    t =    17.10s Type 'KW-6b3b38da681850e...' into "Kiln or rule ID" SearchField
+    t =    17.10s     Wait for com.kilnwatch.inspector to idle
+    t =    17.92s     Find the "Kiln or rule ID" SearchField
+    t =    17.99s     Check for interrupting elements affecting "Kiln or rule ID" SearchField
+    t =    18.04s     Synthesize event
+    t =    18.83s     Wait for com.kilnwatch.inspector to idle
+    t =    18.83s Waiting 5.0s for "kiln-row-KW-6b3b38da681850e5af46b024f3d3f78e" Any to exist
+    t =    19.88s     Checking `Expect predicate `existsNoRetry == 1` for object "kiln-row-KW-6b3b38da681850e5af46b024f3d3f78e" Any`
+    t =    19.88s         Checking existence of `"kiln-row-KW-6b3b38da681850e5af46b024f3d3f78e" Any`
+    t =    20.02s Tap "kiln-row-KW-6b3b38da681850e5af46b024f3d3f78e" Any
+    t =    20.02s     Wait for com.kilnwatch.inspector to idle
+    t =    20.03s     Find the "kiln-row-KW-6b3b38da681850e5af46b024f3d3f78e" Any
+    t =    20.14s     Check for interrupting elements affecting "kiln-row-KW-6b3b38da681850e5af46b024f3d3f78e" Button
+    t =    20.18s     Synthesize event
+    t =    20.46s     Wait for com.kilnwatch.inspector to idle
+    t =    21.37s Waiting 12.0s for "Model score 0.32" StaticText to exist
+    t =    22.43s     Checking `Expect predicate `existsNoRetry == 1` for object "Model score 0.32" StaticText`
+    t =    22.43s         Checking existence of `"Model score 0.32" StaticText`
+    t =    22.49s Waiting 12.0s for "Predicted FCBK · unverified" StaticText to exist
+    t =    23.54s     Checking `Expect predicate `existsNoRetry == 1` for object "Predicted FCBK · unverified" StaticText`
+    t =    23.54s         Checking existence of `"Predicted FCBK · unverified" StaticText`
+    t =    23.60s Waiting 12.0s for "Satellite images not yet published" StaticText to exist
+    t =    24.64s     Checking `Expect predicate `existsNoRetry == 1` for object "Satellite images not yet published" StaticText`
+    t =    24.65s         Checking existence of `"Satellite images not yet published" StaticText`
+    t =    24.71s Get all elements bound by index for: Descendants matching type Any
+    t =    24.75s Find the Any (Element at index 0)
+    t =    24.76s Find the Any (Element at index 1)
+    t =    24.78s Find the Any (Element at index 2)
+    t =    24.80s Find the Any (Element at index 3)
+    t =    24.82s Find the Any (Element at index 4)
+    t =    24.83s Find the Any (Element at index 5)
+    t =    24.85s Find the Any (Element at index 6)
+    t =    24.87s Find the Any (Element at index 7)
+    t =    24.89s Find the Any (Element at index 8)
+    t =    24.90s Find the Any (Element at index 9)
+    t =    24.92s Find the Any (Element at index 10)
+    t =    24.94s Find the Any (Element at index 11)
+    t =    24.95s Find the Any (Element at index 12)
+    t =    24.97s Find the Any (Element at index 13)
+    t =    24.99s Find the Any (Element at index 14)
+    t =    25.01s Find the Any (Element at index 15)
+    t =    25.03s Find the Any (Element at index 16)
+    t =    25.05s Find the Any (Element at index 17)
+    t =    25.07s Find the Any (Element at index 18)
+    t =    25.08s Find the Any (Element at index 19)
+    t =    25.10s Find the Any (Element at index 20)
+    t =    25.12s Find the Any (Element at index 21)
+    t =    25.14s Find the Any (Element at index 22)
+    t =    25.16s Find the Any (Element at index 23)
+    t =    25.18s Find the Any (Element at index 24)
+    t =    25.20s Find the Any (Element at index 25)
+    t =    25.22s Find the Any (Element at index 26)
+    t =    25.24s Find the Any (Element at index 27)
+    t =    25.26s Find the Any (Element at index 28)
+    t =    25.29s Find the Any (Element at index 29)
+    t =    25.31s Find the Any (Element at index 30)
+    t =    25.33s Find the Any (Element at index 31)
+    t =    25.35s Find the Any (Element at index 32)
+    t =    25.37s Find the Any (Element at index 33)
+    t =    25.39s Find the Any (Element at index 34)
+    t =    25.41s Find the Any (Element at index 35)
+    t =    25.43s Find the Any (Element at index 36)
+    t =    25.45s Find the Any (Element at index 37)
+    t =    25.47s Find the Any (Element at index 38)
+    t =    25.49s Find the Any (Element at index 39)
+    t =    25.51s Find the Any (Element at index 40)
+    t =    25.54s Find the Any (Element at index 41)
+    t =    25.56s Find the Any (Element at index 42)
+    t =    25.58s Find the Any (Element at index 43)
+    t =    25.60s Find the Any (Element at index 44)
+    t =    25.62s Find the Any (Element at index 45)
+    t =    25.65s Find the Any (Element at index 46)
+    t =    25.67s Find the Any (Element at index 47)
+    t =    25.69s Find the Any (Element at index 48)
+    t =    25.71s Find the Any (Element at index 49)
+    t =    25.74s Find the Any (Element at index 50)
+    t =    25.76s Find the Any (Element at index 51)
+    t =    25.78s Find the Any (Element at index 52)
+    t =    25.80s Find the Any (Element at index 53)
+    t =    25.83s Find the Any (Element at index 54)
+    t =    25.85s Find the Any (Element at index 55)
+    t =    25.87s Find the Any (Element at index 56)
+    t =    25.90s Find the Any (Element at index 57)
+    t =    25.92s Find the Any (Element at index 58)
+    t =    25.94s Find the Any (Element at index 59)
+    t =    25.97s Find the Any (Element at index 60)
+    t =    25.99s Find the Any (Element at index 61)
+    t =    26.02s Find the Any (Element at index 62)
+    t =    26.04s Find the Any (Element at index 63)
+    t =    26.07s Find the Any (Element at index 64)
+    t =    26.09s Find the Any (Element at index 65)
+    t =    26.11s Find the Any (Element at index 66)
+    t =    26.14s Find the Any (Element at index 67)
+    t =    26.16s Find the Any (Element at index 68)
+    t =    26.19s Find the Any (Element at index 69)
+    t =    26.21s Find the Any (Element at index 70)
+    t =    26.24s Find the Any (Element at index 71)
+    t =    26.27s Find the Any (Element at index 72)
+    t =    26.29s Find the Any (Element at index 73)
+    t =    26.32s Find the Any (Element at index 74)
+    t =    26.34s Find the Any (Element at index 75)
+    t =    26.37s Find the Any (Element at index 76)
+    t =    26.39s Find the Any (Element at index 77)
+    t =    26.42s Find the Any (Element at index 78)
+    t =    26.45s Find the Any (Element at index 79)
+    t =    26.47s Find the Any (Element at index 80)
+    t =    26.50s Find the Any (Element at index 81)
+    t =    26.53s Find the Any (Element at index 82)
+    t =    26.55s Find the Any (Element at index 83)
+    t =    26.58s Find the Any (Element at index 84)
+    t =    26.61s Find the Any (Element at index 85)
+    t =    26.63s Find the Any (Element at index 86)
+    t =    26.66s Find the Any (Element at index 87)
+    t =    26.69s Find the Any (Element at index 88)
+    t =    26.72s Find the Any (Element at index 89)
+    t =    26.75s Find the Any (Element at index 90)
+    t =    26.78s Find the Any (Element at index 91)
+    t =    26.81s Find the Any (Element at index 92)
+    t =    26.84s Find the Any (Element at index 93)
+    t =    26.86s Find the Any (Element at index 94)
+    t =    26.89s Find the Any (Element at index 95)
+    t =    26.92s Find the Any (Element at index 96)
+    t =    26.95s Find the Any (Element at index 97)
+    t =    26.98s Find the Any (Element at index 98)
+    t =    27.01s Checking existence of `"Record verdict" Button`
+    t =    27.04s Checking existence of `"Ask about this kiln" Button`
+    t =    27.06s Swipe up Target Application 'com.kilnwatch.inspector'
+    t =    27.06s     Wait for com.kilnwatch.inspector to idle
+    t =    27.06s     Find the Target Application 'com.kilnwatch.inspector'
+    t =    27.08s     Check for interrupting elements affecting "KilnWatch" Application
+    t =    27.10s     Synthesize event
+    t =    27.51s     Wait for com.kilnwatch.inspector to idle
+    t =    28.22s Waiting 12.0s for "Rules not evaluated" StaticText to exist
+    t =    29.28s     Checking `Expect predicate `existsNoRetry == 1` for object "Rules not evaluated" StaticText`
+    t =    29.28s         Checking existence of `"Rules not evaluated" StaticText`
+    t =    29.33s Waiting 12.0s for "Population exposure not assessed" StaticText to exist
+    t =    30.38s     Checking `Expect predicate `existsNoRetry == 1` for object "Population exposure not assessed" StaticText`
+    t =    30.38s         Checking existence of `"Population exposure not assessed" StaticText`
+    t =    30.43s Get all elements bound by index for: Descendants matching type Any
+    t =    30.47s Find the Any (Element at index 0)
+    t =    30.49s Find the Any (Element at index 1)
+    t =    30.50s Find the Any (Element at index 2)
+    t =    30.52s Find the Any (Element at index 3)
+    t =    30.54s Find the Any (Element at index 4)
+    t =    30.55s Find the Any (Element at index 5)
+    t =    30.57s Find the Any (Element at index 6)
+    t =    30.58s Find the Any (Element at index 7)
+    t =    30.60s Find the Any (Element at index 8)
+    t =    30.62s Find the Any (Element at index 9)
+    t =    30.64s Find the Any (Element at index 10)
+    t =    30.65s Find the Any (Element at index 11)
+    t =    30.67s Find the Any (Element at index 12)
+    t =    30.69s Find the Any (Element at index 13)
+    t =    30.70s Find the Any (Element at index 14)
+    t =    30.72s Find the Any (Element at index 15)
+    t =    30.74s Find the Any (Element at index 16)
+    t =    30.76s Find the Any (Element at index 17)
+    t =    30.77s Find the Any (Element at index 18)
+    t =    30.79s Find the Any (Element at index 19)
+    t =    30.81s Find the Any (Element at index 20)
+    t =    30.83s Find the Any (Element at index 21)
+    t =    30.84s Find the Any (Element at index 22)
+    t =    30.86s Find the Any (Element at index 23)
+    t =    30.88s Find the Any (Element at index 24)
+    t =    30.90s Find the Any (Element at index 25)
+    t =    30.92s Find the Any (Element at index 26)
+    t =    30.94s Find the Any (Element at index 27)
+    t =    30.96s Find the Any (Element at index 28)
+    t =    30.97s Find the Any (Element at index 29)
+    t =    30.99s Find the Any (Element at index 30)
+    t =    31.01s Find the Any (Element at index 31)
+    t =    31.03s Find the Any (Element at index 32)
+    t =    31.05s Find the Any (Element at index 33)
+    t =    31.07s Find the Any (Element at index 34)
+    t =    31.09s Find the Any (Element at index 35)
+    t =    31.11s Find the Any (Element at index 36)
+    t =    31.13s Find the Any (Element at index 37)
+    t =    31.15s Find the Any (Element at index 38)
+    t =    31.17s Find the Any (Element at index 39)
+    t =    31.19s Find the Any (Element at index 40)
+    t =    31.21s Find the Any (Element at index 41)
+    t =    31.23s Find the Any (Element at index 42)
+    t =    31.25s Find the Any (Element at index 43)
+    t =    31.27s Find the Any (Element at index 44)
+    t =    31.30s Find the Any (Element at index 45)
+    t =    31.32s Find the Any (Element at index 46)
+    t =    31.34s Find the Any (Element at index 47)
+    t =    31.36s Find the Any (Element at index 48)
+    t =    31.38s Find the Any (Element at index 49)
+    t =    31.40s Find the Any (Element at index 50)
+    t =    31.42s Find the Any (Element at index 51)
+    t =    31.45s Find the Any (Element at index 52)
+    t =    31.47s Find the Any (Element at index 53)
+    t =    31.49s Find the Any (Element at index 54)
+    t =    31.51s Find the Any (Element at index 55)
+    t =    31.53s Find the Any (Element at index 56)
+    t =    31.56s Find the Any (Element at index 57)
+    t =    31.58s Find the Any (Element at index 58)
+    t =    31.60s Find the Any (Element at index 59)
+    t =    31.62s Find the Any (Element at index 60)
+    t =    31.65s Find the Any (Element at index 61)
+    t =    31.67s Find the Any (Element at index 62)
+    t =    31.69s Find the Any (Element at index 63)
+    t =    31.71s Find the Any (Element at index 64)
+    t =    31.74s Find the Any (Element at index 65)
+    t =    31.76s Find the Any (Element at index 66)
+    t =    31.79s Find the Any (Element at index 67)
+    t =    31.81s Find the Any (Element at index 68)
+    t =    31.83s Find the Any (Element at index 69)
+    t =    31.86s Find the Any (Element at index 70)
+    t =    31.88s Find the Any (Element at index 71)
+    t =    31.91s Find the Any (Element at index 72)
+    t =    31.93s Find the Any (Element at index 73)
+    t =    31.96s Find the Any (Element at index 74)
+    t =    31.98s Find the Any (Element at index 75)
+    t =    32.01s Find the Any (Element at index 76)
+    t =    32.03s Find the Any (Element at index 77)
+    t =    32.06s Find the Any (Element at index 78)
+    t =    32.08s Find the Any (Element at index 79)
+    t =    32.11s Find the Any (Element at index 80)
+    t =    32.13s Find the Any (Element at index 81)
+    t =    32.16s Find the Any (Element at index 82)
+    t =    32.19s Find the Any (Element at index 83)
+    t =    32.21s Find the Any (Element at index 84)
+    t =    32.24s Find the Any (Element at index 85)
+    t =    32.26s Find the Any (Element at index 86)
+    t =    32.29s Find the Any (Element at index 87)
+    t =    32.32s Find the Any (Element at index 88)
+    t =    32.34s Checking existence of `"Record verdict" Button`
+    t =    32.36s Checking existence of `"Ask about this kiln" Button`
+    t =    32.38s Tap Button (First Match)
+    t =    32.38s     Wait for com.kilnwatch.inspector to idle
+    t =    32.38s     Find the Button (First Match)
+    t =    32.40s     Check for interrupting elements affecting "BackButton" Button
+    t =    32.42s     Synthesize event
+    t =    32.71s     Wait for com.kilnwatch.inspector to idle
+    t =    33.40s Checking existence of `"Cancel" Button`
+    t =    33.49s Swipe down Target Application 'com.kilnwatch.inspector'
+    t =    33.49s     Wait for com.kilnwatch.inspector to idle
+    t =    33.57s     Find the Target Application 'com.kilnwatch.inspector'
+    t =    33.59s     Check for interrupting elements affecting "KilnWatch" Application
+    t =    33.61s     Synthesize event
+    t =    34.03s     Wait for com.kilnwatch.inspector to idle
+    t =    34.53s Checking existence of `"Today" Button`
+    t =    34.60s Waiting 3.0s for "Today" Button to exist
+    t =    35.64s     Checking `Expect predicate `existsNoRetry == 1` for object "Today" Button`
+    t =    35.64s         Checking existence of `"Today" Button`
+    t =    35.70s Tap "Today" Button
+    t =    35.70s     Wait for com.kilnwatch.inspector to idle
+    t =    35.70s     Find the "Today" Button
+    t =    35.73s     Check for interrupting elements affecting "map" Button
+    t =    35.76s     Synthesize event
+    t =    35.76s         Scroll element to visible
+    t =    35.76s         Find the "map" Button
+    t =    35.80s         Computed hit point {-1, -1} after scrolling to visible
+    t =    36.09s     Wait for com.kilnwatch.inspector to idle
+LIVE_AFTER_SEARCH_CROSS_TAB_VERIFIED
+    t =    36.09s Waiting 12.0s for "39 satellite-flagged candidates" StaticText to exist
+    t =    37.14s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    37.14s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    37.23s         Capturing element debug description
+    t =    38.17s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    38.17s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    38.27s         Capturing element debug description
+    t =    39.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    39.18s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    39.26s         Capturing element debug description
+    t =    40.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    40.18s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    40.27s         Capturing element debug description
+    t =    41.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    41.19s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    41.27s         Capturing element debug description
+    t =    42.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    42.18s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    42.27s         Capturing element debug description
+    t =    43.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    43.18s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    43.26s         Capturing element debug description
+    t =    44.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    44.18s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    44.27s         Capturing element debug description
+    t =    45.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    45.18s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    45.26s         Capturing element debug description
+    t =    46.18s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    46.18s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    46.26s         Capturing element debug description
+    t =    47.10s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    47.10s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    47.18s         Capturing element debug description
+    t =    48.10s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    48.10s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    48.18s         Capturing element debug description
+    t =    48.18s     Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    48.24s Collecting debug information to assist test failure triage
+    t =    48.24s     Requesting snapshot of accessibility hierarchy for app with pid 9915
+/tmp/KilnWatchPhase3Checks/Tests/Phase3Checks.swift:13: error: -[Phase3Checks.Phase3Checks testLiveListDetailAndToday] : XCTAssertTrue failed - 39 satellite-flagged candidates
+    t =    48.36s Tear Down
+Test Case '-[Phase3Checks.Phase3Checks testLiveListDetailAndToday]' failed (48.691 seconds).
+Test Case '-[Phase3Checks.Phase3Checks testRequiredScreenshots]' started.
+    t =     0.00s Start Test at 2026-10-10 02:44:33.082
+    t =     0.03s Set Up
+    t =     0.03s Open com.kilnwatch.inspector
+    t =     0.04s     Launch com.kilnwatch.inspector
+    t =     0.04s         Terminate com.kilnwatch.inspector:9915
+2026-10-10 02:44:34.177 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-10 02:44:34.177 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.30s         Setting up automation session
+    t =     3.35s         Wait for com.kilnwatch.inspector to idle
+    t =     4.87s Waiting 25.0s for "HAPUR · 39 KILNS" StaticText to exist
+    t =     5.90s     Checking `Expect predicate `existsNoRetry == 1` for object "HAPUR · 39 KILNS" StaticText`
+    t =     5.90s         Checking existence of `"HAPUR · 39 KILNS" StaticText`
+    t =     6.02s Find the Target Application 'com.kilnwatch.inspector'
+    t =     6.16s Added attachment named 'kilns-dark'
+    t =     6.16s Open com.kilnwatch.inspector
+    t =     6.16s     Launch com.kilnwatch.inspector
+    t =     6.16s         Terminate com.kilnwatch.inspector:10169
+2026-10-10 02:44:40.275 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-10 02:44:40.275 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     7.40s         Setting up automation session
+    t =     9.35s         Wait for com.kilnwatch.inspector to idle
+    t =    10.88s Waiting 12.0s for "Model score 0.32" StaticText to exist
+    t =    11.93s     Checking `Expect predicate `existsNoRetry == 1` for object "Model score 0.32" StaticText`
+    t =    11.93s         Checking existence of `"Model score 0.32" StaticText`
+    t =    12.03s         Capturing element debug description
+    t =    12.93s     Checking `Expect predicate `existsNoRetry == 1` for object "Model score 0.32" StaticText`
+    t =    12.93s         Checking existence of `"Model score 0.32" StaticText`
+    t =    12.99s         Capturing element debug description
+    t =    13.89s     Checking `Expect predicate `existsNoRetry == 1` for object "Model score 0.32" StaticText`
+    t =    13.89s         Checking existence of `"Model score 0.32" StaticText`
+    t =    13.92s Find the Target Application 'com.kilnwatch.inspector'
+    t =    14.03s Added attachment named 'detail-top-dark'
+    t =    14.03s Swipe up Target Application 'com.kilnwatch.inspector'
+    t =    14.03s     Wait for com.kilnwatch.inspector to idle
+    t =    14.04s     Find the Target Application 'com.kilnwatch.inspector'
+    t =    14.05s     Check for interrupting elements affecting "KilnWatch" Application
+    t =    14.07s     Synthesize event
+    t =    14.50s     Wait for com.kilnwatch.inspector to idle
+    t =    15.20s Swipe up Target Application 'com.kilnwatch.inspector'
+    t =    15.20s     Wait for com.kilnwatch.inspector to idle
+    t =    15.20s     Find the Target Application 'com.kilnwatch.inspector'
+    t =    15.23s     Check for interrupting elements affecting "KilnWatch" Application
+    t =    15.25s     Synthesize event
+    t =    15.67s     Wait for com.kilnwatch.inspector to idle
+    t =    16.16s Waiting 12.0s for "Sign-in coming soon. Inspection actions aren't available yet." StaticText to exist
+    t =    17.21s     Checking `Expect predicate `existsNoRetry == 1` for object "Sign-in coming soon. Inspection actions aren't available yet." StaticText`
+    t =    17.21s         Checking existence of `"Sign-in coming soon. Inspection actions aren't available yet." StaticText`
+    t =    17.27s Find the Target Application 'com.kilnwatch.inspector'
+    t =    17.37s Added attachment named 'detail-bottom-dark'
+    t =    17.37s Open com.kilnwatch.inspector
+    t =    17.37s     Launch com.kilnwatch.inspector
+    t =    17.37s         Terminate com.kilnwatch.inspector:10179
+2026-10-10 02:44:51.508 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-10 02:44:51.508 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    18.64s         Setting up automation session
+    t =    20.68s         Wait for com.kilnwatch.inspector to idle
+    t =    22.06s Waiting 25.0s for "39 satellite-flagged candidates" StaticText to exist
+    t =    23.11s     Checking `Expect predicate `existsNoRetry == 1` for object "39 satellite-flagged candidates" StaticText`
+    t =    23.11s         Checking existence of `"39 satellite-flagged candidates" StaticText`
+    t =    23.22s Find the Target Application 'com.kilnwatch.inspector'
+    t =    23.34s Added attachment named 'today-dark'
+    t =    23.34s Open com.kilnwatch.inspector
+    t =    23.34s     Launch com.kilnwatch.inspector
+    t =    23.34s         Terminate com.kilnwatch.inspector:10239
+2026-10-10 02:44:57.472 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-10 02:44:57.472 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    24.60s         Setting up automation session
+    t =    26.57s         Wait for com.kilnwatch.inspector to idle
+    t =    28.22s Waiting 12.0s for "KilnWatch data is temporarily unavailable" StaticText to exist
+    t =    29.25s     Checking `Expect predicate `existsNoRetry == 1` for object "KilnWatch data is temporarily unavailable" StaticText`
+    t =    29.25s         Checking existence of `"KilnWatch data is temporarily unavailable" StaticText`
+    t =    29.36s Find the Target Application 'com.kilnwatch.inspector'
+    t =    29.45s Added attachment named '503-dark'
+    t =    29.45s Open com.kilnwatch.inspector
+    t =    29.45s     Launch com.kilnwatch.inspector
+    t =    29.45s         Terminate com.kilnwatch.inspector:10280
+2026-10-10 02:45:03.576 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: debugger version lookup failed for path '<nil>': noURL
+2026-10-10 02:45:03.576 xcodebuild[9885:21799984] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    30.70s         Setting up automation session
+    t =    32.70s         Wait for com.kilnwatch.inspector to idle
+    t =    34.37s Waiting 12.0s for "You're offline" StaticText to exist
+    t =    35.42s     Checking `Expect predicate `existsNoRetry == 1` for object "You're offline" StaticText`
+    t =    35.42s         Checking existence of `"You're offline" StaticText`
+    t =    35.53s Find the Target Application 'com.kilnwatch.inspector'
+    t =    35.63s Added attachment named 'offline-dark'
+    t =    35.63s Tear Down
+Test Case '-[Phase3Checks.Phase3Checks testRequiredScreenshots]' passed (35.922 seconds).
+Test Suite 'Phase3Checks' failed at 2026-10-10 02:45:09.004.
+	 Executed 2 tests, with 1 failure (0 unexpected) in 84.613 (84.617) seconds
+Test Suite 'Phase3Checks.xctest' failed at 2026-10-10 02:45:09.009.
+	 Executed 2 tests, with 1 failure (0 unexpected) in 84.613 (84.621) seconds
+Test Suite 'Selected tests' failed at 2026-10-10 02:45:09.009.
+	 Executed 2 tests, with 1 failure (0 unexpected) in 84.613 (84.623) seconds
+** BUILD INTERRUPTED **

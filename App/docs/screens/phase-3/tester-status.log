@@ -1,0 +1,42 @@
+ M .gitignore
+ M App/KilnWatch/Design/Components/BeforeAfterComparator.swift
+ M App/KilnWatch/Design/Components/ExposureBlock.swift
+ M App/KilnWatch/Design/Components/KilnIDLabel.swift
+ M App/KilnWatch/Features/Kiln/KilnView.swift
+ M App/KilnWatch/Features/Kilns/KilnsView.swift
+ M App/KilnWatch/Features/Today/TodayView.swift
+ M App/KilnWatch/KilnWatchApp.swift
+ M App/Packages/KilnWatchCore/Package.swift
+ M App/Packages/KilnWatchCore/Sources/KilnWatchCore/KilnWatchAPI.swift
+ M App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/KilnWatchCoreTests.swift
+ M App/docs/api-contract.md
+ M KilnWatch.xcodeproj/project.pbxproj
+?? App/Config/
+?? App/KilnWatch/Design/Components/RegistryStateView.swift
+?? App/KilnWatch/Features/Today/PublicRegistryMap.swift
+?? App/KilnWatch/Mock/EvidenceAfter.png
+?? App/KilnWatch/Mock/EvidenceBefore.png
+?? App/KilnWatch/Mock/PublicDemo.swift
+?? App/Packages/KilnWatchCore/Sources/KilnWatchCore/EvidenceImageData.swift
+?? App/Packages/KilnWatchCore/Tests/KilnWatchCoreTests/PublicFixtures/
+?? App/docs/screens/phase-2/accessibility-tests.log
+?? App/docs/screens/phase-2/build.log
+?? App/docs/screens/phase-2/core-tests.log
+?? App/docs/screens/phase-2/recovery-tests.log
+?? App/docs/screens/phase-2/ui-tests.log
+?? App/docs/screens/phase-3/
+
+ .gitignore                                         |   3 +
+ .../Design/Components/BeforeAfterComparator.swift  | 180 +++++++++++++++++++++
+ .../Design/Components/ExposureBlock.swift          |   7 +-
+ App/KilnWatch/Design/Components/KilnIDLabel.swift  |   6 +-
+ App/KilnWatch/Features/Kiln/KilnView.swift         |  98 ++++++++---
+ App/KilnWatch/Features/Kilns/KilnsView.swift       |  30 ++--
+ App/KilnWatch/Features/Today/TodayView.swift       |  11 +-
+ App/KilnWatch/KilnWatchApp.swift                   | 141 ++++++++++++++--
+ App/Packages/KilnWatchCore/Package.swift           |   2 +-
+ .../Sources/KilnWatchCore/KilnWatchAPI.swift       |  54 ++++++-
+ .../KilnWatchCoreTests/KilnWatchCoreTests.swift    | 143 ++++++++++++++++
+ App/docs/api-contract.md                           |  32 ++++
+ KilnWatch.xcodeproj/project.pbxproj                |   4 +
+ 13 files changed, 651 insertions(+), 60 deletions(-)

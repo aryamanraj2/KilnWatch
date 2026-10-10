@@ -1,0 +1,4 @@
+KILNWATCH_PUBLIC_API_URL = 
+KILNWATCH_DISTRICT = Hapur
+#include? "Public.xcconfig"
+INFOPLIST_FILE = App/Config/PublicInfo.plist
