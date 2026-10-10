@@ -1,0 +1,940 @@
+{
+"kilns": [
+{
+"detection_confidence": 0.745,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.683193,
+"longitude": 77.757537
+}
+},
+"kiln_id": "KW-00c562060b40502fb4a7ed2016ce7576",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "CFCBK",
+"type_confidence": 0.745,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.287,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.751785,
+"longitude": 77.810308
+}
+},
+"kiln_id": "KW-04e76b6d905c56ac95bb461e6a909014",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "CFCBK",
+"type_confidence": 0.287,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.56,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.680523,
+"longitude": 77.74046
+}
+},
+"kiln_id": "KW-0a71fed0e5045e2290f223d27b3519c6",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.56,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.405,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.762611,
+"longitude": 77.772457
+}
+},
+"kiln_id": "KW-0b91e418f4ce5dae88d1d5dad3aca3ed",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.405,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.305,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.762857,
+"longitude": 77.773692
+}
+},
+"kiln_id": "KW-1b34736325f255cfab97ac41d5f5f0d3",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.305,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.485,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.696572,
+"longitude": 77.7968
+}
+},
+"kiln_id": "KW-1cf1a27586db5efa98b75774acd0f5c9",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.485,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.605,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.692168,
+"longitude": 77.80982
+}
+},
+"kiln_id": "KW-1f08261de3155be7a0d666f4727a3239",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.605,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.508,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.713294,
+"longitude": 77.776524
+}
+},
+"kiln_id": "KW-25672ba2e9aa5340a2ebc51257a4e5fd",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.508,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.328,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.753978,
+"longitude": 77.767474
+}
+},
+"kiln_id": "KW-2f65f376dfad55b389c76461ab8792cb",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.328,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.441,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.774126,
+"longitude": 77.75502
+}
+},
+"kiln_id": "KW-394d4155481758b9a19bb26eabbaee44",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.441,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.568,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.699167,
+"longitude": 77.803225
+}
+},
+"kiln_id": "KW-39fdbe64b2e95d0dbb2dc8a4f6947cef",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.568,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.612,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.727357,
+"longitude": 77.826877
+}
+},
+"kiln_id": "KW-45dc53d0408d515fa200c55bc57106a8",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.612,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.418,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.699985,
+"longitude": 77.779228
+}
+},
+"kiln_id": "KW-478b344dd52759d399bef96f25490874",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.418,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.447,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.772213,
+"longitude": 77.803432
+}
+},
+"kiln_id": "KW-4f912b3f6f6e5063a50ce12f4ce257db",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.447,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.257,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.691928,
+"longitude": 77.809895
+}
+},
+"kiln_id": "KW-58443f037bb25f2bafeaef7d8a515a7d",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "CFCBK",
+"type_confidence": 0.257,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.685,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.751888,
+"longitude": 77.804053
+}
+},
+"kiln_id": "KW-5941d0b5f7845e09b042a56f1a6659b4",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.685,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.482,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.75538,
+"longitude": 77.739846
+}
+},
+"kiln_id": "KW-5a2372b87fbf55ba832f3a8ad411a35f",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.482,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.481,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.67905,
+"longitude": 77.796244
+}
+},
+"kiln_id": "KW-5da98aaa2e1254cdadbbf57746f2292a",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.481,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.57,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.7394,
+"longitude": 77.74759
+}
+},
+"kiln_id": "KW-64e53b7b965453108b2aeea524685304",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.57,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.339,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.70577,
+"longitude": 77.779292
+}
+},
+"kiln_id": "KW-65b3d0efb3ad5f22a1163635f2b33434",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "CFCBK",
+"type_confidence": 0.339,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.381,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.680217,
+"longitude": 77.769264
+}
+},
+"kiln_id": "KW-6661200bde69501b837e373671fdbdb4",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.381,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.324,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.747059,
+"longitude": 77.72956
+}
+},
+"kiln_id": "KW-6b3b38da681850e5af46b024f3d3f78e",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.324,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.32,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.778279,
+"longitude": 77.746884
+}
+},
+"kiln_id": "KW-736b057e0fa45cce872289a4ffcfa94e",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.32,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.252,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.691403,
+"longitude": 77.8226
+}
+},
+"kiln_id": "KW-849a3f1e7d375618bfcbb3d3023a9172",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.252,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.394,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.7674,
+"longitude": 77.739662
+}
+},
+"kiln_id": "KW-9b9cc76db22855e594c5ea338c1a6371",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.394,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.568,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.678747,
+"longitude": 77.818416
+}
+},
+"kiln_id": "KW-b75d224c60f654fa89e5ec620e7594be",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.568,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.555,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.688253,
+"longitude": 77.813084
+}
+},
+"kiln_id": "KW-bd4fdc13568e5da8b0c1456bb98c7e9c",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.555,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.288,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.762806,
+"longitude": 77.732877
+}
+},
+"kiln_id": "KW-c06756064f5a50ec8460401c76787941",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.288,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.626,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.688882,
+"longitude": 77.789295
+}
+},
+"kiln_id": "KW-c3fa9e8bb1cc52cb8e035e21316d08d0",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.626,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.268,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.687994,
+"longitude": 77.775908
+}
+},
+"kiln_id": "KW-cc813f7e2d2550cc90e1fce458a34041",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.268,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.476,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.692851,
+"longitude": 77.772127
+}
+},
+"kiln_id": "KW-ceabeea6f2cc5a9a82223cc4aefb68da",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.476,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.425,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.765371,
+"longitude": 77.813527
+}
+},
+"kiln_id": "KW-d22f9e143ac755808141eb1b59873045",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "CFCBK",
+"type_confidence": 0.425,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.47,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.698178,
+"longitude": 77.731357
+}
+},
+"kiln_id": "KW-d636ba63d0e558c9a20f1a4cc1bbfa50",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.47,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.404,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.744333,
+"longitude": 77.809045
+}
+},
+"kiln_id": "KW-d78246e972b857ae9b041774b62c1732",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.404,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.361,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.760049,
+"longitude": 77.782474
+}
+},
+"kiln_id": "KW-d840eb3a6cc0515d93d0b1c96ca0b31d",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.361,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.336,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.740653,
+"longitude": 77.817416
+}
+},
+"kiln_id": "KW-dae6a4b0d0ac5fc19f619b6aec3fe3e9",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.336,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.56,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.726612,
+"longitude": 77.801514
+}
+},
+"kiln_id": "KW-e730cb05565c5cf292937929f6bfdb0c",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.56,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.561,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.765509,
+"longitude": 77.81183
+}
+},
+"kiln_id": "KW-f5b65957ae025ce5a5877dc9a89d3cf2",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.561,
+"type_verification": "unverified",
+"violations": []
+},
+{
+"detection_confidence": 0.303,
+"district": "Hapur",
+"evidence": {
+"after": null,
+"before": null
+},
+"exposure": null,
+"first_seen": "2026-10-05T05:41:03.148000Z",
+"footprint": {
+"centroid": {
+"latitude": 28.705981,
+"longitude": 77.813116
+}
+},
+"kiln_id": "KW-fd84509a2e3558a9bd529edaa5b4b97b",
+"last_seen": "2026-10-05T05:41:03.148000Z",
+"rules_assessment": "not_evaluated",
+"status": "flagged",
+"type": "FCBK",
+"type_confidence": 0.303,
+"type_verification": "unverified",
+"violations": []
+}
+]
+}

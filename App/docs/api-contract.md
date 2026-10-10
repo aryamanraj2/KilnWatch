@@ -249,7 +249,7 @@ Response: `201` on first receipt, `200` on a replay.
 
 ### Agent stream (planner, "Ask")
 
-**TBD, see `docs/research/agent-streaming.md`.** That document is owned by the research spike. Agents can read through their tools but cannot call `POST /verdicts` (see the Cedar `forbid` above).
+**v1 is the non-streaming `POST /ask` in "Phase 4A — Ask" below.** Streaming remains a later decision; see `docs/research/agent-streaming.md`. That document is owned by the research spike. Agents can read through their tools but cannot call `POST /verdicts` (see the Cedar `forbid` above).
 
 ## Open questions for the backend owner
 
@@ -407,3 +407,78 @@ have no mock imagery, inspection actions, route, or assumed siting buffer.
 Published before/after PNGs use integer device-pixel magnification and no image
 interpolation, with acquisition metadata, attribution and supplied pixel
 footprints. Live evidence delivery remains unverified until publication.
+
+## Phase 4A — Ask (`POST /ask`)
+
+Status: built and planned (2026-10-10), **not deployed**. Stateless (one question, one
+answer, no history), English only (Hindi is Phase 6), **no streaming in v1**: the HTTP API
+returns one JSON body. Public with **no `Authorization` header**, because the app has no
+sign-in until Phase 5. The URL is the existing public base URL plus `/ask`.
+
+One shared assistant: the Lambda's core (`AWS/assistant/core.py`, `answer(question,
+kiln_id, lat, lon)`) is route-independent. The resident portal will later add its own
+**authenticated** route to this same Lambda instead of building a second assistant.
+
+### Request
+
+```json
+{"question": "How many kilns are flagged in Hapur?", "kiln_id": "KW-…", "lat": 28.73, "lon": 77.78}
+```
+
+- Body: JSON object, at most 2 KB. Unknown keys are rejected.
+- `question`: required, non-empty string, at most **500 characters** after trimming.
+- `kiln_id`: optional, a full registry ID (`KW-` plus 32 lowercase hex characters, or
+  `KW-` plus at least 4 digits). Shortened IDs are rejected.
+- `lat` and `lon`: optional, finite JSON numbers (not strings), −90..90 and −180..180,
+  given together or not at all.
+
+### Success, 200
+
+```json
+{
+  "answer": "validated text",
+  "citations": ["KW-…"],
+  "steps": [{"tool": "list_flagged_kilns", "label": "Searching flagged kilns", "summary": "39 found", "ok": true}],
+  "fallback": false,
+  "disclaimer": "Answers cite registry records. Agents never record verdicts. Kilns are flagged by satellite and pending inspection."
+}
+```
+
+- `answer` has passed the server's citation validator: every `KW-…` ID in it came from a
+  tool result in this request, it cites no rule IDs (no rules are evaluated), and it uses
+  no banned words.
+- `citations`: the full IDs that appear in `answer`, in order of first appearance, de-duplicated.
+- `steps`: one per tool call, written by the server (never model text, never raw tool output).
+  `tool` is `list_flagged_kilns`, `kilns_near`, `kiln_detail` or `unknown`; `ok: false`
+  means the model sent invalid tool input. A `kiln_detail` that finds nothing has
+  `summary: "Not found"` and `ok: true`.
+- `fallback: true`: the model failed validation twice. `answer` is fixed server text with no
+  model text ("I couldn't produce a reliable answer to that. Here are the flagged kilns I
+  looked up:"), and `citations` are the kiln IDs the tools returned (at most 10, possibly empty).
+- Headers: `content-type: application/json`, `cache-control: no-store`.
+
+### Errors
+
+Lambda errors use the nested format with a `retryable` flag:
+`{"error": {"code", "message", "retryable"}}`.
+
+| Status | Code | Meaning | Retryable |
+|---|---|---|---|
+| 400 | `invalid_request` | Bad body (see the rules above) | no |
+| 429 | `daily_cap_reached` | The global daily cap is used up | no (try tomorrow, UTC) |
+| 503 | `assistant_unavailable` | The daily counter is unavailable; the model is never called | yes |
+| 503 | `upstream_unavailable` | The public read API returned 429/5xx or timed out | yes |
+| 503 | `model_unavailable` | Bedrock failed: throttling or timeout (retryable), or access/configuration (not retryable) | per flag |
+
+**Two kinds of 429.** API Gateway stage throttling on `POST /ask` (**1 request/s, burst 2**)
+returns the gateway's own body, `{"message":"Too Many Requests"}`, with **no `error.code`**:
+the client should slow down and retry. `daily_cap_reached` has `error.code` and should not
+be retried today.
+
+**Daily cap:** **50 questions per UTC day across all callers**, counted atomically in one
+on-demand DynamoDB item before any model call. A question counts once, even if it later fails
+or is regenerated. A gateway timeout (504 with the gateway's body) is possible only if the
+Lambda exceeds its 28 s budget.
+
+**Cost at the cap (Nova 2 Lite):** typical $0.0027 × 50 × 30 ≈ $4, worst case
+$0.0312 × 50 × 30 ≈ $47 per 30 days.

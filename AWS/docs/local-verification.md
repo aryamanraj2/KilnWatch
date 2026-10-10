@@ -411,3 +411,184 @@ shows no changes and the untargeted plan shows only the 2 CloudFront resources.
 Throttling confirmed read-only with `apigatewayv2 get-stage`: default 50/100, both public
 routes 10/20. No load test.
 
+
+# Phase 4A — Ask backend preflight (2026-10-10)
+
+Built and planned, **not deployed**. Nothing was applied. Private outputs, plans and raw
+Bedrock listings are in the ignored `.local/phase-4/`.
+
+## Synthetic/mocked tests
+
+`PYTHONPATH=AWS .venv-integration/bin/python -m unittest discover -s AWS/tests -v`:
+**before 35 run (26 passed, 9 skipped); after 65 run (56 passed, 9 skipped)**. The 9 skips
+are the existing opt-in PostGIS tests. The new `AWS/tests/test_assistant.py` (30 tests) uses
+a stub Bedrock client with scripted `Converse` replies, a stub DynamoDB with the conditional
+`ADD`, and a stub opener over `AWS/tests/public_hapur.json` (the real 39-record public
+Hapur list, trimmed: centroid only, no polygon or image metadata, no API host). Covered:
+boundary validation, the cap boundary (tested at 300/301; the deployed cap is 50) and fail-closed counter, tool validation/trimming/
+pagination/404/upstream failures, 3 tool calls per round, the 4-round limit, Nova 2 reasoning
+explicitly off (`reasoningConfig.type=disabled`, sent only to Nova 2 model IDs), the validator,
+regenerate-then-fallback, scripted adversarial conversations, log privacy, and response
+shapes. These test the validator and flow, **not a real model**; real-model adversarial checks
+are prompt 16.
+
+`AWS/scripts/package_assistant.py` builds `AWS/build/assistant.zip` (4 files, fixed
+timestamps); two builds gave the same SHA-256.
+
+## Real AWS read-only checks (`kilnwatch` profile, `ap-south-1`, IAM user, not root)
+
+- `list-foundation-models`, `list-inference-profiles`, `get-inference-profile` and
+  `get-foundation-model-availability` for the candidates. Nova Lite and Nova 2 Lite are
+  reachable only through the `apac.`/`global.` inference profiles; Claude Haiku 4.5 through
+  `in.`/`global.`. The Anthropic models report `agreementAvailability: NOT_AVAILABLE`
+  (use-case form not submitted).
+- Prices from the AWS Price List API (`AmazonBedrock`, `AmazonBedrockFoundationModels`,
+  `regionCode=ap-south-1`), cross-checked with the public Bedrock pricing page (US East
+  figures), both read 2026-10-10.
+- Budget `kilnwatch-monthly-50`: USD 50 monthly cost budget, no cost filters, alerts at 80%
+  actual and 100% forecast. It includes credits (`IncludeCredit`), so it tracks net spend.
+
+## Smoke calls (allowed: 3)
+
+**1 call made, 0 succeeded.** `Converse` on `apac.amazon.nova-lite-v1:0` (the first
+shortlist pick) with a one-tool config and a fixed test string returned `ValidationException:
+Operation not allowed` before any tokens were used. Per the rules, no retry, and no call on the
+model the user then chose (Nova 2 Lite). The listing calls work, so this looks like an
+account-level Bedrock runtime block (a known pattern on new or unverified accounts), not IAM
+or the model. Tool use from `ap-south-1` is **not yet proven** for any model.
+
+## Terraform
+
+`fmt -check -recursive` and `validate` pass, including with `enable_assistant=false` and no
+`build/assistant.zip`. A read-only targeted plan (`-target` on the 8 assistant resources plus
+`aws_apigatewayv2_stage.default`, `enable_assistant=true`, model `global.amazon.nova-2-lite-v1:0`,
+the user's choice; Nova Pro via `apac.` is the runner-up):
+**8 to add, 1 to change, 0 to destroy**. The Bedrock IAM statement covers the profile ARN, the
+`ap-south-1` foundation-model ARN and the region-less global foundation-model ARN, read from
+`get-inference-profile` via the `aws_bedrock_inference_profile` data source. The only stage change is one new `route_settings`
+block for `POST /ask` (rate 1, burst 2). The default (50/100) and public-route (10/20) settings
+are unchanged. The same targets with `enable_assistant=false` show **no changes**. Not applied.
+The provider lock file is unchanged.
+
+**Daily cap: 50 questions per UTC day** (`assistant_daily_cap` default and the handler fallback).
+Cost at the cap on Nova 2 Lite: typical $0.0027 × 50 × 30 ≈ $4, worst $0.0312 × 50 × 30 ≈ $47 per 30 days.
+
+# Phase 4A — Ask deploy and live checks (2026-10-10)
+
+Deployed with a targeted apply. Bedrock is still blocked, so **real answers are unproven**.
+Request and response bodies, plans and read-backs are in the ignored `.local/phase-4/`.
+
+## Synthetic/mocked tests
+
+Banned words are now stems at a word start (`\b(?:<stem>)\w*` over the one constant
+`validator.BANNED_WORDS`, case-insensitive). Five longer and upper-case forms of the stems now
+fail in `test_banned_words`; "paralegal", "nonviolent" and "nonviolations" still pass. Cap default 50 in `variables.tf` and the handler.
+`unittest discover -s AWS/tests`: **65 run, 56 passed, 9 skipped** (the opt-in PostGIS tests).
+`package_assistant.py` twice: the same SHA-256 both times.
+
+## Terraform
+
+Saved targeted plan (8 assistant addresses plus `aws_apigatewayv2_stage.default`):
+**8 to add, 1 to change, 0 to destroy**; the only stage change is the `POST /ask` route setting
+(rate 1, burst 2). That plan file was applied: **8 added, 1 changed, 0 destroyed**. Provider
+lock unchanged. Read-back: stage default 50/100, both public routes 10/20, `POST /ask` 1/2;
+Lambda `python3.12`, 28 s, 256 MB, x86_64, no VPC, no reserved concurrency, environment
+`COUNTER_TABLE`, `DAILY_CAP` (50), `MODEL_ID`, `PUBLIC_API_BASE_URL`; table on-demand, key
+`day`, no streams, AWS-owned encryption, TTL enabled on `expires_at`.
+
+## Budget
+
+Added `kilnwatch-monthly-gross-50` with the AWS CLI (outside Terraform): USD 50 monthly cost
+budget, `IncludeCredit=false` (gross spend), no filters, alerts at 80% actual and 100% forecast
+to the same subscriber as `kilnwatch-monthly-50`, which is unchanged (`IncludeCredit=true`).
+
+## Live checks (no Bedrock needed)
+
+- **Bad input:** a 501-character question, an unknown key, a short `kiln_id`, `lat` without
+  `lon`, and a non-JSON body each returned **400 `invalid_request`**.
+- **Throttle:** 6 parallel invalid requests, twice: **6 × 400, 0 × 429** both times. A
+  diagnostic burst of 20: **18 × 400, 2 × 429** with the gateway body
+  `{"message":"Too Many Requests"}`. HTTP API throttling is best-effort, so 1/s, burst 2 is
+  a loose limit; the daily cap is the hard cost guard.
+- **Daily cap:** today's counter item did not exist. With `question_count` set to 50, one
+  valid question returned **429 `daily_cap_reached`** (`retryable: false`). The item was then
+  deleted and a consistent read confirmed it was gone again.
+- **Log privacy:** a valid question with `SENTINEL-7Q3 near 28.7311,77.7811` (also sent as
+  `lat`/`lon`). `filter-log-events` on the assistant log group: **0 matches** for each of the
+  three strings. Log lines hold only status, counts and latencies.
+
+## Bedrock
+
+The Nova 2 Lite console playground in `ap-south-1` still shows `ValidationException:
+Operation not allowed`. One valid `POST /ask` returned **503 `model_unavailable`,
+`retryable: false`**, and the body does not echo the AWS error text. No smoke `Converse` calls
+and none of the 12 real-model questions were run. Real answers, tool use and the validator on
+real model output remain **unproven**.
+
+# Phase 4A — Bedrock through the second account and live answers (2026-10-10)
+
+The main account still has the account-level Bedrock block (support case open). The assistant
+Lambda, API, daily cap and logs stay in the main account; only the model call goes through a
+narrow role in the user's second AWS account. Identifiers, policies, plans, read-backs and
+response bodies are in the ignored `.local/phase-4/` (`second/`, `cross-account.*`, `live/w*`).
+
+## Setup
+
+- **Second account role** `kilnwatch-assistant-bedrock`, created with the AWS CLI (no Terraform
+  state there). Trust: only the main account's `kilnwatch-assistant-lambda` role, `sts:AssumeRole`.
+  Inline policy `bedrock-invoke-nova-2-lite`: `bedrock:InvokeModel` on only the
+  `global.amazon.nova-2-lite-v1:0` inference profile in `ap-south-1` and its two destination
+  foundation-model ARNs (region-less and `ap-south-1`). No managed policies, no access keys,
+  default 1 h max session.
+- **Code** (`AWS/assistant/core.py`): optional `BEDROCK_ROLE_ARN` (assume the role with 15-minute
+  credentials, re-assumed when under 5 minutes remain) and `BEDROCK_REGION`. With neither set
+  the behaviour is unchanged. An `AssumeRole` failure is 503 `model_unavailable` (retryable only
+  for throttling) and never echoes AWS text. The log's `validator` label now starts as `none`
+  and becomes `pass` only when an answer passes.
+- **Terraform:** `assistant_bedrock_role_arn` and `assistant_bedrock_region` (default empty, set
+  only in the ignored `terraform.tfvars`). When the role ARN is set, the assistant policy gains
+  `sts:AssumeRole` on only that ARN; the same-account Bedrock statement stays.
+- **Trust caveat:** AWS stores the main role's unique ID in the trust policy. If
+  `kilnwatch-assistant-lambda` is ever deleted and recreated, re-save the trust policy in the
+  second account.
+
+### Switch back (when the main account is unblocked)
+
+1. Clear `assistant_bedrock_role_arn` and `assistant_bedrock_region` in `AWS/terraform.tfvars`.
+2. Run a targeted plan and apply on `aws_lambda_function.assistant[0]` and
+   `aws_iam_role_policy.assistant[0]` only.
+3. After the hackathon, delete `kilnwatch-assistant-bedrock` (and its inline policy) in the
+   second account.
+
+## Synthetic/mocked tests
+
+Six new tests in `CrossAccountBedrockTests` with stub STS and Bedrock clients: no variables
+means no STS call; the role is assumed once and reused; re-assumed near expiry; `BEDROCK_REGION`
+applied; `AssumeRole` denial is 503 `model_unavailable` with no AWS text; the validator label is
+`none` when the model fails. `unittest discover -s AWS/tests`: **71 run, 62 passed, 9 skipped**
+(the opt-in PostGIS tests). The fallback fixture `fallback.synthetic.json` comes from this
+code path with a stub model, not from a live call.
+
+## Terraform
+
+Saved targeted plan on the two addresses: **0 to add, 2 to change, 0 to destroy** (new code hash
+and two environment variables on the Lambda; one `sts:AssumeRole` statement on the policy).
+Applied from the saved plan: **0 added, 2 changed, 0 destroyed**. Provider lock unchanged.
+Read-back: environment names `BEDROCK_REGION`, `BEDROCK_ROLE_ARN`, `COUNTER_TABLE`, `DAILY_CAP`,
+`MODEL_ID`, `PUBLIC_API_BASE_URL`; policy actions logs, `bedrock:InvokeModel` (3 resources),
+`dynamodb:UpdateItem`, `sts:AssumeRole` (1 resource). Deployed code hash matches the local ZIP.
+
+## Live checks
+
+- **Smoke:** one direct `Converse` call in the second account (one tool, fixed string):
+  `stopReason: tool_use` with the right tool and input, 764 ms model latency, 931 in / 28 out tokens.
+- **12 questions through `POST /ask`:** all **200**, none fell back. Validator: 11 `pass`,
+  1 `regenerated` (the unknown-ID question; the retry answered without citing it). 0 to 1 tool
+  rounds each; 1.2 to 10.1 s client latency (the first call was a cold start); 34,433 input and
+  1,152 output tokens in total, well under the $0.04 estimate, billed to the second account.
+  Answers stated missing data plainly, cited only returned IDs, and made no ownership, law,
+  health, route or school-distance claims. The kiln facts in the "Explain" answer match the
+  public record.
+- **Log privacy:** `filter-log-events` for four question fragments: **0 matches**. Log lines
+  hold counts, latencies and `validator` only.
+- **Cap:** today's counter went from 2 to 14 of 50.

@@ -188,3 +188,41 @@ variable "create_registry_runner" {
   type        = bool
   default     = false
 }
+
+variable "enable_assistant" {
+  description = "Phase 4A public POST /ask assistant Lambda, counter table and route. Build AWS/build/assistant.zip first."
+  type        = bool
+  default     = false
+}
+
+variable "assistant_model_id" {
+  description = "Bedrock cross-region inference profile ID for the assistant (Phase 4A preflight recommendation)."
+  type        = string
+  default     = "global.amazon.nova-2-lite-v1:0"
+}
+
+variable "assistant_daily_cap" {
+  description = "Hard cap on Ask questions per UTC day across all callers."
+  type        = number
+  default     = 50
+  validation {
+    condition     = var.assistant_daily_cap >= 1 && floor(var.assistant_daily_cap) == var.assistant_daily_cap
+    error_message = "assistant_daily_cap must be a positive integer."
+  }
+}
+
+variable "assistant_bedrock_role_arn" {
+  description = "Optional IAM role in another AWS account that the assistant assumes to call Bedrock. Empty calls Bedrock in this account. Set it only in the ignored terraform.tfvars."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.assistant_bedrock_role_arn == "" || can(regex("^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]+$", var.assistant_bedrock_role_arn))
+    error_message = "assistant_bedrock_role_arn must be empty or an IAM role ARN."
+  }
+}
+
+variable "assistant_bedrock_region" {
+  description = "Optional region for the assistant's Bedrock calls. Empty uses the Lambda's region."
+  type        = string
+  default     = ""
+}
