@@ -27,12 +27,12 @@ export const kilns: Kiln[] = Array.from({ length: 7 }, (_, i) => {
     centroid, footprint: [...[45, 135, 225, 315, 45].map(b => destination(centroid, 48, b))],
     status: ['flagged', 'flagged', 'flagged', 'unclassified', 'compliant', 'closed', 'flagged'][i], human_reviewed: i === 4 || i === 5,
     last_seen: UPDATED, revision: 'sample-1', prediction: { type: i === 3 ? 'unclassified' : i === 1 ? 'Zigzag' : 'FCBK', score: i === 3 ? null : 0.82, verified: false },
-    evidence: { before: i === 0 ? before : null, after: i === 0 || i === 1 ? after : i === 2 ? { ...after, url: '/samples/unavailable.svg' } : null },
+    evidence: { before: i === 0 || i >= 4 ? before : null, after: i !== 3 ? after : null },
     assessments: [
-      ...(i === 0 ? [{ rule_id: 'C-ORCH-800', state: 'assessed', measured_distance_m: 520, threshold_m: 800, source_url: SOURCE }] : []),
+      ...([0, 4, 6].includes(i) ? [{ rule_id: 'C-ORCH-800', state: 'assessed', measured_distance_m: [520, 0, 0, 0, 1120, 0, 640][i], threshold_m: 800, source_url: SOURCE }] : []),
       { rule_id: 'C-HAB-800', state: 'not_evaluated', measured_distance_m: null, threshold_m: null, source_url: null },
       { rule_id: 'C-TECH-10K', state: 'not_evaluated', measured_distance_m: null, threshold_m: null, source_url: null },
     ],
-    exposure: i === 0 ? { people: 1240, radius_m: 800, source: text('Synthetic population example · not a measured health impact', 'काल्पनिक जनसंख्या उदाहरण · स्वास्थ्य प्रभाव का माप नहीं'), estimated_at: UPDATED } : null,
+    exposure: [0, 1, 4, 6].includes(i) ? { people: [1240, 860, 0, 0, 420, 0, 1780][i], radius_m: 800, source: text('Synthetic population example · not a measured health impact', 'काल्पनिक जनसंख्या उदाहरण · स्वास्थ्य प्रभाव का माप नहीं'), estimated_at: UPDATED } : null,
   });
 });

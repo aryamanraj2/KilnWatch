@@ -1,4 +1,6 @@
 import { test, expect, type Page as BrowserPage } from '@playwright/test';
+import { mockMapTiles } from './map-tiles';
+test.beforeEach(async ({ page }) => { await mockMapTiles(page); });
 import { readFile } from 'node:fs/promises';
 import { deflateSync } from 'node:zlib';
 import { kilns, rules, UPDATED } from '../../src/data/fixtures';
@@ -72,7 +74,7 @@ test('live-mode query, paging, diagram selection, detail, and session Back', asy
   await expect(page.getByLabel('Place or address', { exact: true })).toBeDisabled();
   await expect(page.getByText('Confirming sends your search coordinates', { exact: false })).toBeVisible();
   await search(page); await expect(page.getByText('1 results loaded')).toBeVisible();
-  await expect(page.getByText('Public record coordinates · no basemap')).toBeVisible();
+  await expect(page.getByText('Public records', { exact: true })).toBeVisible();
   await expect(page.getByText('Distance from search centre to record centroid', { exact: false })).toBeVisible();
   const query = new URL(requests[0]).searchParams;
   expect(Object.fromEntries(query)).toEqual({ longitude: '77.68', latitude: '28.73', radius_m: '1000', limit: '3' });

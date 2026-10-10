@@ -15,7 +15,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173/`. Choose **Pilkhuwa · sample area**, confirm the search, open a record, and add it to an inspection draft. Hindi is available from the header. All seven candidates, positions, assessment measurements, verdict examples, population counts, and evidence scenes are fictional.
+Open `http://127.0.0.1:5173/`. The demo opens on a populated **Pilkhuwa** street map. Adjust the search or load more records, open a record, and add it to an inspection draft. Hindi is available from the header. All seven candidates, positions, assessment measurements, verdict examples, population counts, and evidence scenes are fictional.
 
 This workstation also has an isolated, ignored runtime at `.runtime/node_modules/node/bin/node`. It is a convenience, not a checked-in dependency. To use it here, prefix npm commands with `PATH="$PWD/.runtime/node_modules/node/bin:$PATH"`. The system Node 26 runtime is not the pinned build runtime.
 
@@ -32,7 +32,7 @@ npm run test:e2e:live -- --project=chromium
 npm run test:e2e:live -- --project=webkit
 ```
 
-Browser checks use one worker, no retries, and a local Vite server. Engines are run sequentially. On this workstation browsers were downloaded to the ignored `.cache/ms-playwright`; set `PLAYWRIGHT_BROWSERS_PATH=.cache/ms-playwright` when running tests. Do not install a second cache unnecessarily. The browser suite creates a small set of review artifacts under `docs/screens/`; failure traces and reports are ignored under `test-results/`.
+Functional browser checks mock map tile responses to avoid repeatedly fetching community tiles. Separate visual review checks real provider rendering. Browser checks use one worker, no retries, and a local Vite server. Engines are run sequentially. On this workstation browsers were downloaded to the ignored `.cache/ms-playwright`; set `PLAYWRIGHT_BROWSERS_PATH=.cache/ms-playwright` when running tests. Do not install a second cache unnecessarily. The browser suite creates a small set of review artifacts under `docs/screens/`; failure traces and reports are ignored under `test-results/`.
 
 `test:e2e:live` starts a separate Vite server on port 5174 in live mode and intercepts every test API/image request with fictional contract responses and generated 256-pixel PNGs. It does not contact AWS, change `.env`, or establish public publication approval. Set `KW_ARTIFACT_DIR=.cache/sample-review` on sample-suite runs to keep regenerated review files separate from the previously reviewed `docs/screens/` artifacts and Playwright's cleared result directory.
 
@@ -63,18 +63,20 @@ For local failure review, start in development mode at one of these URLs, then c
 | `/?demo=unknown` | Unknown coverage, no clean-air/compliance inference. |
 | `/?demo=partial` | First page succeeds; later page fails while loaded records remain. |
 | `/?demo=stale` | Older dataset date explicitly labeled. |
-| `/?demo=map-error` | Diagram unavailable; list and drafting remain usable. |
+| `/?demo=map-error` | Map unavailable; list and drafting remain usable. |
+
+Use `/kilns/SAMPLE-KW-003?demo=image-error` to review failed evidence and retry behavior.
 
 A scenario is selected at page load and remains for that document session. Return to `/` with a full reload to clear it. The query string contains only a diagnostic scenario, never resident coordinates or drafts. An environment scenario takes precedence. These controls are removed in production builds.
 
 ## Behavior and limits
 
 - Bilingual sample-place lookup, Devanagari coordinate digits, opt-in one-shot geolocation, radius confirmation, synchronized map/list, bounded paging, and session Back navigation.
-- The diagram is an interactive geographic illustration without a tile provider. It is not a real basemap. All pins have a list alternative. Near the poles it explicitly falls back to the list.
+- Interactive Leaflet street maps use OpenStreetMap tiles, with attribution, pan, zoom, reset, search-radius overlays, numbered selections and record location maps. Geography is real; all demo sites are fictional. Tile requests expose the viewed map area and IP address to OpenStreetMap. Near the poles or on map failure, the list remains usable.
 - Synthetic before/after evidence, single/missing/broken evidence, per-image outlines, source links, provisional predictions, unknown facts, and deterministic explanations.
 - Up to ten selected records in an editable inspection request. Optional personal details and explicit location opt-in. Copy, UTF-8 text download, and browser Print/Save as PDF. Evidence URLs are references, not attachments. Nothing is filed or sent.
 - Language/theme preferences are the only local-storage values. Other state is memory-only; refresh loses it. Meaningful unsaved draft changes prompt before replacement or unloading. Browser unload warnings depend on browser support/user interaction.
-- No third-party map/geocoding, live assistant, analytics, service worker, citizen account, notification system, private image proxy, model weights, or automatic complaint submission.
+- No external geocoding, live assistant, analytics, service worker, citizen account, notification system, private image proxy, model weights, or automatic complaint submission.
 - Legal sources are references with stated limits. The UP habitation threshold is unresolved. A sample orchard comparison is not a finding about a real site.
 
 ## Documentation

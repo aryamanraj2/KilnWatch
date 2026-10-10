@@ -9,6 +9,7 @@ import type { Page } from '../src/data/model';
 import { Evidence } from '../src/features/evidence/Evidence';
 import { Status } from '../src/components/shared';
 import { AreaPage } from '../src/features/area/AreaPage';
+vi.mock('../src/features/area/Diagram', () => ({ default: () => null }));
 afterEach(() => { vi.restoreAllMocks(); localStorage.clear(); });
 const page = (index: number): Page => ({ items: [{ kiln: kilns[index], distance_m: 300 }], next_cursor: null, complete: true, revision: 'sample-1', coverage: 'known', updated_at: UPDATED, distance_basis: 'centroid' });
 function loadImage(image: HTMLElement, size = 256) {

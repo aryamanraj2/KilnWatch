@@ -12,7 +12,7 @@ Theme choices are System, Light, and Dark. Motion is limited to color transition
 
 ## Screens
 
-- **Area:** practical heading, search form, and sample diagram/list workspace. The first action is selecting an area. Desktop keeps map and results adjacent; phones offer Map/List buttons. The list is independently usable. Place results explicitly describe sample lookup.
+- **Area:** practical heading, search form, and interactive street-map/list workspace. The demo opens with a populated Pilkhuwa area; public mode starts with an explicit search. Leaflet displays muted OpenStreetMap tiles with visible attribution, a dashed search radius, numbered selectable pins and native HTML zoom/reset controls. A selected record card links to evidence and drafting. Desktop keeps map and results adjacent; phones show the map first, offer Map/List buttons, and place area settings below the workspace. The list is independently usable. Place results explicitly describe sample lookup.
 - **Record:** observation and provisional status first, then evidence and assessed/unassessed rules. The sidebar contains model limitations, population context, deterministic explanations, and drafting actions.
 - **Rule:** jurisdiction, reference source/date, threshold availability, and limitations. No conclusion inferred from an ID.
 - **Draft:** selected records and optional resident details beside an editable request. Export actions are after the editor. The print document contains only the actual draft, sample notice, source references, and not-submitted statement.
@@ -26,6 +26,10 @@ The exact English candidate status is **Flagged by satellite · pending inspecti
 
 Distances from the search centre are labeled centroid distances. Rule distances come exclusively from record assessments; a search radius is never a rule buffer. Missing exposure is not zero, population is not measured health harm, and observation dates are not construction dates.
 
-The two evidence examples are distinct 256×256 SVG scenes composed of coarse cells. They are clearly marked synthetic, not passed off as satellite photography. Only the later side has its supplied outline. This is an intentional R1 web adaptation: the real PNGs remain unpublished and are not copied from private storage. Actual bitmap handling remains an R2 verification requirement.
+The evidence examples are distinct 256×256 SVG scenes composed of coarse cells, agricultural parcels, an access road, orchard rows and a kiln-shaped structure. They are clearly marked synthetic, not passed off as satellite photography. Only the later side has its supplied outline. This is an intentional R1 web adaptation: the real PNGs remain unpublished and are not copied from private storage. Actual bitmap handling remains an R2 verification requirement. The divider supports pointer dragging as well as the native slider and comparison buttons.
 
 Source text is rendered as React text, never HTML. Image/source URLs are allowlisted. Complaint exports preserve the edited text, with a mandatory sample notice outside the editable body. Hindi has implementation coverage, but independent human translation review remains a release input.
+
+## Demo completion (10 October 2026)
+
+The user authorized a finished local demo with maps and sample data. This supersedes R1’s diagram-only limitation. Record sidebars now include real street geography around fictional demo coordinates. Additional reviewed examples include synthetic evidence, orchard reference measurements and population context. The missing-data record remains intentionally unassessed; failed imagery is a development scenario. No design-token changes or unrelated inspector/AWS work. Map-provider requests are explained in Privacy.

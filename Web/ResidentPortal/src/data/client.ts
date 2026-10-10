@@ -126,7 +126,7 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
     },
     async detail(id: string, signal?: AbortSignal): Promise<Kiln> {
       if (!/^[A-Za-z0-9-]{1,100}$/.test(id)) throw new DataError('not_found');
-      if (cfg.mode === 'fixture') { const f = await fixtures(signal); const k = f.kilns.find(k => k.id === id); if (!k) throw new DataError('not_found'); return k; }
+      if (cfg.mode === 'fixture') { const f = await fixtures(signal); const k = f.kilns.find(k => k.id === id); if (!k) throw new DataError('not_found'); if (cfg.scenario === 'image-error') return { ...k, evidence: { before: null, after: k.evidence.after && { ...k.evidence.after, url: '/samples/unavailable.svg' } } }; return k; }
       const result = kilnSchema.safeParse(await read(`/public/kilns/${encodeURIComponent(id)}`, signal));
       if (!result.success || result.data.id !== id) throw new DataError('malformed');
       return result.data;
