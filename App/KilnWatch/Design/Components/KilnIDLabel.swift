@@ -19,7 +19,7 @@ struct KilnIDLabel: View {
     }
 
     @ViewBuilder private var content: some View {
-        Text(abbreviatesID && kiln.kilnId.count > 18 ? "\(kiln.kilnId.prefix(9))…\(kiln.kilnId.suffix(6))" : kiln.kilnId)
+        Text(abbreviatesID ? Self.shortID(kiln.kilnId) : kiln.kilnId)
             .font(idFont.monospaced())
             .foregroundStyle(.ink)
         if showsType {
@@ -27,6 +27,10 @@ struct KilnIDLabel: View {
                 .font(.subheadline.monospacedDigit())
                 .foregroundStyle(.inkSecondary)
         }
+    }
+
+    static func shortID(_ id: String) -> String {
+        id.count > 18 ? "\(id.prefix(9))…\(id.suffix(6))" : id
     }
 
     private var typeLine: String {

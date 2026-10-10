@@ -1,0 +1,37 @@
+kilnwatch-polish-ax5-dark.log: 1 executed; 1 passed; 0 failed
+  -[Phase3Checks.Phase3Checks testAXAndReduceMotion]: passed
+kilnwatch-polish-ax5-light-final.log: 1 executed; 1 passed; 0 failed
+  -[Phase3Checks.Phase3Checks testAXAndReduceMotion]: passed
+kilnwatch-polish-ax5-light.log: 1 executed; 1 passed; 0 failed
+  -[Phase3Checks.Phase3Checks testAXAndReduceMotion]: passed
+kilnwatch-polish-ui-dark-final.log: 1 executed; 1 passed; 0 failed
+  -[Phase3Checks.Phase3Checks testRequiredScreenshots]: passed
+kilnwatch-polish-ui-dark.log: 1 executed; 1 passed; 0 failed
+  -[Phase3Checks.Phase3Checks testRequiredScreenshots]: passed
+kilnwatch-polish-ui-light-final.log: 1 executed; 1 passed; 0 failed
+  -[Phase3Checks.Phase3Checks testRequiredScreenshots]: passed
+kilnwatch-polish-ui-light.log: 8 executed; 7 passed; 1 failed
+  -[Phase3Checks.Phase3Checks testDetailCancellationBackoffAndRetryGuard]: passed
+  -[Phase3Checks.Phase3Checks testFixtureRouteRegression]: passed
+  -[Phase3Checks.Phase3Checks testLiveListDetailAndToday]: passed
+  -[Phase3Checks.Phase3Checks testPublicDetailFailuresAndRecovery]: passed
+  -[Phase3Checks.Phase3Checks testPublicListStates]: passed
+  -[Phase3Checks.Phase3Checks testRequiredScreenshots]: passed
+  -[Phase3Checks.Phase3Checks testSearchCancelThenToday]: failed
+  -[Phase3Checks.Phase3Checks testSyntheticEvidenceStatesAndAdjustableComparator]: passed
+  /tmp/KilnWatchPolishChecks/Tests/Phase3Checks.swift:64: error: -[Phase3Checks.Phase3Checks testSearchCancelThenToday] : XCTAssertTrue failed
+kilnwatch-polish-zoom.log: 1 executed; 1 passed; 0 failed
+  -[Phase3Checks.Phase3Checks testExistingFootprintsWhenZoomedAndRestoredMotion]: passed
+Total: 15 executions; 14 passed; 1 harness failure.
+All eight existing Phase 3 methods have passing coverage.
+Core: 34 functions; 33 passed; 1 existing opt-in skip; zero warnings.
+Prescribed root iPhone 17 build: BUILD SUCCEEDED; zero warnings.
+Initial temporary-harness compile was corrected before any tests executed.
+Temporary harness has manual build-order and missing-AppIntents metadata warnings.
+Light regression suite emitted final XCTest outcomes, then stalled finalizing its beta result bundle; stopped after completion. No complete result bundle is claimed for that run.
+Other selected runs returned TEST SUCCEEDED normally.
+Manual search: entered 6b3b38; submitted the active search (keyboard dismissed); tapped Today once; saw 39 candidates, pins and route-unavailable notice.
+Single cancel-search UI attempt: native Cancel button absent; stopped at its existence assertion; no retry.
+Map gesture check: 39 pin controls and Reduce Motion off asserted; gesture completed but close footprint visibility remains visually unverified.
+Settings restored: Light, Large, ReduceMotionEnabled override absent; UIAccessibility.isReduceMotionEnabled false verified by runner. Keyboard capture returned to off before Mac locked.
+419 protected/Phase 2/HEAD fingerprints preserved; staged diff empty. Index file byte hash changed during read-only Git inspections; no staging or other Git write commands were issued.

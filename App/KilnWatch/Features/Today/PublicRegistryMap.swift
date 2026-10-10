@@ -26,9 +26,9 @@ struct PublicRegistryMap: View {
                         Annotation(kiln.kilnId, coordinate: kiln.coordinate) {
                             Button { model.open(kiln: kiln.kilnId) } label: {
                                 Image(systemName: "flag.fill")
-                                    .font(.caption.weight(.semibold))
+                                    .font(.caption2.weight(.semibold))
                                     .foregroundStyle(.flagged)
-                                    .frame(width: 32, height: 32)
+                                    .frame(width: 22, height: 22)
                                     .background(.surface, in: .circle)
                                     .frame(minWidth: 44, minHeight: 44)
                                     .contentShape(.rect)

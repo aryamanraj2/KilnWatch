@@ -94,6 +94,7 @@ private struct KilnDetailView: View {
             .padding(.bottom, Space.xl)
             .redacted(reason: model.isLoading ? .placeholder : [])
         }
+        .scrollEdgeEffectStyle(.hard, for: .top)
         .scrollPosition($scroll)
         .background(.canvas)
         .navigationBarTitleDisplayMode(.inline)
@@ -124,12 +125,18 @@ private struct KilnDetailView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
-            // Explicit wrap opportunities prevent a discretionary hyphen becoming part of the visible ID.
-            Text(kiln.kilnId.map(String.init).joined(separator: "\u{200B}"))
+            Text(KilnIDLabel.shortID(kiln.kilnId))
                 .font(.largeTitle.weight(.semibold).monospaced())
                 .foregroundStyle(.ink)
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityLabel(kiln.kilnId)
+            Text(kiln.kilnId)
+                // IDs are nonlinguistic: wrap without dictionary-inserted hyphens.
+                .typesettingLanguage(.explicit(.init(identifier: "zxx")))
+                .font(.footnote.monospaced())
+                .foregroundStyle(.inkSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
             Text(typeLine)
                 .font(.subheadline)
                 .foregroundStyle(.inkSecondary)
@@ -211,7 +218,7 @@ private struct BufferMap: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
-            Map(initialPosition: .region(MKCoordinateRegion(center: kiln.coordinate, latitudinalMeters: 2_400, longitudinalMeters: 2_400)),
+            Map(initialPosition: .region(region),
                 interactionModes: []) {
                 if illustrative {
                 MapCircle(center: kiln.coordinate, radius: 800)
@@ -219,8 +226,8 @@ private struct BufferMap: View {
                     .stroke(Color.ink.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
                 } else if kiln.footprint.polygon.allSatisfy(\.isValid), kiln.footprint.polygon.count >= 3 {
                     MapPolygon(coordinates: kiln.footprint.polygon.map(\.clLocation))
-                        .foregroundStyle(Color.flagged.opacity(0.12))
-                        .stroke(Color.flagged, lineWidth: 2)
+                        .foregroundStyle(Color.clay.opacity(0.12))
+                        .stroke(Color.clay, lineWidth: 2)
                 }
                 Annotation(kiln.kilnId, coordinate: kiln.coordinate) {
                     if illustrative {
@@ -230,10 +237,9 @@ private struct BufferMap: View {
                         .frame(width: 22, height: 10)
                         .rotationEffect(.degrees(-28))
                     } else {
-                        Image(systemName: "flag.fill")
-                            .foregroundStyle(.flagged)
-                            .padding(Space.xs)
-                            .background(.surface, in: .circle)
+                        Circle()
+                            .fill(.clay)
+                            .frame(width: 8, height: 8)
                     }
                 }
                 .annotationTitles(.hidden)
@@ -272,6 +278,19 @@ private struct BufferMap: View {
                 .font(.caption)
                 .foregroundStyle(.inkSecondary)
         }
+    }
+
+    private var region: MKCoordinateRegion {
+        let fallback = MKCoordinateRegion(center: kiln.coordinate, latitudinalMeters: illustrative ? 2_400 : 300, longitudinalMeters: illustrative ? 2_400 : 300)
+        let polygon = kiln.footprint.polygon
+        guard !illustrative, polygon.count >= 3, polygon.allSatisfy(\.isValid),
+              let minLat = polygon.map(\.latitude).min(), let maxLat = polygon.map(\.latitude).max(),
+              let minLon = polygon.map(\.longitude).min(), let maxLon = polygon.map(\.longitude).max() else { return fallback }
+        let center = CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: (minLon + maxLon) / 2)
+        let minimum = MKCoordinateRegion(center: center, latitudinalMeters: 300, longitudinalMeters: 300).span
+        return MKCoordinateRegion(center: center, span: MKCoordinateSpan(
+            latitudeDelta: max((maxLat - minLat) * 1.4, minimum.latitudeDelta),
+            longitudeDelta: max((maxLon - minLon) * 1.4, minimum.longitudeDelta)))
     }
 
     private var accessibilityText: String {

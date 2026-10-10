@@ -38,6 +38,7 @@ struct KilnsView: View {
                     }
                 }
             }
+            .scrollEdgeEffectStyle(.hard, for: .top)
             .scrollContentBackground(.hidden)
             .background(.canvas)
             .redacted(reason: model.isLoading ? .placeholder : [])
