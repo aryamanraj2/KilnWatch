@@ -11,6 +11,8 @@ KILN_ID = re.compile(r'^KW-(?:[0-9]{4,}|[0-9a-f]{32})$')
 DISTRICT = re.compile(r'^[A-Za-z][A-Za-z -]{0,63}$')
 NOTE = ('predicted_type is an unverified model prediction. model_score is a detector score, not accuracy, '
         'not a probability of wrongdoing and not a rule check. Every kiln is flagged by satellite, pending inspection.')
+IMAGES_NOTE = ('Satellite images are published only for the kiln IDs listed in images_published_only_for; '
+               'for every other kiln they are not yet published.')
 
 
 class UpstreamUnavailable(Exception):
@@ -64,7 +66,7 @@ def trim(record):
             'last_seen': (record.get('last_seen') or '')[:10] or None,
             'rules_assessment': record.get('rules_assessment') or 'not_evaluated',
             'exposure_assessed': record.get('exposure') is not None,
-            'images_published': bool(evidence.get('before') or evidence.get('after'))}
+            'satellite_images': 'published' if evidence.get('before') or evidence.get('after') else 'not yet published'}
     if 'distance_m' in record: view['distance_m'] = record['distance_m']
     return view
 
@@ -107,10 +109,10 @@ def run(api, name, args):
             kilns += records(body); cursor = body.get('next_cursor'); pages += 1
             if not cursor: break
         shown = [trim(k) for k in kilns[:50]]
-        more = bool(cursor)
+        more, images = bool(cursor), image_fields(shown)
         ids = [k['kiln_id'] for k in shown]
         result = {'district': district, 'count': len(kilns), 'more_pages': more, 'kilns_shown': len(shown),
-                  'kilns': table(shown), 'note': NOTE}
+                  'kilns': table(shown), **images, 'note': NOTE}
         summary = f'{len(kilns)}{"+" if more else ""} found'
         return result, step(name, label, summary, True), ids
     if name == 'kilns_near':
@@ -120,7 +122,8 @@ def run(api, name, args):
             return invalid(name, label)
         body = api.get('/public/kilns', {'lat': f'{lat:.6f}', 'lon': f'{lon:.6f}', 'radius_m': radius}) or {}
         shown = [trim(k) for k in records(body)[:50]]
-        result = {'radius_m': radius, 'count': len(shown), 'kilns': table(shown), 'note': NOTE}
+        images = image_fields(shown)
+        result = {'radius_m': radius, 'count': len(shown), 'kilns': table(shown), **images, 'note': NOTE}
         return result, step(name, label, f'{len(shown)} within {radius} m', True), [k['kiln_id'] for k in shown]
     if name == 'kiln_detail':
         kiln_id = args.get('kiln_id')
@@ -133,6 +136,12 @@ def run(api, name, args):
         if record.get('kiln_id') != kiln_id: raise UpstreamUnavailable('unexpected body')
         return {'found': True, 'kiln': trim(record), 'note': NOTE}, step(name, label, 'Found', True), [kiln_id]
     return invalid('unknown', 'Unknown tool')
+
+
+def image_fields(views):
+    """Lists carry no per-row image field (a boolean column was misread): one top-level ID list instead."""
+    published = [view['kiln_id'] for view in views if view.pop('satellite_images') == 'published']
+    return {'images_published_only_for': published, 'images_note': IMAGES_NOTE}
 
 
 def table(views):

@@ -715,3 +715,37 @@ any excluded services under Billing → Credits.
   expects null URLs; after publication, decode a body with URLs through the default
   suite or update that expectation.
 
+
+## Evidence CDN in the second account (prompt 16c, 2026-10-10)
+
+- **Why:** the main account still can't create CloudFront until AWS verifies it, and that
+  could take days. The user's second account (the one already serving Bedrock, owner agreed
+  until the hackathon ends) hosts the evidence distribution in the meantime. The user treats
+  it as the CDN home until further notice.
+- **How it works:** the PNGs stay in the main account's **private** data bucket (SSE-S3, public
+  access blocks on). `aws_cloudfront_distribution.evidence_cdn[0]` and its OAC
+  `aws_cloudfront_origin_access_control.evidence_cdn[0]` live in the second account through the
+  aliased provider `aws.cdn` (same `hashicorp/aws`, lock unchanged). The provider uses
+  `profile = var.cdn_profile`, a `~/.aws/config` profile outside the repo whose
+  `credential_process` runs `aws configure export-credentials --profile <second-account-profile>
+  --format process`, so there are no stored keys. `aws_s3_bucket_policy.evidence` (main account)
+  allows only `s3:GetObject` on `evidence/*.png` for the `cloudfront.amazonaws.com` principal with
+  `AWS:SourceArn` equal to that one distribution. `local.evidence_distribution` picks whichever
+  distribution exists; the bucket policy and the `evidence_base_url` output both use it.
+- **Switch:** `evidence_cdn_account = "main" | "second"` (default `main`) and `cdn_profile` are set
+  only in the ignored `terraform.tfvars`. The main-account OAC stays in state either way.
+- **Applied:** a targeted plan on the two `evidence_cdn[0]` addresses plus the bucket policy was
+  3 add / 0 change / 0 destroy, and the apply added exactly those 3. The registry runner was
+  **kept** for the rules-engine apply (prompt 09 Part B step 5 skipped).
+- **Then:** §7 publication with the new `evidence_base_url`, receipt upload, a receipt re-import on
+  the runner through SSM `send-command` (exact-key downloads, 0 new candidates and observations),
+  and the denial probe. Results are in `local-verification.md`.
+- **Switch-back** (once AWS verifies the main account, and only with the user's go): set
+  `evidence_cdn_account = "main"`, then run a targeted plan and apply on
+  `aws_cloudfront_distribution.evidence[0]` and `aws_s3_bucket_policy.evidence`. A dry plan showed
+  2 to add, with the policy recreated for the new ARN. Re-run `verify_publication.py` against the
+  new `evidence_base_url`, upload the receipt and re-import on the runner. Then run a targeted
+  destroy of the second-account `evidence_cdn[0]` resources, which are now removed by count.
+  CloudFront disables a distribution before it can delete it, so that step takes several minutes.
+- **After the hackathon:** remove the second-account distribution and OAC (targeted, with the
+  user's go) and delete the Bedrock role in that account (Phase 4A, `local-verification.md`).

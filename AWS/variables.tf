@@ -226,3 +226,19 @@ variable "assistant_bedrock_region" {
   type        = string
   default     = ""
 }
+
+variable "evidence_cdn_account" {
+  description = "Account that hosts the evidence CloudFront distribution: \"main\", or \"second\" (via the aws.cdn provider) while the main account cannot create CloudFront."
+  type        = string
+  default     = "main"
+  validation {
+    condition     = contains(["main", "second"], var.evidence_cdn_account)
+    error_message = "evidence_cdn_account must be \"main\" or \"second\"."
+  }
+}
+
+variable "cdn_profile" {
+  description = "Optional AWS config profile for the aws.cdn provider. Empty uses the default credential chain. Set it only in the ignored terraform.tfvars."
+  type        = string
+  default     = ""
+}

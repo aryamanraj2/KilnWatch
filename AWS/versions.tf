@@ -31,3 +31,18 @@ provider "aws" {
     }
   }
 }
+
+# Account that hosts the evidence CDN (see evidence_cdn_account). Same provider, no new lock entry.
+provider "aws" {
+  alias   = "cdn"
+  region  = var.aws_region
+  profile = var.cdn_profile != "" ? var.cdn_profile : null
+
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+      ManagedBy   = "Terraform"
+    }
+  }
+}

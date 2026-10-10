@@ -285,7 +285,7 @@ clients must adopt these optionals before consuming candidate records.
 | `rules_assessment` | `not_evaluated` until the rules engine runs, then `evaluated` or `partially_evaluated` (some rules lacked data; see `AWS/rules/README.md`); legacy absence means assessment state unknown, never passed |
 | `violations` | Empty for an unassessed candidate; after assessment, the rules measured inside their threshold. Never a compliance conclusion, and an empty list after `partially_evaluated` is not a clean result |
 | `type_verification` | `unverified` for model candidates regardless of class score; no C-TECH-10K finding |
-| `evidence.before`, `.after` | Optional URL strings, preserving legacy shape; null until an object is actually published |
+| `evidence.before`, `.after` | Optional URL strings, preserving legacy shape; null until an object is actually published. Since 2026-10-10 they are non-null HTTPS evidence-CDN URLs for published evidence (currently both sides of `KW-6b3b38…`); all other kilns stay null |
 | `evidence.before_metadata`, `.after_metadata` | Optional scene/grid/image metadata even when URL is unavailable |
 | `provenance` | Model hash/version, scene ID, exact acquisition timestamp, input SHA-256 and import timestamp |
 | `first_seen`, `last_seen` | Earliest/latest **observed acquisition**, not construction/appearance dates |

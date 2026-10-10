@@ -5,7 +5,7 @@ iOS scope = the **Inspector app** (concept §05). The resident portal and the re
 
 ## Ground rules for every agent
 
-- Stack: SwiftUI, MapKit, Swift 6 language mode, Xcode 27, deployment target iOS 27.0. No `#available` gating needed for iOS 27 APIs.
+- Stack: SwiftUI, MapKit, Swift 6 language mode, existing Xcode 27 / iOS 27 SDK toolchain, minimum supported runtime iOS 26.1. Preserve current API usage and behavior; any API requiring a newer runtime must return for review.
 - Load Axiom skills before you write code: `axiom:axiom-design`, `axiom:axiom-swiftui`, `swiftui-expert-skill`, plus whatever the phase needs.
 - Research: start with WebSearch. If a page is blocked, gated or thin, use Firecrawl (`firecrawl_search`, `firecrawl_scrape`). Cite what you used in your report.
 - `docs/DESIGN.md` (written in Phase 0) is binding. If you deviate from it, say so in your report.

@@ -10,6 +10,13 @@ Both still apply unless this file says otherwise. All three are snapshots: check
 
 ---
 
+## 0. Split of roles (the user's decision, 2026-10-10)
+
+- **This Codex orchestrator owns iOS only:** prompt 18 (Phase 4B iOS Ask) and later iOS phases or polish. Leave §5's "backend Step 0" out of 18.
+- **The Claude Code orchestrator owns AWS:** 16c (CloudFront), the backend Ask tweaks (plain text, the no-action line), the rules and exposure apply plus the Ask update (§5a), and Part B or switch-back. Don't write AWS prompts here.
+- **Coordinate through the user.** Don't start the 18 builder while the 16c builder is in its Xcode/Simulator step (16c Step 3). Both use the Simulator.
+- **The API contract is shared.** If iOS needs a backend change, tell the user to ask the AWS orchestrator.
+
 ## 1. Rules (unchanged, short form)
 
 - **Your job.** You orchestrate; you don't build. You review the builder's evidence yourself (rerun tests, `git diff`, a leak scan, look at screenshots), write **one** builder prompt at a time into `App/docs/prompts/NN-*.md`, and give the user a **full pre-prompt** to paste.
@@ -39,6 +46,7 @@ Both still apply unless this file says otherwise. All three are snapshots: check
 | 4A deploy | 16 | Done, and reviewed. Assistant live, cap 50, a gross budget added. Bedrock blocked. |
 | 4A Bedrock via second account | 16b | **Done, and reviewed by the Claude orchestrator** (tests 71 run / 62 pass / 9 skip rerun, lock unchanged, leak scan of 22 files 0 hits for both accounts, API host and ID). 12/12 live answers were 200 with no fallback; the fake-ID question was caught and regenerated; all answers were honest. Fixtures are now complete, including `normal_answer.json` and `fallback.synthetic.json`. §4 is kept as a reference. |
 | This handover | 17 | — |
+| Evidence images through CloudFront in the second account | **16c** | **Written by the Claude orchestrator, not run yet.** The user ran or will run it in a Codex builder **before** prompt 18, because both use Xcode and the Simulator. Review its report against 16c's own report list. See §5b. |
 | **Next: Phase 4B iOS Ask** | **18** (to write) | See §5. |
 
 **User decisions made in this stretch:**
@@ -167,6 +175,22 @@ Scope: handover 14 §3.2, with these updates:
 
   Product language stays: "flagged by satellite, pending inspection" and "siting signal", never a legal verdict. Ask the user whether to do this before or after prompt 18. My recommendation: **after**. Ship iOS Ask on the current live data first, then a combined "apply assessment + Ask and app update" step.
 
+## 5b. CloudFront: images through the second account (prompt 16c)
+
+- **The user's decision:** serve the evidence PNGs through a CloudFront distribution in the **second account** (a teammate's, the same one serving Bedrock; the owner agreed). The images stay in the main account's **private** bucket. OAC reads them, and the bucket policy allows only `s3:GetObject` on `evidence/*.png` for that one distribution's ARN. The bucket uses SSE-S3, so no KMS is involved.
+- **Terraform:** an aliased provider `aws.cdn` (the same provider version, so the lock is unchanged) using a `credential_process` profile; `evidence_cdn_account = "main"|"second"` (default `main`); the values live in the ignored tfvars. The main distribution is gated by count; the main OAC already exists and is left alone.
+- **The registry runner is deliberately KEPT,** because the teammates' rules engine needs it to write the assessment. Don't remove it until that's done.
+- **When reviewing 16c, check:**
+  - the plan was 3 add / 0 change / 0 destroy;
+  - the bucket policy is exactly as narrow as described;
+  - the denial probe passed (S3 direct and non-PNG paths denied);
+  - the re-import was 0 new;
+  - only `KW-6b3b38…` has URLs;
+  - the Swift test was updated, and the build and tests are green;
+  - **look at the two screenshots yourself;**
+  - the leak scan also covers the CloudFront domain and ID.
+- **Switch-back** once AWS verifies the main account: set `evidence_cdn_account = "main"`, run a targeted apply, republish, re-import, then remove the second-account distribution. That needs the user's go.
+
 ## 6. Git state
 
 - **Phase 4A is committed and pushed** (`2e7470f`, rebased on the teammates' rules-engine commits; the leak scan of the outgoing diff was clean).
@@ -204,4 +228,4 @@ Scope: handover 14 §3.2, with these updates:
 
 1. Confirm you've read this file, plus 14 and 11 (at least §1, §1a and §7 of 11), and checked `git status` and `log`.
 2. 16b is already reviewed (§2). Don't redo the review; at most, rerun the tests and the leak scan.
-3. Phase 4A is already committed and pushed. Raise §5a in one line (recommend: rules and exposure go live after iOS Ask), then write **prompt 18** (Phase 4B iOS Ask, with the small backend Step 0 from §5) and its full pre-prompt.
+3. Phase 4A is already committed and pushed. Ask whether 16c has run; review its report if pasted. Raise §5a in one line (recommend: rules and exposure go live after iOS Ask), then write **prompt 18** (Phase 4B iOS Ask, with the small backend Step 0 from §5) and its full pre-prompt.

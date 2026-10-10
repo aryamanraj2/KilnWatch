@@ -434,7 +434,11 @@ func localRealDetectionContractDecodesThroughExistingClient() async throws {
     let records = try JSONDecoder.kilnWatch.decode(KilnList.self, from: data).kilns
     #expect(!records.isEmpty)
     #expect(records.allSatisfy { $0.status == .flagged && $0.exposure == nil && $0.rulesAssessment == "not_evaluated" && !$0.typeMayBePresentedAsCertain })
-    #expect(records.allSatisfy { $0.evidence.before == nil && $0.evidence.after == nil }) // local, unpublished
+    // Only the one kiln with verified, published evidence may carry image URLs (HTTPS); all others stay null.
+    let published = "KW-6b3b38da681850e5af46b024f3d3f78e"
+    #expect(records.filter { $0.id != published }.allSatisfy { $0.evidence.before == nil && $0.evidence.after == nil })
+    #expect(records.compactMap(\.evidence.before).allSatisfy { $0.scheme == "https" })
+    #expect(records.compactMap(\.evidence.after).allSatisfy { $0.scheme == "https" })
     #expect(records.contains { $0.evidence.afterMetadata?.patchPx == 256 && $0.evidence.beforeMetadata != nil })
     let client = Stub { _ in (200, data) }
     #expect(try await client.api.kilns(district: "Hapur") == records)

@@ -59,7 +59,7 @@ output "agent_runtime_id" {
 }
 output "agent_model_id" { value = var.agent_model_id }
 
-output "evidence_base_url" { value = "https://${aws_cloudfront_distribution.evidence.domain_name}" }
+output "evidence_base_url" { value = "https://${local.evidence_distribution.domain_name}" }
 output "registry_reader_secret_arn" { value = aws_secretsmanager_secret.registry_reader.arn }
 output "registry_admin_secret_arn" { value = aws_db_instance.main.master_user_secret[0].secret_arn }
 output "registry_runner_id" { value = var.create_registry_runner ? aws_instance.registry_runner[0].id : null }
