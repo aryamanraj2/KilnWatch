@@ -1,0 +1,569 @@
+{
+ "note": "Recorded real shapes (prompt 38 runs m0-before/m0-after, public registry IDs); trimmed, URLs replaced.",
+ "baseline": {
+  "type": "FeatureCollection",
+  "kilnwatch": {
+   "scenes": [
+    {
+     "id": "S2A_T43RGM_20231205T053206_L2A",
+     "date": "2023-12-05"
+    }
+   ]
+  },
+  "features": [
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.547,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "scene_date": "2023-12-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.809268,
+        28.691962
+       ],
+       [
+        77.809679,
+        28.69166
+       ],
+       [
+        77.810346,
+        28.692365
+       ],
+       [
+        77.809935,
+        28.692667
+       ],
+       [
+        77.809268,
+        28.691962
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.552,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "scene_date": "2023-12-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.788796,
+        28.68857
+       ],
+       [
+        77.789252,
+        28.688328
+       ],
+       [
+        77.789824,
+        28.689171
+       ],
+       [
+        77.789369,
+        28.68941
+       ],
+       [
+        77.788796,
+        28.68857
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.407,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "scene_date": "2023-12-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.79711,
+        28.696059
+       ],
+       [
+        77.797412,
+        28.696433
+       ],
+       [
+        77.796515,
+        28.696993
+       ],
+       [
+        77.796213,
+        28.696618
+       ],
+       [
+        77.79711,
+        28.696059
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.665,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "scene_date": "2023-12-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.778835,
+        28.711046
+       ],
+       [
+        77.779316,
+        28.710811
+       ],
+       [
+        77.779832,
+        28.71163
+       ],
+       [
+        77.779352,
+        28.711868
+       ],
+       [
+        77.778835,
+        28.711046
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.541,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "scene_date": "2023-12-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.797076,
+        28.751851
+       ],
+       [
+        77.797555,
+        28.751553
+       ],
+       [
+        77.798261,
+        28.752435
+       ],
+       [
+        77.797782,
+        28.752734
+       ],
+       [
+        77.797076,
+        28.751851
+       ]
+      ]
+     ]
+    }
+   }
+  ]
+ },
+ "current": {
+  "type": "FeatureCollection",
+  "kilnwatch": {
+   "scenes": [
+    {
+     "id": "S2B_T43RGM_20261005T053448_L2A",
+     "date": "2026-10-05"
+    }
+   ]
+  },
+  "features": [
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.605,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "scene_date": "2026-10-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.809297,
+        28.691954
+       ],
+       [
+        77.809705,
+        28.691671
+       ],
+       [
+        77.810343,
+        28.692381
+       ],
+       [
+        77.809935,
+        28.692665
+       ],
+       [
+        77.809297,
+        28.691954
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.626,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "scene_date": "2026-10-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.788781,
+        28.688597
+       ],
+       [
+        77.789207,
+        28.688351
+       ],
+       [
+        77.78981,
+        28.689167
+       ],
+       [
+        77.789385,
+        28.689412
+       ],
+       [
+        77.788781,
+        28.688597
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.485,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "scene_date": "2026-10-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.79706,
+        28.696075
+       ],
+       [
+        77.797403,
+        28.69644
+       ],
+       [
+        77.79654,
+        28.697069
+       ],
+       [
+        77.796197,
+        28.696704
+       ],
+       [
+        77.79706,
+        28.696075
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "CFCBK",
+     "detection_confidence": 0.745,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "scene_date": "2026-10-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.757873,
+        28.682889
+       ],
+       [
+        77.757898,
+        28.683473
+       ],
+       [
+        77.757202,
+        28.683496
+       ],
+       [
+        77.757177,
+        28.682912
+       ],
+       [
+        77.757873,
+        28.682889
+       ]
+      ]
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "type": "FCBK",
+     "detection_confidence": 0.508,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "scene_date": "2026-10-05"
+    },
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        77.775946,
+        28.713081
+       ],
+       [
+        77.776309,
+        28.712776
+       ],
+       [
+        77.777101,
+        28.713506
+       ],
+       [
+        77.776738,
+        28.713812
+       ],
+       [
+        77.775946,
+        28.713081
+       ]
+      ]
+     ]
+    }
+   }
+  ]
+ },
+ "registry": {
+  "kilns": [
+   {
+    "kiln_id": "KW-1f08261de3155be7a0d666f4727a3239",
+    "district": "Hapur",
+    "status": "flagged",
+    "type": "FCBK",
+    "detection_confidence": 0.605,
+    "footprint": {
+     "polygon": [
+      {
+       "latitude": 28.691954,
+       "longitude": 77.809297
+      },
+      {
+       "latitude": 28.691671,
+       "longitude": 77.809705
+      },
+      {
+       "latitude": 28.692381,
+       "longitude": 77.810343
+      },
+      {
+       "latitude": 28.692665,
+       "longitude": 77.809935
+      }
+     ],
+     "centroid": {
+      "latitude": 28.692168,
+      "longitude": 77.80982
+     }
+    },
+    "evidence": {
+     "before": "https://evidence.example.invalid/before.png",
+     "after": "https://evidence.example.invalid/after.png"
+    }
+   },
+   {
+    "kiln_id": "KW-c3fa9e8bb1cc52cb8e035e21316d08d0",
+    "district": "Hapur",
+    "status": "flagged",
+    "type": "FCBK",
+    "detection_confidence": 0.626,
+    "footprint": {
+     "polygon": [
+      {
+       "latitude": 28.688597,
+       "longitude": 77.788781
+      },
+      {
+       "latitude": 28.688351,
+       "longitude": 77.789207
+      },
+      {
+       "latitude": 28.689167,
+       "longitude": 77.78981
+      },
+      {
+       "latitude": 28.689412,
+       "longitude": 77.789385
+      }
+     ],
+     "centroid": {
+      "latitude": 28.688882,
+      "longitude": 77.789295
+     }
+    },
+    "evidence": {
+     "before": null,
+     "after": null
+    }
+   },
+   {
+    "kiln_id": "KW-1cf1a27586db5efa98b75774acd0f5c9",
+    "district": "Hapur",
+    "status": "flagged",
+    "type": "FCBK",
+    "detection_confidence": 0.485,
+    "footprint": {
+     "polygon": [
+      {
+       "latitude": 28.696075,
+       "longitude": 77.79706
+      },
+      {
+       "latitude": 28.69644,
+       "longitude": 77.797403
+      },
+      {
+       "latitude": 28.697069,
+       "longitude": 77.79654
+      },
+      {
+       "latitude": 28.696704,
+       "longitude": 77.796197
+      }
+     ],
+     "centroid": {
+      "latitude": 28.696572,
+      "longitude": 77.7968
+     }
+    },
+    "evidence": {
+     "before": null,
+     "after": null
+    }
+   },
+   {
+    "kiln_id": "KW-00c562060b40502fb4a7ed2016ce7576",
+    "district": "Hapur",
+    "status": "flagged",
+    "type": "CFCBK",
+    "detection_confidence": 0.745,
+    "footprint": {
+     "polygon": [
+      {
+       "latitude": 28.682889,
+       "longitude": 77.757873
+      },
+      {
+       "latitude": 28.683473,
+       "longitude": 77.757898
+      },
+      {
+       "latitude": 28.683496,
+       "longitude": 77.757202
+      },
+      {
+       "latitude": 28.682912,
+       "longitude": 77.757177
+      }
+     ],
+     "centroid": {
+      "latitude": 28.683193,
+      "longitude": 77.757537
+     }
+    },
+    "evidence": {
+     "before": null,
+     "after": null
+    }
+   },
+   {
+    "kiln_id": "KW-25672ba2e9aa5340a2ebc51257a4e5fd",
+    "district": "Hapur",
+    "status": "flagged",
+    "type": "FCBK",
+    "detection_confidence": 0.508,
+    "footprint": {
+     "polygon": [
+      {
+       "latitude": 28.713081,
+       "longitude": 77.775946
+      },
+      {
+       "latitude": 28.712776,
+       "longitude": 77.776309
+      },
+      {
+       "latitude": 28.713506,
+       "longitude": 77.777101
+      },
+      {
+       "latitude": 28.713812,
+       "longitude": 77.776738
+      }
+     ],
+     "centroid": {
+      "latitude": 28.713294,
+      "longitude": 77.776524
+     }
+    },
+    "evidence": {
+     "before": null,
+     "after": null
+    }
+   }
+  ],
+  "next_cursor": null
+ }
+}

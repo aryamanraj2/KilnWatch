@@ -4,6 +4,7 @@ The daily cap uses one on-demand DynamoDB counter. Prompt 10 says "no DynamoDB u
 serve it": this Lambda runs outside the VPC by design (it reads only the public API), so it cannot reach
 RDS, and one atomic counter item per UTC day is the cheapest correct option."""
 import base64
+import functools
 import json
 import logging
 import os
@@ -67,7 +68,10 @@ def count_question(dynamodb, table, cap, now):
         raise
 
 
-def handle(event, context, *, dynamodb, ask, now=None):
+def handle(event, context, *, dynamodb, ask, now=None, triage=None):
+    # Change triage (prompt 40) is internal: only a direct invoke (no API Gateway requestContext) reaches it.
+    if triage and isinstance(event, dict) and 'requestContext' not in event and event.get('action') == 'triage':
+        return triage(event, context)
     started = time.monotonic()
     request_id = getattr(context, 'aws_request_id', None)
     metrics = {}
@@ -112,4 +116,8 @@ def handler(event, context):
         import boto3
         from botocore.config import Config
         _dynamodb = boto3.client('dynamodb', config=Config(connect_timeout=2, read_timeout=3, retries={'total_max_attempts': 2}))
-    return handle(event, context, dynamodb=_dynamodb, ask=core.answer)
+    triage = None
+    if os.environ.get('REVIEW_TABLE'):
+        from triage import agent
+        triage = functools.partial(agent.run, dynamodb=_dynamodb)
+    return handle(event, context, dynamodb=_dynamodb, ask=core.answer, triage=triage)

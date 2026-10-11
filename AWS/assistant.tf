@@ -3,6 +3,8 @@
 
 locals {
   assistant = var.enable_assistant ? 1 : 0
+  # Change triage (prompt 40) lives inside the assistant Lambda: internal invocation only, no route.
+  change_triage = var.enable_assistant && var.enable_change_triage ? 1 : 0
 }
 
 # The model must be a cross-region inference profile (Nova 2 Lite and Nova Pro are only invocable that way in ap-south-1).
@@ -28,6 +30,29 @@ resource "aws_dynamodb_table" "assistant_counter" {
   ttl {
     attribute_name = "expires_at"
     enabled        = true
+  }
+
+  # Encrypted at rest with the AWS-owned key (DynamoDB default). No streams.
+  server_side_encryption {
+    enabled = false
+  }
+}
+
+# Change triage review queue: one item per difference, written only by queue_for_review (conditional PutItem).
+# Nothing here or in the Lambda changes a kiln's status; a reviewer's approval path is not built yet.
+resource "aws_dynamodb_table" "review_queue" {
+  count        = local.change_triage
+  name         = "${var.project_name}-review-queue"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "item_id"
+
+  attribute {
+    name = "item_id"
+    type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = false
   }
 
   # Encrypted at rest with the AWS-owned key (DynamoDB default). No streams.
@@ -79,6 +104,19 @@ resource "aws_iam_role_policy" "assistant" {
         Action   = ["sts:AssumeRole"]
         Resource = [var.assistant_bedrock_role_arn]
       }
+      ], local.change_triage == 0 ? [] : [
+      {
+        # Change triage reads detector runs only; it never lists or writes the bucket.
+        Effect   = "Allow"
+        Action   = ["s3:GetObject"]
+        Resource = ["${aws_s3_bucket.data.arn}/detections/*"]
+      },
+      {
+        # queue_for_review: the only write, idempotent through attribute_not_exists(item_id) in code.
+        Effect   = "Allow"
+        Action   = ["dynamodb:PutItem"]
+        Resource = [aws_dynamodb_table.review_queue[0].arn]
+      }
     ])
   })
 }
@@ -105,7 +143,11 @@ resource "aws_lambda_function" "assistant" {
       COUNTER_TABLE       = aws_dynamodb_table.assistant_counter[0].name
       },
       var.assistant_bedrock_role_arn == "" ? {} : { BEDROCK_ROLE_ARN = var.assistant_bedrock_role_arn },
-    var.assistant_bedrock_region == "" ? {} : { BEDROCK_REGION = var.assistant_bedrock_region })
+      var.assistant_bedrock_region == "" ? {} : { BEDROCK_REGION = var.assistant_bedrock_region },
+      local.change_triage == 0 ? {} : {
+        REVIEW_TABLE      = aws_dynamodb_table.review_queue[0].name
+        DETECTIONS_BUCKET = aws_s3_bucket.data.id
+    })
   }
 
   depends_on = [aws_cloudwatch_log_group.assistant, aws_iam_role_policy.assistant]

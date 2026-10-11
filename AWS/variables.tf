@@ -267,6 +267,12 @@ variable "enable_portal_hosting" {
   default     = false
 }
 
+variable "enable_change_triage" {
+  description = "Change triage (prompt 40): the review-queue DynamoDB table and the assistant role's read of detections/ and PutItem on that table. Needs enable_assistant. Internal invocation only; no API route."
+  type        = bool
+  default     = false
+}
+
 variable "enable_model_pipeline" {
   description = "Detector image build (prompt 38/38b): CodeBuild, its role, log group and source bucket in the second account via aws.cdn, plus the inference ECR repository policy allowing only that role to push."
   type        = bool

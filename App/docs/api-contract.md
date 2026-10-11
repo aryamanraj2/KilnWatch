@@ -659,3 +659,55 @@ people exposed or "not assessed", image dates and attribution). Its step is
 kilns listed" (or "not yet published for any kiln listed") instead of listing every ID; the ID
 list remains only when some kilns have images. The response shape is unchanged; the app shows
 step labels as given.
+
+## Change triage (40): internal review queue (live, 2026-10-11)
+
+**Internal only, no public route.** Concept Agent 2. An operator invokes the assistant Lambda
+directly with `{"action": "triage", "baseline_run": "m0-before", "current": "registry"}` (optional
+`current_run`, default `m0-after`; `start_after`, an item ID cursor; `max_model_calls`, 1–80). The
+event is honoured only without an API Gateway `requestContext`; `POST /ask` with that body is a
+400 as before and does not touch the Ask daily cap. Gated by `enable_change_triage`.
+
+It compares a baseline detector run with today's registry (all Hapur kilns via
+`include=inspected`) and sorts every difference into one of four groups. Matching is one-to-one by
+footprint IoU ≥ 0.3, with a centroid-distance fallback of 30 m. An unchanged match is no item.
+
+| Group | When | Fixed wording |
+|---|---|---|
+| `possible_zigzag_conversion` | matched; baseline FCBK or CFCBK, registry Zigzag | "detected as FCBK in the Dec 2023 scene and as Zigzag in the Oct 2026 scene" |
+| `new_candidate` | in the registry, no baseline match | "in the registry; not detected in the Dec 2023 scene" (never "built after") |
+| `low_confidence` | matched, current detector score < 0.5 | "current detector score 0.36 is below 0.5" (a score is not accuracy) |
+| `no_longer_detected` | in the baseline, no registry match | "detected in the Dec 2023 scene; no longer detected in the Oct 2026 scene" (never "closed" or "demolished") |
+
+Precedence: zigzag, then new, then low confidence. Every item is a **candidate for review**, never
+a finding. Groups, matches and numbers come from deterministic code (`AWS/triage/diff.py`); the
+model (Ask's Nova 2 Lite path, reasoning off, no tools) only writes a one- or two-sentence reason
+from the item's facts. A validator rejects foreign kiln or scene IDs, the banned stems, status
+words (confirmed, compliant, closed, approved, "not a kiln"), "finding" and construction or
+demolition claims; one regeneration, then a deterministic template (`reason_source: "template"`).
+
+**Queue item** (DynamoDB, written only by `queue_for_review`, a conditional PutItem idempotent on
+`item_id`):
+
+```json
+{
+  "item_id": "<32 hex: sha256 of baseline run + group + footprint>",
+  "group": "new_candidate",
+  "kiln_id": "KW-… (absent for no_longer_detected)",
+  "facts": "<JSON string: group_words, both scenes {id, date}, baseline and current {type, score} or null, iou or \"none\", match basis, centroid, evidence>",
+  "reason": "One or two plain sentences.",
+  "reason_source": "model | template",
+  "state": "pending",
+  "created_at": "2026-10-11T08:12:30+00:00",
+  "model_id": "<model ID, or none for a template reason>",
+  "baseline_run": "m0-before",
+  "current": "registry"
+}
+```
+
+`facts.evidence` holds the registry's `evidence.before/after` URLs when published; otherwise
+`{"images": "no published image", "scene_ids": [...], "footprint": [[lat, lon], ...]}`.
+
+**Nothing changes a kiln.** No triage code path writes `status` or `review_state`, RDS or the
+public API. The registry changes only when a reviewer approves an item; that review console and
+approval path are **not built yet**. Triage is started manually; Step Functions wiring is next.

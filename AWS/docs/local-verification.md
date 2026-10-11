@@ -1445,3 +1445,70 @@ Open limits: ARM CPU on Fargate instead of the original laptop runtime (results 
 scene); a harmless Ultralytics warning about its settings directory (it falls back to
 `/tmp/Ultralytics`); no import; manual start only; the image tag names commit `aba69ad` but was
 built from the working tree with this step's uncommitted files.
+
+## Change triage (40) — live (2026-10-11)
+
+Concept Agent 2 inside the assistant Lambda, internal invocation only (no route). Code:
+`AWS/triage/diff.py` (deterministic diff, pure Python; exact convex-polygon IoU, no new
+dependency) and `AWS/triage/agent.py` (one reason per item, then `queue_for_review`, the only
+write). The assistant ZIP now also carries `triage/`. Gated by `enable_change_triage`.
+
+- **Terraform:** one targeted plan/apply (`review_queue` table, assistant role policy, assistant
+  Lambda): **1 added, 2 changed**. The table is on-demand, PITR off, no stream. The role gained
+  only `s3:GetObject` on `detections/*` and `dynamodb:PutItem` on that table; the Lambda gained
+  two env keys (timeout 28 s and memory unchanged). The first live invoke then failed before any
+  write: a duplicate `current` key in the item facts failed boto3's client-side parameter check on
+  the first `PutItem` (table scan: 0 items). With a second go, the fix (facts key
+  `compared_with`; the test stub now rejects non-string values as boto3 does) went out in a second
+  targeted plan/apply on the Lambda only: **0 added, 1 changed** (code hash). Provider lock
+  unchanged.
+- **Run** (`baseline_run = m0-before`, `current = registry`, `max_model_calls = 64`): one invoke,
+  14.1 s, no cursor continuation needed. 39 registry kilns (all statuses), 32 baseline
+  candidates, 15 one-to-one matches; all 39 registry kilns matched the `m0-after` run for their
+  current score.
+
+| Group | Items |
+|---|---|
+| `new_candidate` (not detected in the Dec 2023 scene) | 24 |
+| `no_longer_detected` | 17 |
+| `possible_zigzag_conversion` | 0 (no registry kiln is predicted Zigzag) |
+| `low_confidence` (score < 0.5, matched) | 4 (scores 0.36, 0.48, 0.48, 0.49) |
+| **Total** | **45** |
+
+  6 of the 39 current scores sit within 0.05 of 0.5. New candidates below 0.5 stay in
+  `new_candidate` by precedence.
+- **Read-back** (scan): 45 items, `state = pending` on all, 45 `reason_source = model`, 0
+  template, 0 regenerations, every stored reason passes the validator again; 28 items carry the
+  published before/after URLs, the 17 `no_longer_detected` items say "no published image".
+- **Nothing else changed:** the public API still returns 38 flagged in Hapur, 39 with
+  `include=inspected` (38 flagged, 1 confirmed, the known demo verdict).
+- **Cost:** 61 Bedrock calls in all (16 in the failed first invoke, 45 in the run), 27,002 input
+  and 4,034 output tokens: about $0.02 at Nova 2 Lite list prices, billed to the **second
+  account**. DynamoDB: 45 on-demand writes, negligible. Lambda: about 25 s in total.
+- **Tests:** `PYTHONPATH=AWS .venv-integration/bin/python -m unittest discover -s AWS/tests`:
+  203 run, 187 pass, 16 skipped (20 new in `AWS/tests/test_triage.py`, with a trimmed real-shape
+  sample in `triage_sample.json`).
+
+**Start a run** (manual; needs a go each time):
+
+```sh
+aws lambda invoke --profile kilnwatch --region ap-south-1 --function-name <assistant-function> \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"action":"triage","baseline_run":"<run-id>","current":"registry"}' out.json
+```
+
+If `next_start_after` is not null, invoke again with `"start_after": "<that item ID>"` and
+`max_model_calls` lowered by the calls already used. Re-running the same comparison writes
+nothing new (`existing` counts the items), but it still makes one model call per item.
+
+**Rollback** (needs a go): `enable_change_triage = false`, then one targeted apply on
+`aws_dynamodb_table.review_queue`, `aws_iam_role_policy.assistant` and
+`aws_lambda_function.assistant` removes the table (and its items), the two role statements and
+the two env keys. The triage code stays in the ZIP but is unreachable without `REVIEW_TABLE`.
+
+Open limits: no review console or approval path yet, so nothing can act on the queue; manual
+invocation only (Step Functions wiring is next); 10 m pixels, haze and season limit what "not
+detected" means, so a missing 2023 match is not evidence that a kiln is new; the run response
+reports `current_run` as the feature count (39) instead of the run name (cosmetic; the summary
+key overwrites it, fix with the next deploy); some model reasons are clumsy ("with a new
+detection in today's images") but pass every check.
