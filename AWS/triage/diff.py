@@ -180,6 +180,6 @@ def triage(baseline, registry, current, baseline_scene, current_scene, baseline_
     items.sort(key=lambda f: f['item_id'])
     counts = {g: sum(f['group'] == g for f in items) for g in GROUPS}
     summary = {'counts': counts, 'items': len(items), 'baseline': len(baseline), 'registry': len(registry),
-               'current_run': len(current), 'matched': len(to_baseline), 'registry_matched_to_current_run': len(to_current),
+               'current_run_features': len(current), 'matched': len(to_baseline), 'registry_matched_to_current_run': len(to_current),
                'near_low_score': sum(isinstance(s, (int, float)) and abs(s - LOW_SCORE) <= NEAR_SCORE for s in scores)}
     return items, summary

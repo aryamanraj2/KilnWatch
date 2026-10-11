@@ -3,7 +3,8 @@
 
 locals {
   assistant = var.enable_assistant ? 1 : 0
-  # Change triage (prompt 40) lives inside the assistant Lambda: internal invocation only, no route.
+  # Change triage (prompt 40) lives inside the assistant Lambda: the triage run is an internal invocation only;
+  # the queue's only route is the read-only GET /public/review (prompt 40b).
   change_triage = var.enable_assistant && var.enable_change_triage ? 1 : 0
 }
 
@@ -116,6 +117,12 @@ resource "aws_iam_role_policy" "assistant" {
         Effect   = "Allow"
         Action   = ["dynamodb:PutItem"]
         Resource = [aws_dynamodb_table.review_queue[0].arn]
+      },
+      {
+        # GET /public/review (prompt 40b): the read-only queue view.
+        Effect   = "Allow"
+        Action   = ["dynamodb:Scan"]
+        Resource = [aws_dynamodb_table.review_queue[0].arn]
       }
     ])
   })
@@ -177,4 +184,22 @@ resource "aws_lambda_permission" "assistant" {
   function_name = aws_lambda_function.assistant[0].function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/POST/ask"
+}
+
+# Prompt 40b: the read-only review queue for the iOS Review tab. Public like /public/kilns (no sign-in yet), with
+# the same stage throttle (10/s, burst 20). No write route exists.
+resource "aws_apigatewayv2_route" "review" {
+  count     = local.change_triage
+  api_id    = aws_apigatewayv2_api.http.id
+  route_key = "GET /public/review"
+  target    = "integrations/${aws_apigatewayv2_integration.assistant[0].id}"
+}
+
+resource "aws_lambda_permission" "review" {
+  count         = local.change_triage
+  statement_id  = "AllowApiGatewayInvokeReview"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.assistant[0].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/GET/public/review"
 }

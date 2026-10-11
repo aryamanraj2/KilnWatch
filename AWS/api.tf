@@ -168,9 +168,10 @@ resource "aws_apigatewayv2_stage" "default" {
     throttling_rate_limit  = 50
     throttling_burst_limit = 100
   }
-  # Unauthenticated, database-backed routes get a tighter limit. No Lambda reserved concurrency (account limit may be 10).
+  # Unauthenticated, database-backed routes (and the review queue read, 40b) get a tighter limit. No Lambda reserved concurrency (account limit may be 10).
   dynamic "route_settings" {
-    for_each = [aws_apigatewayv2_route.get_public_kilns.route_key, aws_apigatewayv2_route.get_public_kiln.route_key]
+    for_each = concat([aws_apigatewayv2_route.get_public_kilns.route_key, aws_apigatewayv2_route.get_public_kiln.route_key],
+    aws_apigatewayv2_route.review[*].route_key)
     content {
       route_key              = route_settings.value
       throttling_rate_limit  = 10

@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'assistant'))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import handler
-from triage import agent, diff
+from triage import agent, diff, review
 
 SAMPLE = json.loads((Path(__file__).resolve().parent / 'triage_sample.json').read_text())
 NOW = datetime(2026, 10, 11, 12, tzinfo=timezone.utc)
@@ -322,6 +322,148 @@ class AgentTests(unittest.TestCase):
         result = agent.run(EVENT, Context(), dynamodb=dynamo, s3=StubS3({}), bedrock=StubBedrock(), api=StubAPI([]),
                            model_id='m', table='review', bucket='data', now=NOW)
         self.assertEqual((result['error'], result['kind'], dynamo.calls), ('inputs_unavailable', 'KeyError', []))
+
+    def test_summary_names_the_current_run(self):
+        result, _, _ = go()
+        self.assertEqual(result['current_run'], 'm0-after')
+        self.assertEqual(result['current_run_features'], len(SAMPLE['current']['features']))
+
+
+CDN = 'https://d0example.cloudfront.net/evidence/'
+PICS = {'before': CDN + 'a' * 64 + '.png', 'after': CDN + 'b' * 64 + '.png'}
+
+
+def stored(baseline_run='m0-before', now=NOW):
+    """The queue as 40 writes it: one item per group (zigzag, new with CDN evidence, low, gone) via queue_for_review."""
+    kilns = [diff.from_record(r) for r in (record(77.70, 28.7, kid(1)), record(77.72, 28.7, kid(2), 'Zigzag'),
+                                           record(77.74, 28.7, kid(3), score=0.42),
+                                           record(77.80, 28.7, kid(4), evidence=PICS))]
+    base = [diff.from_feature(f) for f in (feature(77.70, 28.7), feature(77.72, 28.7, 'CFCBK'),
+                                           feature(77.74, 28.7, score=0.51234), feature(77.76, 28.7))]
+    items, _ = diff.triage(base, kilns, kilns, THEN, TODAY, baseline_run)
+    dynamo = StubDynamo()
+    for facts in items: agent.queue_for_review(dynamo, 'review', facts, 'Candidate for review.', 'model', 'm', now)
+    return list(dynamo.items.values())
+
+
+class StubScan:
+    """Only scan exists, paged two items at a time."""
+    def __init__(self, items, fail=False):
+        self.items, self.fail, self.calls = items, fail, 0
+
+    def scan(self, TableName, ExclusiveStartKey=None):
+        assert TableName == 'review'
+        self.calls += 1
+        if self.fail: raise AWSError('ProvisionedThroughputExceededException')
+        start = int(ExclusiveStartKey['n']['N']) if ExclusiveStartKey else 0
+        page = {'Items': copy.deepcopy(self.items[start:start + 2])}
+        if start + 2 < len(self.items): page['LastEvaluatedKey'] = {'n': {'N': str(start + 2)}}
+        return page
+
+
+def api(method, path, query=''):
+    return {'rawPath': path, 'rawQueryString': query, 'requestContext': {'http': {'method': method}}}
+
+
+class ReviewTests(unittest.TestCase):
+    ITEM_KEYS = {'item_id', 'group', 'state', 'kiln_id', 'reason', 'centroid', 'baseline', 'current', 'iou',
+                 'evidence', 'created_at'}
+
+    def setUp(self):
+        review._memo.update(until=0.0, body=None)
+        patcher = unittest.mock.patch.dict('os.environ', {'COUNTER_TABLE': 'counter', 'DAILY_CAP': '300'})
+        patcher.start(); self.addCleanup(patcher.stop)
+
+    def get(self, event, table):
+        counter = unittest.mock.Mock()
+        result = handler.handle(event, None, dynamodb=counter, ask=None,
+                                review=lambda: review.read(table, 'review', clock=lambda: 0.0))
+        counter.update_item.assert_not_called()  # never the Ask daily counter
+        return result
+
+    def test_dispatch(self):
+        result = self.get(api('GET', '/public/review'), StubScan(stored()))
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers'], {'content-type': 'application/json', 'cache-control': 'public, max-age=60'})
+        table = StubScan(stored())
+        for event, status in ((api('GET', '/public/review', 'x=1'), 400), (api('POST', '/public/review'), 404),
+                              (api('GET', '/ask'), 404)):
+            result = self.get(event, table)
+            self.assertEqual(result['statusCode'], status)
+            self.assertEqual(result['headers']['cache-control'], 'no-store')
+        self.assertEqual(json.loads(self.get(api('GET', '/public/review', 'x=1'), table)['body'])['error']['code'],
+                         'invalid_filter')
+        self.assertEqual(table.calls, 0)
+        # Feature off (no REVIEW_TABLE): unknown, as before.
+        self.assertEqual(handler.handle(api('GET', '/public/review'), None, dynamodb=None, ask=None)['statusCode'], 404)
+
+    def test_allowlist_nulls_order_and_counts(self):
+        items = stored()
+        for raw in items: raw['secret'] = {'S': 'internal'}
+        body = review.build(items)
+        self.assertEqual(set(body), {'baseline', 'current', 'counts', 'truncated', 'items'})
+        self.assertEqual(body['baseline'], {'run': 'm0-before', 'scene': THEN['id'], 'date': THEN['date']})
+        self.assertEqual(body['current'], {'label': 'registry', 'scene': TODAY['id'], 'date': TODAY['date']})
+        self.assertEqual(body['counts'], {'new_candidate': 1, 'no_longer_detected': 1,
+                                          'possible_zigzag_conversion': 1, 'low_confidence': 1})
+        self.assertEqual([i['group'] for i in body['items']], list(diff.GROUPS))
+        text = json.dumps(body)
+        for leak in ('internal', 'facts', 'model_id', 'group_words', 'footprint', 'scene_ids', 'reason_source'):
+            self.assertNotIn(leak, text)
+        new, gone, zigzag, low = body['items']
+        for i in body['items']:
+            self.assertEqual(set(i), self.ITEM_KEYS)
+            self.assertEqual((i['state'], i['reason']), ('pending', 'Candidate for review.'))
+            self.assertTrue(i['created_at'].endswith('Z'))
+        self.assertEqual((new['kiln_id'], new['baseline'], new['iou'], new['evidence']), (kid(4), None, None, PICS))
+        self.assertEqual((gone['kiln_id'], gone['current'], gone['iou'], gone['evidence']), (None, None, None, None))
+        self.assertEqual(gone['baseline'], {'type': 'FCBK', 'score': 0.8})
+        self.assertEqual((low['baseline']['score'], low['current']['score'], low['iou']), (0.512, 0.42, 1.0))
+        self.assertEqual(zigzag['evidence'], None)  # registry had no published images
+        self.assertEqual(set(new['centroid']), {'lat', 'lon'})
+        self.assertEqual(review.build([])['counts'], dict.fromkeys(diff.GROUPS, 0))
+
+    def test_ordering_within_a_group_and_foreign_evidence(self):
+        new = next(r for r in stored() if r['group']['S'] == 'new_candidate')
+        items = [copy.deepcopy(new) for _ in range(3)]
+        for n, raw in zip((9, 2), items): raw['kiln_id'] = {'S': kid(n)}; raw['item_id'] = {'S': f'{n:032x}'}
+        del items[2]['kiln_id']
+        facts = json.loads(items[0]['facts']['S'])
+        facts['evidence'] = {'before': 'https://evil.example/evidence/' + 'a' * 64 + '.png', 'after': PICS['after']}
+        items[0]['facts'] = {'S': json.dumps(facts)}
+        body = review.build(items)
+        self.assertEqual([i['kiln_id'] for i in body['items']], [kid(2), kid(9), None])
+        self.assertEqual(body['items'][1]['evidence'], {'before': None, 'after': PICS['after']})
+
+    def test_latest_run_only(self):
+        old = stored('m0-older', datetime(2026, 10, 1, tzinfo=timezone.utc))
+        body = review.build(old + stored())
+        self.assertEqual((body['baseline']['run'], len(body['items'])), ('m0-before', 4))
+
+    def test_memo(self):
+        table, now = StubScan(stored()), [100.0]
+        first = review.read(table, 'review', clock=lambda: now[0])
+        now[0] += 59
+        self.assertIs(review.read(table, 'review', clock=lambda: now[0]), first)
+        self.assertEqual(table.calls, 2)  # one paginated scan: 4 items, 2 pages
+        now[0] += 1
+        review.read(table, 'review', clock=lambda: now[0])
+        self.assertEqual(table.calls, 4)
+
+    def test_unavailable_is_503_never_empty(self):
+        result = self.get(api('GET', '/public/review'), StubScan([], fail=True))
+        self.assertEqual(result['statusCode'], 503)
+        self.assertEqual(json.loads(result['body'])['error'], {'code': 'review_unavailable', 'retryable': True,
+                                                               'message': 'The review queue is temporarily unavailable.'})
+        self.assertEqual(result['headers']['cache-control'], 'no-store')
+        self.assertIsNone(review._memo['body'])
+
+    def test_truncation(self):
+        raw = stored()[0]
+        items = [{**copy.deepcopy(raw), 'item_id': {'S': f'{n:032x}'}} for n in range(501)]
+        body = review.build(items)
+        self.assertEqual((body['truncated'], len(body['items']), body['counts'][raw['group']['S']]), (True, 500, 501))
+        self.assertFalse(review.build(items[:500])['truncated'])
 
 
 if __name__ == '__main__':

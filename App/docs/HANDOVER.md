@@ -222,3 +222,7 @@ See `screens/phase-5/polish-report.md`: zero confirmed leaks (one compressed-PNG
 **Prompt 22 — verdict loop (2026-10-11):** Real geotagged photos, public no-auth verdict submission, durable outbox/retry/discard, and inspected-inclusive status presentation are implemented; no sign-in by user decision.
 Core runner: 90 tests (89 passed, one existing opt-in skip); prescribed root build: zero warnings. Six live/stub screenshots reviewed; confirmed leak counts: 0. See [verdict-loop report](screens/phase-6/verdict-loop-report.md).
 One live confirmed verdict for `KW-00c562060b40502fb4a7ed2016ce7576`: POST 201, photo PUT 200, outbox empty; public flagged count/Ask/planning now see 38 until operator reset. Route/Ask POSTs 0/0; no AWS CLI, backend/contract edits, agents, staging or commits by this lane. Stopped for orchestrator review.
+
+**Prompt 23 — Review tab (2026-10-11):** Read-only fourth tab shows the public 45-item queue (24/17/0/4), verbatim reasons, inspected-inclusive kiln navigation and historical location details; DESIGN §10 updated.
+Core: 99 reported (98 passed, one existing opt-in skip); root build: zero warnings. Six inspected captures and zero confirmed leaks; see [Review tab report](screens/phase-7/review-tab-report.md).
+Live Ask/route/verdict POSTs: 0/0/0; no AWS CLI, backend/contract edits, agents, staging, commits or pushes by this lane. Snapshot until triage is automated; no reviewer sign-in. Stopped for orchestrator review.

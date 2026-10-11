@@ -1,0 +1,972 @@
+{
+  "baseline": {
+    "run": "m0-before",
+    "scene": "S2A_T43RGM_20231205T053206_L2A",
+    "date": "2023-12-05"
+  },
+  "current": {
+    "label": "registry",
+    "scene": "S2B_T43RGM_20261005T053448_L2A",
+    "date": "2026-10-05"
+  },
+  "counts": {
+    "new_candidate": 24,
+    "no_longer_detected": 17,
+    "possible_zigzag_conversion": 0,
+    "low_confidence": 4
+  },
+  "truncated": false,
+  "items": [
+    {
+      "item_id": "41db9ab75da628b55bfabe9dc02fb9f2",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-00c562060b40502fb4a7ed2016ce7576",
+      "reason": "This item needs review because KW-00c562060b40502fb4a7ed2016ce7576 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with before and after images provided.",
+      "centroid": {
+        "lat": 28.68319,
+        "lon": 77.75754
+      },
+      "baseline": null,
+      "current": {
+        "type": "CFCBK",
+        "score": 0.745
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/8e179b711684f339994cad3eb9fb5bab485e4069e67e6b19e5a5eadaf50a5db5.png",
+        "after": "https://evidence.example/evidence/b686f63df0d1cac1db4ad5993a5308dedba5b036f75f6d67343b1ac115324e65.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "993a5e3259b528a474eba06ad6037382",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-04e76b6d905c56ac95bb461e6a909014",
+      "reason": "This item needs review because KW-04e76b6d905c56ac95bb461e6a909014 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with conflicting data from current scene S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.75178,
+        "lon": 77.81031
+      },
+      "baseline": null,
+      "current": {
+        "type": "CFCBK",
+        "score": 0.287
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/f72a553a1f2038f857c8dad69d15f99e5185ce537db1799bd68cc6436f4bee76.png",
+        "after": "https://evidence.example/evidence/278e78b75adbf5231c956a76dc654a5bebe282caf6d4e998edee0eb30c6d56ed.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "8fbb6a3c1608372e8009d51ae093eda5",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-0b91e418f4ce5dae88d1d5dad3aca3ed",
+      "reason": "This item needs review because KW-0b91e418f4ce5dae88d1d5dad3aca3ed is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with before and after images provided.",
+      "centroid": {
+        "lat": 28.76261,
+        "lon": 77.77246
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.405
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/3a05bc903f2674680ea1e862f83a32eec37ea27cd161de50c45a03bba4f9e7a4.png",
+        "after": "https://evidence.example/evidence/ca10bcf8e20fd9c3eb144102efa52c94c32ef9857cb781ad85f03c15e6145136.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "609b596efd18ceb34be713ef8a6a775d",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-1b34736325f255cfab97ac41d5f5f0d3",
+      "reason": "This item needs review because KW-1b34736325f255cfab97ac41d5f5f0d3 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with a new detection in S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.76286,
+        "lon": 77.77369
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.305
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/8b40e11b81d982fac0fa2c6de0391edb2a27e2cb76da44ced2917be69c5d5f4f.png",
+        "after": "https://evidence.example/evidence/ba406bbfa5315af7b90a7ce747daa8e236a79a08bf5b5440f4825fb8b49b1d21.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "37b542278178953820f69aabd1eb48ba",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-25672ba2e9aa5340a2ebc51257a4e5fd",
+      "reason": "This item needs review because KW-25672ba2e9aa5340a2ebc51257a4e5fd is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.71329,
+        "lon": 77.77652
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.508
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/ee06c0f7c6f3409e0dd7d83192f73379fa2850de6986c550c75cf799292ef83f.png",
+        "after": "https://evidence.example/evidence/ea97594a516615e38c1912d4a05ee4a7acfbba8908d9f074ade0326a993feed3.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "c7d4578289e4a535d357885e3d6b032a",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-2f65f376dfad55b389c76461ab8792cb",
+      "reason": "This item needs review because KW-2f65f376dfad55b389c76461ab8792cb is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with a new detection in S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.75398,
+        "lon": 77.76747
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.328
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/70c98fedfe8e12244b6c31ae1ac99323a1e3222621545576e5d192fc02e5bade.png",
+        "after": "https://evidence.example/evidence/0a8d56429828525f820f11636d8ef7602e847890ea020cb9340e1bca6fd37dc5.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "8410bf11d8731828173cc275f28fc5b0",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-394d4155481758b9a19bb26eabbaee44",
+      "reason": "This item needs review because KW-394d4155481758b9a19bb26eabbaee44 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new evidence from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.77413,
+        "lon": 77.75502
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.441
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/ce871ee9b353c2b76d04ea946d295e2970ccc4575612ed507d1e0cf73a7f8107.png",
+        "after": "https://evidence.example/evidence/212044666c4580fc4c9b4f5a720fd299b6231323d3792d8ea9249f091949110a.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "30700af13d6129e5bd9dc541d4a5390b",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-478b344dd52759d399bef96f25490874",
+      "reason": "This item needs review because KW-478b344dd52759d399bef96f25490874 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.69998,
+        "lon": 77.77923
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.418
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/3576ac78039d494d95e1937f8cacb5b2e12243421eb81f1f0d1d251e51a9acce.png",
+        "after": "https://evidence.example/evidence/8bc41edda520b12ef34bc20872d3ed65e2ab839a072c8eb64215432caf112c7b.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "e85ead7c605b48bc6ee865bbce163b2a",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-4f912b3f6f6e5063a50ce12f4ce257db",
+      "reason": "This item needs review because KW-4f912b3f6f6e5063a50ce12f4ce257db is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.77221,
+        "lon": 77.80343
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.447
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/4661e238d1ec06357899c2cb94f69e15545f7007543b07ba524b9dcb9d964301.png",
+        "after": "https://evidence.example/evidence/5d2e70e30f688ec8ccf47d7f746fe4b1350c978a076dbc5ffee6dd65b758bf03.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "383556bb44eff377a6047528715e5c29",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-58443f037bb25f2bafeaef7d8a515a7d",
+      "reason": "This item needs review because KW-58443f037bb25f2bafeaef7d8a515a7d is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.69193,
+        "lon": 77.80989
+      },
+      "baseline": null,
+      "current": {
+        "type": "CFCBK",
+        "score": 0.257
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/a1809c9926e76e5b37e37ecca21f2c1e563b8ea597f8a01e63dade57b10afc03.png",
+        "after": "https://evidence.example/evidence/a08bc5b17819436d6b60a2af30c8448e2b6fea7b9d9048bb6a1cc238314287a2.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "d05f8fa2396dbe52ab9c183134a77be1",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-5a2372b87fbf55ba832f3a8ad411a35f",
+      "reason": "This item needs review because KW-5a2372b87fbf55ba832f3a8ad411a35f is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.75538,
+        "lon": 77.73985
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.482
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/8a4dd8d945acc7433a45d25de458e1ba00b24270743f97f58d0204eed4d79764.png",
+        "after": "https://evidence.example/evidence/899d6fbdbbbd41a7a8629fe8f49b53b2eb9e2849ab2cf14f6c59ce4a934a096f.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "770b73dc6605fd172abc7589f9ae33c8",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-65b3d0efb3ad5f22a1163635f2b33434",
+      "reason": "This item needs review because KW-65b3d0efb3ad5f22a1163635f2b33434 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with only current scene data available.",
+      "centroid": {
+        "lat": 28.70577,
+        "lon": 77.77929
+      },
+      "baseline": null,
+      "current": {
+        "type": "CFCBK",
+        "score": 0.339
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/bd96b2371169759a44641e213f3cf74ead42b1356ff0b534e273817f5248a75e.png",
+        "after": "https://evidence.example/evidence/4231614b85a9982b9d584a58149e39039bfd43b173b7375b5d404536cc08c6ba.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "9a8028907106b3024b28e1721363cb31",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-6661200bde69501b837e373671fdbdb4",
+      "reason": "This item needs review because KW-6661200bde69501b837e373671fdbdb4 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new evidence from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.68022,
+        "lon": 77.76926
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.381
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/df6e043972cac83dff3a22f24b591377a7b70945d615628b2703e2c2c5e51cea.png",
+        "after": "https://evidence.example/evidence/b8e431eb04f4e1bdfc69b9b18a7036fb61d6a4700d6918786282daf816e90920.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "a619028bef110d1eafef40eb423ec537",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-6b3b38da681850e5af46b024f3d3f78e",
+      "reason": "This item needs review because KW-6b3b38da681850e5af46b024f3d3f78e is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.74706,
+        "lon": 77.72956
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.324
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc.png",
+        "after": "https://evidence.example/evidence/a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "762602ebe1e2be99e7aed3bff90a6c48",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-736b057e0fa45cce872289a4ffcfa94e",
+      "reason": "This item needs review because KW-736b057e0fa45cce872289a4ffcfa94e is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with a detector score of 0.32 for type FCBK in current scene S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.77828,
+        "lon": 77.74688
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.32
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/cb6a03b0cda3b9a30695ebc9aa7c43f793617683b6c924229d20182fa05e325b.png",
+        "after": "https://evidence.example/evidence/d5309a87ddafe87e00b111b9990a2e9b5d1185da05f5d6daeb1a2d0767c205f8.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "e49f9a8049e42d9863f45f143a09193e",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-849a3f1e7d375618bfcbb3d3023a9172",
+      "reason": "This item needs review because KW-849a3f1e7d375618bfcbb3d3023a9172 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.6914,
+        "lon": 77.8226
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.252
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/cc10ad43dbdee49883b056f3e1b1a301210b6d73d3aeff1d64d17efe973c9143.png",
+        "after": "https://evidence.example/evidence/0e158008ad6217d632a764e5c9f1f72221d8fca57d1601f8d1fcc7255c61a1a5.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "63b56c3793fad86c12021d91f18e2f4d",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-9b9cc76db22855e594c5ea338c1a6371",
+      "reason": "This item needs review because KW-9b9cc76db22855e594c5ea338c1a6371 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with before and after images provided.",
+      "centroid": {
+        "lat": 28.7674,
+        "lon": 77.73966
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.394
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/a34f60d1922cde720c6a748137151ca7eb36a943e061a13d65bfef4926c98d5b.png",
+        "after": "https://evidence.example/evidence/7284e4626a3d7b33d154be61279af76de9592aeec453714d97d91fcb5704c069.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "374d4ae8b912cae5d6b502ba42107ee6",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-c06756064f5a50ec8460401c76787941",
+      "reason": "This item needs review because KW-c06756064f5a50ec8460401c76787941 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.76281,
+        "lon": 77.73288
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.288
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/1103f6aa6a02322f68b7cf781c0281f950b5c89ea94e2bb83778a4774156a243.png",
+        "after": "https://evidence.example/evidence/4eff9f8ab111f1b9cd93fcb6efaad79209aa517e9f8b3fa0b93c45abe59a5cb8.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "01bc87dc24b867a17d46d71c46e76574",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-cc813f7e2d2550cc90e1fce458a34041",
+      "reason": "This item needs review because KW-cc813f7e2d2550cc90e1fce458a34041 is in the registry but was not detected in the Dec 2023 scene, with a new detection in today's images.",
+      "centroid": {
+        "lat": 28.68799,
+        "lon": 77.77591
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.268
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/e74a1d4c8dc336585a8dbccdbe5ba0a6fef640007633ef55d360cf856c2196a3.png",
+        "after": "https://evidence.example/evidence/2dfb5d4c47040fc07a7b15d676650e31afa68a077f3751b82ab31b8dbe6423f9.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "1444b8f2e387ab257fedfdc3bc9eba61",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-d22f9e143ac755808141eb1b59873045",
+      "reason": "This item needs review because KW-d22f9e143ac755808141eb1b59873045 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.76537,
+        "lon": 77.81353
+      },
+      "baseline": null,
+      "current": {
+        "type": "CFCBK",
+        "score": 0.425
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/40f2c64fb25ee70534d558d7bc17a30f117bb70a1a4f07b110e6d4a9d4191021.png",
+        "after": "https://evidence.example/evidence/df700d7001aed2f1914677eadec212a2169a482c21eb036251904a549502fb94.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "4e770062729eb5aff268be2d8464fc31",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-d636ba63d0e558c9a20f1a4cc1bbfa50",
+      "reason": "This item needs review because kiln KW-d636ba63d0e558c9a20f1a4cc1bbfa50 is in the registry now but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with only current scene S2B_T43RGM_20261005T053448_L2A available for context.",
+      "centroid": {
+        "lat": 28.69818,
+        "lon": 77.73136
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.47
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/568b4e65305bdc7585ad11815183317ba5463482a937206e88da006cd1ca6874.png",
+        "after": "https://evidence.example/evidence/4edb7c5afcd2972399a0718ea4f180910212fa85a3e4218d9eeb2313dc2e9daf.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "ab104c71babd1748202ca782b2cadb6f",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-d78246e972b857ae9b041774b62c1732",
+      "reason": "This item needs review because kiln KW-d78246e972b857ae9b041774b62c1732 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with new data from S2B_T43RGM_20261005T053448_L2A.",
+      "centroid": {
+        "lat": 28.74433,
+        "lon": 77.80905
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.404
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/dc0cdfdfed50a6473f1b0b5bf5fb3f7d5600d42affda575c33fe6a3d727d2c2e.png",
+        "after": "https://evidence.example/evidence/5f84bf960899f4dd3901bb46761d2aba12ad5ef70aeb425b82185b56ab1e8511.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "f4489d32e34872d7c90bf84d8ff5deb4",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-dae6a4b0d0ac5fc19f619b6aec3fe3e9",
+      "reason": "This item needs review because KW-dae6a4b0d0ac5fc19f619b6aec3fe3e9 is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with only current scene S2B_T43RGM_20261005T053448_L2A available for verification.",
+      "centroid": {
+        "lat": 28.74065,
+        "lon": 77.81742
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.336
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/f040d34a8ff8572004edebcd8ecd1952bf48b6a87c1d3a373813fcb50f21ef05.png",
+        "after": "https://evidence.example/evidence/79d42a6ad5771278d49c4b19e3eedda87eac33473ae63cb6688ca4e44725b4c1.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "f7b720ce6e2c2e70ffe89b705265ffa0",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-fd84509a2e3558a9bd529edaa5b4b97b",
+      "reason": "This item needs review because KW-fd84509a2e3558a9bd529edaa5b4b97b is in the registry but was not detected in the Dec 2023 scene S2A_T43RGM_20231205T053206_L2A, with a new detection in today's scene.",
+      "centroid": {
+        "lat": 28.70598,
+        "lon": 77.81312
+      },
+      "baseline": null,
+      "current": {
+        "type": "FCBK",
+        "score": 0.303
+      },
+      "iou": null,
+      "evidence": {
+        "before": "https://evidence.example/evidence/dda5baf591e3602d29952be3d1a92bc8258befb7c6b075b4ee6529e35658b700.png",
+        "after": "https://evidence.example/evidence/eb026785f9c351a05423d6e91da12c00a4c48c2386d9c4165849d5751d3762b7.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "007c59252798223dc9e81bc7bbda5b89",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it's detected in the Dec 2023 scene (S2A_T43RGM_20231205T053206_L2A) but no longer detected in the Oct 2026 scene (S2B_T43RGM_20261005T053448_L2A).",
+      "centroid": {
+        "lat": 28.7221,
+        "lon": 77.74814
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.407
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "0e441c78f7722a2c51023e092b253f3f",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided for verification.",
+      "centroid": {
+        "lat": 28.73221,
+        "lon": 77.81891
+      },
+      "baseline": {
+        "type": "CFCBK",
+        "score": 0.29
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "198a74dec4355d5522e9d072740df1a3",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it's detected in the Dec 2023 scene but no longer detected in the Oct 2026 scene, and has no current type or score.",
+      "centroid": {
+        "lat": 28.69887,
+        "lon": 77.7589
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.299
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "1ccaac619a2c3044b2943d097d682b9d",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided for verification.",
+      "centroid": {
+        "lat": 28.67991,
+        "lon": 77.77551
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.31
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "2e36156a3d05685cdd740d088c990423",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided for verification.",
+      "centroid": {
+        "lat": 28.74398,
+        "lon": 77.72979
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.377
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "30beec0f1303828ebaf57fa9a0b852c2",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided for verification.",
+      "centroid": {
+        "lat": 28.72836,
+        "lon": 77.75962
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.404
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "3608926ec0f329f3e0ad1b9eda3e074c",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene (S2A_T43RGM_20231205T053206_L2A) but is no longer detected in the Oct 2026 scene (S2B_T43RGM_20261005T053448_L2A).",
+      "centroid": {
+        "lat": 28.71464,
+        "lon": 77.79409
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.406
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "70f3bbdeff8d3c11657a450ae8f4155c",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it's detected in the Dec 2023 scene (S2A_T43RGM_20231205T053206_L2A) but no longer detected in the Oct 2026 scene (S2B_T43RGM_20261005T053448_L2A).",
+      "centroid": {
+        "lat": 28.74926,
+        "lon": 77.77904
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.511
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "734b9e51458e1b19744ca892b7ba5e64",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, with no current data available for confirmation.",
+      "centroid": {
+        "lat": 28.71134,
+        "lon": 77.77933
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.665
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "99f408f70d1a3f6cf288ad4650750a8b",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided for verification.",
+      "centroid": {
+        "lat": 28.77174,
+        "lon": 77.79493
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.362
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "9dec94b5a48a0165e2e1a7c37784bec6",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene (S2A_T43RGM_20231205T053206_L2A) but is no longer detected in the Oct 2026 scene (S2B_T43RGM_20261005T053448_L2A).",
+      "centroid": {
+        "lat": 28.70623,
+        "lon": 77.81659
+      },
+      "baseline": {
+        "type": "CFCBK",
+        "score": 0.358
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "a3acf5e97903f4865923e001ab8cafa4",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene (S2A_T43RGM_20231205T053206_L2A) but is no longer detected in the Oct 2026 scene (S2B_T43RGM_20261005T053448_L2A).",
+      "centroid": {
+        "lat": 28.73523,
+        "lon": 77.73669
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.276
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "a9ece6c1e1454f3b407f2c2f885dd91f",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided for verification.",
+      "centroid": {
+        "lat": 28.72677,
+        "lon": 77.80318
+      },
+      "baseline": {
+        "type": "Zigzag",
+        "score": 0.303
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "bcb93ee8769b7f429db0b49424db5522",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided.",
+      "centroid": {
+        "lat": 28.74345,
+        "lon": 77.82473
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.264
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "dbf293bdac0bb91a315f3fa1ced29b1d",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene but is no longer detected in the Oct 2026 scene, and no kiln ID is provided for verification.",
+      "centroid": {
+        "lat": 28.74458,
+        "lon": 77.73814
+      },
+      "baseline": {
+        "type": "CFCBK",
+        "score": 0.375
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "ee73373e66bfc4ae2bbd16f2c6d9efe9",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it's detected in the Dec 2023 scene (S2A_T43RGM_20231205T053206_L2A) but no longer detected in the Oct 2026 scene (S2B_T43RGM_20261005T053448_L2A).",
+      "centroid": {
+        "lat": 28.75214,
+        "lon": 77.79767
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.541
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "eecc10b2e2014c086d9cc5a52c7ecad4",
+      "group": "no_longer_detected",
+      "state": "pending",
+      "kiln_id": null,
+      "reason": "This item needs review because it was detected in the Dec 2023 scene (S2A_T43RGM_20231205T053206_L2A) but is no longer detected in the Oct 2026 scene (S2B_T43RGM_20261005T053448_L2A).",
+      "centroid": {
+        "lat": 28.78042,
+        "lon": 77.76264
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.262
+      },
+      "current": null,
+      "iou": null,
+      "evidence": null,
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "a6845eec6646c42e9849253968fea31a",
+      "group": "low_confidence",
+      "state": "pending",
+      "kiln_id": "KW-1cf1a27586db5efa98b75774acd0f5c9",
+      "reason": "Item KW-1cf1a27586db5efa98b75774acd0f5c9 needs review because the current detector score is 0.485, below 0.5, in scene S2B_T43RGM_20261005T053448_L2A, with footprint overlap from S2A_T43RGM_20231205T053206_L2A.",
+      "centroid": {
+        "lat": 28.69657,
+        "lon": 77.7968
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.407
+      },
+      "current": {
+        "type": "FCBK",
+        "score": 0.485
+      },
+      "iou": 0.82,
+      "evidence": {
+        "before": "https://evidence.example/evidence/720645acf27d3a1ba61de0884847a61e36d888d5c3b732e480ce61f3f20e60ce.png",
+        "after": "https://evidence.example/evidence/419c92705265299cc7a2acf511e5a38b50b74a73c1cfe6e598d6dc3df1db4d20.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "c01409c33c5f284fe81644f6f258dc10",
+      "group": "low_confidence",
+      "state": "pending",
+      "kiln_id": "KW-5da98aaa2e1254cdadbbf57746f2292a",
+      "reason": "Item KW-5da98aaa2e1254cdadbbf57746f2292a needs review because the detector score is below 0.5, and the footprint overlap shows changes not detected in the Dec 2023 scene.",
+      "centroid": {
+        "lat": 28.67905,
+        "lon": 77.79624
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.334
+      },
+      "current": {
+        "type": "FCBK",
+        "score": 0.481
+      },
+      "iou": 0.68,
+      "evidence": {
+        "before": "https://evidence.example/evidence/f536cdf4c14f7d397bbcf22cde244f259eab8695852cc1679f9328b8d9e8f322.png",
+        "after": "https://evidence.example/evidence/6440f28ee67b5207ffb00742e38532deece9fe3e0db390bffc3a0fb503f6dc66.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "9fbaa19b5a3c7c784cac045d6ccaf7f7",
+      "group": "low_confidence",
+      "state": "pending",
+      "kiln_id": "KW-ceabeea6f2cc5a9a82223cc4aefb68da",
+      "reason": "Item KW-ceabeea6f2cc5a9a82223cc4aefb68da needs review because the detector score dropped below 0.5 in scene S2B_T43RGM_20261005T053448_L2A, differing from the baseline in S2A_T43RGM_20231205T053206_L2A.",
+      "centroid": {
+        "lat": 28.69285,
+        "lon": 77.77213
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.538
+      },
+      "current": {
+        "type": "FCBK",
+        "score": 0.476
+      },
+      "iou": 0.4,
+      "evidence": {
+        "before": "https://evidence.example/evidence/b376d07cbe253042e38bc3cd91fe3c0f002d3a6edea06dad69e3d2d71482dafd.png",
+        "after": "https://evidence.example/evidence/c555ef0f09d82487033465db4a2bbe1629bcce84daab0967cd3493798ca50f6b.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    },
+    {
+      "item_id": "6dde1059302182411e33adf26cbdc716",
+      "group": "low_confidence",
+      "state": "pending",
+      "kiln_id": "KW-d840eb3a6cc0515d93d0b1c96ca0b31d",
+      "reason": "Item KW-d840eb3a6cc0515d93d0b1c96ca0b31d needs review because the detector score dropped below 0.5 in scene S2B_T43RGM_20261005T053448_L2A, though the footprint still overlaps with the earlier scene S2A_T43RGM_20231205T053206_L2A.",
+      "centroid": {
+        "lat": 28.76005,
+        "lon": 77.78247
+      },
+      "baseline": {
+        "type": "FCBK",
+        "score": 0.525
+      },
+      "current": {
+        "type": "FCBK",
+        "score": 0.361
+      },
+      "iou": 0.76,
+      "evidence": {
+        "before": "https://evidence.example/evidence/0a31349235d772730758ff3ca8f857183b1de0288babbcf181dcde83840ef60d.png",
+        "after": "https://evidence.example/evidence/4a5553696902d63f4733c578a94680613377fe7217688a6812be67976710d2b7.png"
+      },
+      "created_at": "2026-10-11T08:08:09Z"
+    }
+  ]
+}

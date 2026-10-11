@@ -75,6 +75,11 @@ public struct KilnWatchAPI: Sendable {
         try await send(URLRequest(url: baseURL.appending(path: "public/kilns").appending(path: id).appending(queryItems: inspectedQuery(includeInspected))), as: Kiln.self, authorized: false)
     }
 
+    /// Public read-only change queue; uses the same session and errors as public kiln reads.
+    public func review() async throws(APIError) -> ReviewQueue {
+        try await send(URLRequest(url: baseURL.appending(path: "public/review")), as: ReviewQueue.self, authorized: false)
+    }
+
     private func inspectedQuery(_ include: Bool) -> [URLQueryItem] {
         include ? [URLQueryItem(name: "include", value: "inspected")] : []
     }

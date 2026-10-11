@@ -662,7 +662,8 @@ step labels as given.
 
 ## Change triage (40): internal review queue (live, 2026-10-11)
 
-**Internal only, no public route.** Concept Agent 2. An operator invokes the assistant Lambda
+**The triage run is internal only.** The queue has one read-only public route, `GET /public/review`
+(see "Review queue read (40b)" below). Concept Agent 2. An operator invokes the assistant Lambda
 directly with `{"action": "triage", "baseline_run": "m0-before", "current": "registry"}` (optional
 `current_run`, default `m0-after`; `start_after`, an item ID cursor; `max_model_calls`, 1–80). The
 event is honoured only without an API Gateway `requestContext`; `POST /ask` with that body is a
@@ -711,3 +712,68 @@ demolition claims; one regeneration, then a deterministic template (`reason_sour
 **Nothing changes a kiln.** No triage code path writes `status` or `review_state`, RDS or the
 public API. The registry changes only when a reviewer approves an item; that review console and
 approval path are **not built yet**. Triage is started manually; Step Functions wiring is next.
+
+## Review queue read (40b): `GET /public/review`
+
+Read-only. Approving or rejecting items needs reviewer sign-in and is not built.
+
+The pending change-triage candidates for the iOS Review tab. Public, no sign-in (like
+`/public/kilns`), served by the assistant Lambda; gated by `enable_change_triage`. No request
+body, no query parameters. Every item is a **candidate pending review**, never a finding; the
+response adds no prose of its own beyond the fixed group keys and labels below. `reason` is the
+stored reason, verbatim.
+
+**200** (`content-type: application/json`, `cache-control: public, max-age=60`):
+
+```json
+{
+  "baseline": {"run": "m0-before", "scene": "S2A_T43RGM_20231205T053206_L2A", "date": "2023-12-05"},
+  "current": {"label": "registry", "scene": "S2B_T43RGM_20261005T053448_L2A", "date": "2026-10-05"},
+  "counts": {"new_candidate": 24, "no_longer_detected": 17, "possible_zigzag_conversion": 0, "low_confidence": 4},
+  "truncated": false,
+  "items": [
+    {
+      "item_id": "<32 hex>",
+      "group": "new_candidate",
+      "state": "pending",
+      "kiln_id": "KW-…",
+      "reason": "verbatim stored reason",
+      "centroid": {"lat": 28.7, "lon": 77.7},
+      "baseline": {"type": "FCBK", "score": 0.52},
+      "current": {"type": "FCBK", "score": 0.36},
+      "iou": 0.76,
+      "evidence": {"before": "https://…", "after": "https://…"},
+      "created_at": "2026-10-11T08:08:09Z"
+    }
+  ]
+}
+```
+
+- **Allowlist:** exactly these keys. Never the model ID, the raw facts, the reason source or
+  anything else stored.
+- **Nulls:** `kiln_id`, `baseline`, `current`, `iou` and `evidence` are `null` when the item has
+  none. `no_longer_detected` has no `kiln_id`, no `current`, no `iou` and no `evidence`;
+  `new_candidate` has no `baseline` and no `iou`. Inside `evidence`, either URL may be `null`;
+  URLs appear only when they are images on the evidence CDN (anything else is dropped). The
+  `type` inside `baseline` and `current` is the unverified predicted type; a score is a detector
+  score, not accuracy.
+- **Rounding:** scores 3 decimals, coordinates 5.
+- **Order:** group (`new_candidate`, `no_longer_detected`, `possible_zigzag_conversion`,
+  `low_confidence`), then `kiln_id` (nulls last), then `item_id`.
+- `counts` always has all four keys (0 when empty) and counts every item of the shown run, also
+  when `items` is cut off at 500 (`truncated: true`). Only the latest baseline run (by
+  `created_at`) is shown. `baseline` and `current` are `null` when the queue is empty.
+
+**Errors** (`cache-control: no-store`, the usual
+`{"error": {"code", "message", "retryable"}}` body):
+
+| Status | Code | When |
+|---|---|---|
+| 400 | `invalid_filter` | any query string |
+| 503 | `review_unavailable` (`retryable: true`) | the queue could not be read; never an empty list instead |
+| 404/405 | (gateway) | any other method, e.g. `POST /public/review` (no route) |
+
+**Caching and throttle:** clients and caches may keep a response for 60 s, and a warm Lambda
+reuses its last read for 60 s, so a change shows up within about two minutes. Stage throttle
+10/s, burst 20 (the `/public/kilns` group). CORS as for the rest of the API (hosted portal and
+`http://localhost:5173`). It never touches the Ask daily counter.

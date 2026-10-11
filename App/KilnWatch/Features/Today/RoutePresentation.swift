@@ -35,12 +35,14 @@ extension AppModel {
 @MainActor @Observable
 final class MapsHandoff {
     var confirmation: String?
+    var confirmationTitle = "Use kiln location?"
     var error: String?
     private var pendingCoordinate: Coordinate?
     private var pendingName: String?
     private var pendingURL: URL?
 
     func navigate(id: String, model: AppModel) {
+        confirmationTitle = "Use kiln location?"
         let stop = model.stops.first { $0.kilnId == id }
         let access = stop?.access?.coordinate
         let destination = access?.isValid == true ? access : model.kiln(id)?.footprint.centroid
@@ -50,7 +52,14 @@ final class MapsHandoff {
             confirmation = "No road access point is supplied. Maps will use the kiln location; confirm the entrance on site."
         } else { openPending() }
     }
+    func reviewLocation(_ coordinate: Coordinate) {
+        guard coordinate.isValid else { error = "No usable location is available."; return }
+        confirmationTitle = "Use detection location?"
+        pendingCoordinate = coordinate; pendingName = "2023 detection"; pendingURL = nil
+        confirmation = "No road access point is supplied. Maps will use the satellite detection location; check access on site."
+    }
     func wholeRoute(model: AppModel) {
+        confirmationTitle = "Use kiln location?"
         let start = model.routeActive ? model.currentStopId : model.stops.first?.kilnId
         guard let url = model.route?.mapsURL(startingAt: start) else { error = "No stops are available to open in Maps."; return }
         pendingURL = url; pendingCoordinate = nil

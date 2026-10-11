@@ -14,7 +14,7 @@ struct KilnWatchApp: App {
     }
 }
 
-enum AppTab: String, Hashable { case today, kilns, ask }
+enum AppTab: String, Hashable { case today, kilns, ask, review }
 
 /// Demo states for the clickable mock, set with launch arguments (`-demo loading|empty|offline`).
 /// Other launch arguments: `-signedIn YES`, `-tab kilns`, `-open KW-0412`, `-routeActive YES`, `-rule C-HAB-800`,
@@ -97,6 +97,8 @@ final class AppModel {
     var todayPath: [String] = []
     var kilnsPath: [String] = []
     var askPath: [String] = []
+    var reviewPath: [String] = []
+    let review: ReviewList
     let ask: AskConversation
     let askConnectivity: AskConnectivity
     var askDraft: String {
@@ -152,6 +154,7 @@ final class AppModel {
             VerdictDiagnostics.record(photo: photo, code: code)
         }
         #endif
+        review = ReviewList(cache: ReviewCache(directory: URL.kilnWatchStore.appending(path: configuredPublic == nil || isPublicDemo || DemoOptions.string("demo") != nil ? "DebugReview" : "PublicReview")))
         ask = AskConversation(api: configuredPublic)
         askConnectivity = AskConnectivity(observing: configuredPublic != nil && !isPublicDemo)
         publicAPI = configuredPublic
@@ -226,6 +229,7 @@ final class AppModel {
         } catch { verdictError = "The verdict could not be saved on this phone. Try again."; return false }
     }
     func flushVerdicts() async {
+        if DemoOptions.bool("readOnly") { return } // DEBUG rehearsal: guarantees no outbox delivery.
         guard !flushingVerdicts, let outbox, let publicAPI else { return }
         flushingVerdicts = true
         defer { flushingVerdicts = false }
@@ -290,6 +294,12 @@ final class AppModel {
         guard usesPublicRegistry, case .saved(let route, let offline) = routeState else { return }
         let registryOffline = if case .offline = registryState { true } else { false }
         if registryOffline != offline { routeState = .saved(route, offline: registryOffline) }
+    }
+
+    func loadReview(force: Bool = false) async {
+        let sampleMode = !usesPublicRegistry || isPublicDemo || demo != .live
+        let sample = sampleMode ? ReviewDemo.queue : nil
+        await review.load(api: publicAPI, force: force, sample: sample, scenario: demo.rawValue)
     }
 
     func loadRegistry(force: Bool = false) async {
@@ -444,6 +454,7 @@ final class AppModel {
         case .today: todayPath.append(id)
         case .kilns: kilnsPath.append(id)
         case .ask: askPath.append(id)
+        case .review: reviewPath.append(id)
         }
     }
     func openCurrentStop() {
@@ -497,7 +508,7 @@ struct RootView: View {
         }
         .environment(\.openURL, OpenURLAction { model.handle($0) })
         .sheet(item: $model.shownRule) { RuleSheet(reference: $0) }
-        .alert("Use kiln location?", isPresented: Binding(get: { model.maps.confirmation != nil }, set: { if !$0 { model.maps.cancel() } })) {
+        .alert(model.maps.confirmationTitle, isPresented: Binding(get: { model.maps.confirmation != nil }, set: { if !$0 { model.maps.cancel() } })) {
             Button("Open Maps") { model.maps.openPending() }
             Button("Cancel", role: .cancel) { model.maps.cancel() }
         } message: { Text(model.maps.confirmation ?? "") }
@@ -519,6 +530,7 @@ private struct MainTabs: View {
             Tab("Today", systemImage: "map", value: AppTab.today) { TodayView() }
             Tab("Kilns", systemImage: "list.bullet", value: AppTab.kilns) { KilnsView() }
             Tab("Ask", systemImage: "text.bubble", value: AppTab.ask) { AskView() }
+            Tab("Review", systemImage: "checklist", value: AppTab.review) { ReviewView() }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
         .task { await model.loadData() }

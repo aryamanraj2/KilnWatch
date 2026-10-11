@@ -1512,3 +1512,30 @@ detected" means, so a missing 2023 match is not evidence that a kiln is new; the
 reports `current_run` as the feature count (39) instead of the run name (cosmetic; the summary
 key overwrites it, fix with the next deploy); some model reasons are clumsy ("with a new
 detection in today's images") but pass every check.
+
+## Review route (40b) — live (2026-10-11)
+
+`GET /public/review`: the read-only view of the change-triage queue for the iOS Review tab (contract
+in `App/docs/api-contract.md`, "Review queue read (40b)"). Served by the assistant Lambda
+(`AWS/triage/review.py`: one paginated Scan, 60 s warm memo, allowlisted fields); gated by
+`enable_change_triage`. Also fixed: the triage run summary's `current_run` is now the run name; the
+feature count moved to `current_run_features`.
+
+- **Terraform:** one targeted plan/apply (`aws_apigatewayv2_route.review`,
+  `aws_lambda_permission.review`, `aws_apigatewayv2_stage.default`, `aws_iam_role_policy.assistant`,
+  `aws_lambda_function.assistant`): **2 added, 3 changed, 0 destroyed**. The stage gained only the
+  route's 10/s, burst 20 entry; the role gained only `dynamodb:Scan` on the review table; the Lambda
+  changed only its code hash. The Ask route, its permission and the Ask throttle are unchanged.
+  Provider lock unchanged.
+- **Live (read-only):** `GET /public/review` 200, 45 items, counts 24/17/0/4, all `pending`, exactly
+  the allowlisted keys, `cache-control: public, max-age=60`, 28 items with evidence. `?x=1` → 400
+  `invalid_filter`; `POST /public/review` → 404 from the gateway. CORS echoes the hosted portal
+  origin and `http://localhost:5173`. Table count still 45; public Hapur list 38 flagged, 39 with
+  `include=inspected`. No `POST /ask`, no Bedrock call, no triage invoke.
+- **Tests:** `PYTHONPATH=AWS .venv-integration/bin/python -m unittest discover -s AWS/tests`: 211 run,
+  195 pass, 16 skipped (8 new in `AWS/tests/test_triage.py`).
+
+**Rollback** (needs a go): remove `aws_apigatewayv2_route.review` and `aws_lambda_permission.review`
+from `AWS/assistant.tf`, the review entry from the stage's public throttle group in `AWS/api.tf` and
+the Scan statement from the role, then one targeted apply on those five resources. The gateway
+then answers 404 for the path.

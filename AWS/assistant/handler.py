@@ -1,4 +1,4 @@
-"""POST /ask: public, no login. Boundary validation, the global daily cap, then core.answer.
+"""POST /ask: public, no login (plus the read-only GET /public/review of prompt 40b, see triage/review.py). Boundary validation, the global daily cap, then core.answer.
 
 The daily cap uses one on-demand DynamoDB counter. Prompt 10 says "no DynamoDB unless RDS truly cannot
 serve it": this Lambda runs outside the VPC by design (it reads only the public API), so it cannot reach
@@ -68,10 +68,27 @@ def count_question(dynamodb, table, cap, now):
         raise
 
 
-def handle(event, context, *, dynamodb, ask, now=None, triage=None):
+def review_response(event, review):
+    """GET /public/review (prompt 40b): read-only, no query parameters, never the Ask counter."""
+    if event.get('rawQueryString') or event.get('queryStringParameters'):
+        result = error(400, 'invalid_filter', 'This endpoint takes no query parameters.')
+    else:
+        try:
+            result = response(200, review())
+            result['headers']['cache-control'] = 'public, max-age=60'
+        except Exception:
+            result = error(503, 'review_unavailable', 'The review queue is temporarily unavailable.', True)
+    log.info(json.dumps({'event': 'review', 'status': result['statusCode']}))
+    return result
+
+
+def handle(event, context, *, dynamodb, ask, now=None, triage=None, review=None):
     # Change triage (prompt 40) is internal: only a direct invoke (no API Gateway requestContext) reaches it.
     if triage and isinstance(event, dict) and 'requestContext' not in event and event.get('action') == 'triage':
         return triage(event, context)
+    if review and event.get('requestContext', {}).get('http', {}).get('method') == 'GET' \
+            and event.get('rawPath') == '/public/review':
+        return review_response(event, review)
     started = time.monotonic()
     request_id = getattr(context, 'aws_request_id', None)
     metrics = {}
@@ -116,8 +133,9 @@ def handler(event, context):
         import boto3
         from botocore.config import Config
         _dynamodb = boto3.client('dynamodb', config=Config(connect_timeout=2, read_timeout=3, retries={'total_max_attempts': 2}))
-    triage = None
+    triage = review = None
     if os.environ.get('REVIEW_TABLE'):
-        from triage import agent
+        from triage import agent, review as queue
         triage = functools.partial(agent.run, dynamodb=_dynamodb)
-    return handle(event, context, dynamodb=_dynamodb, ask=core.answer, triage=triage)
+        review = functools.partial(queue.read, _dynamodb, os.environ['REVIEW_TABLE'])
+    return handle(event, context, dynamodb=_dynamodb, ask=core.answer, triage=triage, review=review)

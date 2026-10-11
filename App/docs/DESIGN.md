@@ -105,7 +105,7 @@ No gradients (except the scrim over imagery) · no purple/indigo/neon, glows, gl
 
 ## 10. Screens and states
 
-Navigation: `TabView` with `Tab` API — Today (map), Kilns (list.bullet), Ask (text.bubble). `.tabBarMinimizeBehavior(.onScrollDown)`. While a route is active, `tabViewBottomAccessory(isEnabled:)` shows "Stop 1 of 9 · KW-0412 · 14 min" (compact "KW-0412 · 14 min" inline or at large text); tap opens the stop. Pushes into a kiln use `matchedTransitionSource` + `.navigationTransition(.zoom)`.
+Navigation: `TabView` with `Tab` API — Today (map), Kilns (list.bullet), Ask (text.bubble), Review (checklist). `.tabBarMinimizeBehavior(.onScrollDown)`. While a route is active, `tabViewBottomAccessory(isEnabled:)` shows "Stop 1 of 9 · KW-0412 · 14 min" (compact "KW-0412 · 14 min" inline or at large text); tap opens the stop. Pushes into a kiln use `matchedTransitionSource` + `.navigationTransition(.zoom)`.
 
 | Screen | Content | States |
 |---|---|---|
@@ -114,9 +114,10 @@ Navigation: `TabView` with `Tab` API — Today (map), Kilns (list.bullet), Ask (
 | Kiln | mono ID large, type line, detailed badge; comparator; "Flagged rules" bars; "Within 800 m" exposure; buffer map (dashed 800 m ring, home NE / school SW with distances); "Check on site" (chimney, fuel, nearest home); "Ask about this kiln"; bottom bar Directions (Apple Maps) + Record verdict | loading (redacted); rule sheet from any rule chip |
 | Record verdict | sheet, large detent, Cancel; "KW-0412 · stop 1 of 9"; four rows with `matchedGeometryEffect` ink ring; geotagged photo tiles + Add photo; note; "This changes KW-0412's status for everyone."; hold button | success online "Verdict recorded", offline "Verdict saved · will sync when online"; swipe-dismiss blocked while a choice is unsaved |
 | Kilns | searchable list (search always visible), district menu + status filter menu, rows: ID, type, top rule, badge, people | loading (redacted), empty search "No kilns match 'KW-09'" |
+| Review | read-only change queue; scene dates, four group counts, neutral pending-review badges, verbatim expandable reasons; registry detail or historical location/map/Directions | redacted loading; saved offline list; empty; recoverable error |
 | Ask | "Ask KilnWatch"; user turns right on surface2; agent answers plain, after a trace, with inline chips, streaming word by word; glass composer; "Answers cite registry records. Agents never record verdicts." | empty (3 real requests), offline (composer disabled) |
 
-Launch arguments (for screenshots and later phases): `-signedIn YES`, `-tab kilns|ask`, `-open KW-0412`, `-routeActive YES`, `-demo loading|empty|offline`, `-imagery YES`, `-routeList YES`, `-rule C-HAB-800`, `-query KW-09`, `-askPlay YES`; DEBUG only `-scroll rules|map`, `-verdict YES`, `-verdictChoice confirmed`, `-autoplay carousel|hold`.
+Launch arguments (for screenshots and later phases): `-signedIn YES`, `-tab kilns|ask|review`, `-open KW-0412`, `-routeActive YES`, `-demo loading|empty|offline`, `-imagery YES`, `-routeList YES`, `-rule C-HAB-800`, `-query KW-09`, `-askPlay YES`; DEBUG only `-scroll rules|map`, `-verdict YES`, `-verdictChoice confirmed`, `-autoplay carousel|hold`.
 
 ## 11. Data
 
