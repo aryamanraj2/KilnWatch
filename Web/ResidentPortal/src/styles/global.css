@@ -365,7 +365,7 @@ footer nav { display: flex; gap: 24px; }footer a { min-height: 44px; padding: 4p
 .record-heading h1 { overflow-wrap: anywhere; }
 
 /* Phones (prompt 36b). Desktop and tablet keep the layout above. */
-.tab-bar, .action-bar, .glance, .strip-short, .title-short, .location-icon { display: none; }
+.tab-bar, .action-bar, .strip-short, .title-short, .location-icon { display: none; }
 .intro h1 > .title-full, .intro h1 > .title-short { color: inherit; }
 .strip-full { display: contents; }
 .distance-bar.neutral span { background: var(--muted); }
@@ -429,16 +429,12 @@ footer nav { display: flex; gap: 24px; }footer a { min-height: 44px; padding: 4p
   .search-panel:has(.search-summary) { padding: 12px 16px; }
   .workspace:has(.search-summary) .results-heading h2 { display: none; }.workspace:has(.search-summary) .results-heading .results-count { margin-top: 0; }.workspace:has(.search-summary) .results-heading { padding-block: 8px; }
   /* Figure and unit are one mono token joined by a no-break space; narrow that space so the unit is not spaced like code. */
-  .rule-measure .mono, .glance .mono, .search-summary .mono, .area-settings > summary .mono { word-spacing: -0.3em; }
+  .rule-measure .mono .mono, .search-summary .mono, .area-settings > summary .mono { word-spacing: -0.3em; }
 
-  /* Kiln: at a glance, then evidence and rules; actions stay reachable. */
+  /* Kiln: evidence, rules, exposure and resident requests; actions stay reachable. */
   .detail-page { padding-top: 8px; padding-bottom: 88px; }.detail-page .back-link { margin-bottom: 4px; }
   .record-heading .eyebrow { display: none; }.record-heading .record-code { margin: 4px 0 12px; }
   .record-heading { margin-bottom: 16px; gap: 12px; }.observation { display: none; }
-  .glance { display: block; margin-bottom: 20px; padding: 16px 20px; }
-  .glance .eyebrow { margin-bottom: 4px; }.glance dl { margin: 0; }
-  .glance dl > div { display: grid; gap: 2px; padding: 10px 0; font-size: 15px; }.glance dl > div:first-child { border-top: 0; }
-  .glance dt { font-size: 12px; }.glance dd { text-align: left; }.glance small { display: block; font-size: 12px; color: var(--muted); }
   .prediction-card > summary { margin: 0; }.prediction-card[open] > summary { margin-bottom: 12px; }
   .other-checks .rule-card { margin-top: 12px; margin-bottom: 0; }
   .action-bar { display: flex; gap: 8px; position: fixed; inset: auto 0 calc(57px + env(safe-area-inset-bottom)) 0; z-index: 1050; padding: 8px 20px; background: var(--surface); border-top: 1px solid var(--line); }
@@ -455,7 +451,7 @@ footer nav { display: flex; gap: 24px; }footer a { min-height: 44px; padding: 4p
     .site-header, .tab-bar { background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(16px); backdrop-filter: saturate(1.6) blur(16px); }
   }
 }
-@media print { .tab-bar, .action-bar, .glance { display: none !important; } body { padding-bottom: 0 !important; } }
+@media print { .tab-bar, .action-bar { display: none !important; } body { padding-bottom: 0 !important; } }
 
 /* Anonymous requests use the existing neutral tokens and comfortable native controls. */
 .request-panel { margin-block: 24px; max-width: 680px; scroll-margin-top: 100px; }
@@ -471,3 +467,61 @@ footer nav { display: flex; gap: 24px; }footer a { min-height: 44px; padding: 4p
 .request-confirmation { color: var(--ink); font-weight: 600; }
 .request-error { padding: 12px; background: var(--surface2); border-radius: 12px; }
 @media (min-width: 601px) { .request-panel { max-width: none; } .request-panel form { max-width: 600px; } }
+
+/* Prompt 45: summary-first content, shared neutral surfaces and small interaction feedback. */
+.record-heading { margin-bottom: 24px; align-items: flex-start; }
+.record-heading h1 { font-size: 28px; letter-spacing: -.6px; }
+.record-heading h1.record-identity { font-size: 17px; font-weight: 500; letter-spacing: 0; line-height: 1.5; text-wrap: wrap; margin-bottom: 8px; }
+.record-heading .record-code { font-size: 13px; margin: 8px 0; }
+.record-heading .help { margin-top: 8px; }
+.record-section { margin-top: 24px; }.detail-grid { gap: 24px; }
+.detail-aside .request-panel { margin-block: 0; }
+.detail-aside h2 { font-size: 20px; }.exposure-card h2 { font-size: 24px; }
+.fact-details { margin-top: 12px; }.fact-details > summary, .other-checks > summary, .prediction-card > summary, .explanation > summary, .draft-callout > summary, .result-details > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; font-size: 13px; font-weight: 560; cursor: pointer; }
+.fact-details > summary::after, .other-checks > summary::after, .prediction-card > summary::after, .explanation > summary::after, .draft-callout > summary::after, .result-details > summary::after { content: '▾'; color: var(--muted); flex-shrink: 0; }
+.fact-details[open] > summary::after, .other-checks[open] > summary::after, .prediction-card[open] > summary::after, .explanation[open] > summary::after, .draft-callout[open] > summary::after, .result-details[open] > summary::after { content: '▴'; }
+summary::-webkit-details-marker { display: none; }
+.prediction-card > summary { margin-bottom: 0; text-transform: none; letter-spacing: 0; color: var(--ink); }
+.prediction-card[open] > summary, .explanation[open] > summary, .draft-callout[open] > summary { margin-bottom: 12px; }
+.other-checks { margin-top: 12px; }.other-checks > summary { padding: 0 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.other-checks .rule-card { margin-top: 12px; }.rule-card h3 { font-size: 15px; }
+.result-details { margin-top: 4px; }.result-details > summary { color: var(--muted); font-weight: 400; font-size: 12px; }
+.selected-record-actions .secondary { background: transparent; text-decoration: underline; text-underline-offset: 4px; }
+.map-selection { gap: 8px; }.selected-record-heading .eyebrow { display: none; }
+.map-title { padding-block: 8px; font-size: 12px; }.map-caption { padding-block: 8px; }
+.map-help { font-size: 11px; }.ask-page h1 { font-size: 28px; letter-spacing: -.6px; margin-bottom: 16px; }
+button, .button, summary { transition: transform .12s ease-out, background-color .16s ease-out, border-color .16s ease-out; }
+button:active:not(:disabled), .button:active, summary:active { transform: scale(.985); }
+.map-pin:active { transform: none; }.map-pin:active span { transform: scale(.92); }
+@supports (transition-behavior: allow-discrete) {
+  /* Native details retains keyboard/focus semantics. Only its own content settles. */
+  .fact-details::details-content, .other-checks::details-content, .prediction-card::details-content, .explanation::details-content, .draft-callout::details-content { opacity: 0; transition: opacity .18s ease-out, content-visibility .18s allow-discrete; }
+  .fact-details[open]::details-content, .other-checks[open]::details-content, .prediction-card[open]::details-content, .explanation[open]::details-content, .draft-callout[open]::details-content { opacity: 1; }
+}
+.map-controls { background: var(--surface); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .map-controls { background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+  .map-controls button { background: transparent; }
+}
+@media (max-width: 600px) {
+  .has-results .intro { margin-bottom: 8px; }.has-results .intro h1 { font-size: 20px; }
+  .has-results .search-panel { padding: 8px 16px; }
+  .results-heading .results-count { gap: 2px 8px; }.results-heading .results-count > span { font-size: 10px; }
+  .basemap { height: max(320px, 43svh); }
+  .map-title { padding: 8px 16px; }.map-mode { border: 0; padding: 0; }
+  .record-heading h1.record-identity { font-size: 14px; line-height: 1.6; }
+  .record-heading { margin-bottom: 16px; }
+  .record-heading .status { max-width: 100%; }
+  .detail-page.request-open .action-bar { display: none; }
+  .request-panel:not(:has(form)) .request-open-button { display: none; }
+  .detail-page.request-open { padding-bottom: 24px; }
+  .ask-page h1 { font-size: 24px; }
+  /* A solid composer belongs to the form. It scrolls clear of focused text and the disclaimer. */
+  .ask-form { position: static; order: 1; margin-top: 16px; }
+  .ask-disclaimer { order: 1; }
+  .request-panel { scroll-margin-top: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after, *::details-content { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  button:active:not(:disabled), .button:active, summary:active, .map-pin:active span { transform: none; }
+}

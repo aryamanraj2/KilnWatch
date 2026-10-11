@@ -37,6 +37,9 @@ private struct KilnDetailView: View {
     @Environment(AppModel.self) private var model
     @State private var showVerdict = false
     @State private var scroll = ScrollPosition(edge: .top)
+    @State private var flagsExpanded = false
+    @State private var modelExpanded = false
+    @State private var siteExpanded = false
     @State private var checksExpanded = DemoOptions.bool("checksExpanded")
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -53,9 +56,20 @@ private struct KilnDetailView: View {
                         if kiln.violations.isEmpty {
                             Text("No rule flags measured").font(.body).foregroundStyle(.inkSecondary)
                         }
-                        ForEach(kiln.violations, id: \.ruleId) { violation in
+                        ForEach(Array(kiln.violations.prefix(1)), id: \.ruleId) { violation in
                             RuleDistanceBar(violation: violation, kiln: kiln,
                                             check: kiln.ruleChecks?.first { $0.ruleId == violation.ruleId })
+                        }
+                        if kiln.violations.count > 1 {
+                            DisclosureGroup("More siting flags · \(kiln.violations.count - 1)", isExpanded: $flagsExpanded) {
+                                VStack(alignment: .leading, spacing: Space.l) {
+                                    ForEach(Array(kiln.violations.dropFirst()), id: \.ruleId) { flag in
+                                        RuleDistanceBar(violation: flag, kiln: kiln,
+                                                        check: kiln.ruleChecks?.first { $0.ruleId == flag.ruleId })
+                                    }
+                                }.padding(.top, Space.s)
+                            }.tint(.ink)
+                                .animation(Motion.layout.animation(reduceMotion: reduceMotion), value: flagsExpanded)
                         }
                         if let note = kiln.assessmentNote {
                             Text(note)
@@ -74,6 +88,7 @@ private struct KilnDetailView: View {
                                 }
                             }.padding(.top, Space.s)
                         }.tint(.ink).card()
+                            .animation(Motion.layout.animation(reduceMotion: reduceMotion), value: checksExpanded)
                     } else {
                         Text(kiln.rulesAssessment == "not_evaluated" ? "Rule checks not evaluated · no usable data" : "Rule checks unavailable")
                             .font(.body).foregroundStyle(.inkSecondary).card()
@@ -90,10 +105,34 @@ private struct KilnDetailView: View {
                 section(isFixture ? "Nearest home and school" : "Location and footprint", id: "map") {
                     BufferMap(kiln: kiln, illustrative: isFixture).card()
                 }
-                if isFixture {
-                section("Check on site", id: "checks") {
-                    SiteChecklist(kiln: kiln, sheet: model.stops.first { $0.kilnId == id }?.sheet).card()
+                if isFixture || model.stops.contains(where: { $0.kilnId == id }) {
+                    section("Inspection sheet", id: "checks") {
+                        DisclosureGroup("On-site checks and access notes", isExpanded: $siteExpanded) {
+                            VStack(alignment: .leading, spacing: Space.m) {
+                                SiteChecklist(kiln: kiln, sheet: model.stops.first { $0.kilnId == id }?.sheet)
+                                if let stop = model.stops.first(where: { $0.kilnId == id }) {
+                                    Text(model.arrival(for: stop, compact: false)).font(.subheadline.monospacedDigit())
+                                    Text("\(stop.sheet.peopleExposed.grouped) people within 800 m\(model.usesPublicRegistry ? " · modelled" : " · sample")").font(.footnote)
+                                    if let note = stop.access?.note { Text(note).font(.footnote) }
+                                    if stop.access?.coordinate.isValid != true {
+                                        Text("No access point · Directions will ask before using the kiln location").font(.footnote)
+                                    }
+                                }
+                            }.foregroundStyle(.inkSecondary).padding(.top, Space.s)
+                        }.tint(.ink).card()
+                    }
                 }
+                section("Model and observation", id: "model") {
+                    DisclosureGroup("Prediction, score and satellite dates", isExpanded: $modelExpanded) {
+                        VStack(alignment: .leading, spacing: Space.s) {
+                            Text(typeLine).font(.subheadline).foregroundStyle(.inkSecondary)
+                            Text("Model score \(kiln.typeConfidence.formatted(.number.precision(.fractionLength(2)))) · unverified")
+                                .font(.subheadline.monospacedDigit())
+                            Text("How strongly the model matched this shape; not a rule check").font(.footnote).foregroundStyle(.inkSecondary)
+                            dateLine("First seen on satellite imagery", date: kiln.firstSeen)
+                            dateLine("Latest satellite image", date: kiln.lastSeen)
+                        }.padding(.top, Space.s)
+                    }.tint(.ink).card()
                 }
                 Button {
                     model.askAboutKiln(kiln.kilnId)
@@ -149,7 +188,7 @@ private struct KilnDetailView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
             Text(KilnIDLabel.shortID(kiln.kilnId))
-                .font(.largeTitle.weight(.semibold).monospaced())
+                .font(.title2.weight(.semibold).monospaced())
                 .foregroundStyle(.ink)
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityLabel(kiln.kilnId)
@@ -165,17 +204,7 @@ private struct KilnDetailView: View {
                 .foregroundStyle(.inkSecondary)
             VerdictStatusView(kiln: kiln)
                 .padding(.top, Space.xxs)
-            if !isFixture {
-                Text("Model score \(kiln.typeConfidence.formatted(.number.precision(.fractionLength(2))))")
-                    .font(.subheadline.monospacedDigit()).foregroundStyle(.ink)
-                Text("How strongly the model matched this shape; not a rule check")
-                    .font(.footnote).foregroundStyle(.inkSecondary)
-                VStack(alignment: .leading, spacing: Space.s) {
-                    dateLine("First seen on satellite imagery", date: kiln.firstSeen)
-                    dateLine("Latest satellite image", date: kiln.lastSeen)
-                }
-                .padding(.top, Space.s)
-            }
+
         }
         .padding(.top, Space.xs)
     }

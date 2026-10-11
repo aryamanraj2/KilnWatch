@@ -25,6 +25,7 @@ private struct RouteMap: View {
     @Environment(AppModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var location = ForegroundLocation()
     @State private var camera: MapCameraPosition = .automatic
     @State private var imagery = DemoOptions.bool("imagery")
@@ -50,8 +51,8 @@ private struct RouteMap: View {
             }
             ForEach(model.stops) { stop in
                 if let kiln = model.kiln(stop.kilnId) {
-                    Annotation(stop.kilnId, coordinate: kiln.coordinate) {
-                        StopPin(stop: stop, isSelected: model.selectedStopId == stop.kilnId) { focus(stop.kilnId) }
+                    Annotation(stop.kilnId, coordinate: kiln.coordinate, anchor: pinAnchor(stop)) {
+                        StopPin(stop: stop, isSelected: model.selectedStopId == stop.kilnId, labelSide: labelSide(stop)) { focus(stop.kilnId) }
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     }.annotationTitles(.hidden)
                 }
@@ -63,14 +64,6 @@ private struct RouteMap: View {
         .overlay(alignment: .top) {
             LinearGradient(colors: [.black.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
                 .frame(height: 160).ignoresSafeArea().opacity(imagery ? 1 : 0).allowsHitTesting(false)
-        }
-        .onGeometryChange(for: CGRect.self) { proxy in
-            CGRect(x: proxy.safeAreaInsets.leading, y: proxy.safeAreaInsets.top,
-                   width: max(0, proxy.size.width - proxy.safeAreaInsets.leading - proxy.safeAreaInsets.trailing),
-                   height: max(0, proxy.size.height - proxy.safeAreaInsets.top - proxy.safeAreaInsets.bottom))
-        } action: { _ in
-            // Refit when the actual map viewport changes, including settled insets and text size.
-            if framingOverview { moveCamera(model.overview) }
         }
         .safeAreaInset(edge: .top) { header }
         .safeAreaInset(edge: .bottom) {
@@ -125,39 +118,34 @@ private struct RouteMap: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
-            GlassEffectContainer(spacing: Space.xs) {
-                HStack(alignment: .top, spacing: Space.xs) {
-                    VStack(alignment: .leading, spacing: Space.xxs) {
-                        Text(model.routeTitle).font(.headline)
-                        Text(model.routeSummary).font(.subheadline.monospacedDigit()).foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .redacted(reason: model.route == nil && model.isLoading ? .placeholder : [])
-                        if model.usesPublicRegistry { Text("Visited in road order").font(.footnote).foregroundStyle(.secondary) }
-                    }
-                    .padding(.horizontal, Space.m).padding(.vertical, Space.s)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .glassEffect(.regular, in: .rect(cornerRadius: Radius.card, style: .continuous))
-                    .accessibilityElement(children: .combine).accessibilityAddTraits(.isHeader)
-                    LazyVGrid(columns: [GridItem(.fixed(48)), GridItem(.fixed(48))], spacing: Space.xs) {
-                        Button("Route list", systemImage: "list.number") { showList = true }.disabled(!model.hasRoute)
-                        if model.usesPublicRegistry {
-                            Button("All kilns", systemImage: "flag") { model.showAllKilns = true }
-                                .accessibilityHint("Shows all kiln statuses. The saved plan is kept.")
+            VStack(alignment: .leading, spacing: Space.xxs) {
+                HStack(spacing: Space.xxs) {
+                    Text(model.routeTitle).font(.headline).frame(maxWidth: .infinity, alignment: .leading)
+                    Button("Route list", systemImage: "list.number") { showList = true }.disabled(!model.hasRoute)
+                    Menu {
+                        Button("Route overview", systemImage: "map") {
+                            framingOverview = true
+                            moveCamera(model.overview)
                         }
                         Button(imagery ? "Standard map" : "Satellite imagery", systemImage: imagery ? "map" : "globe.asia.australia") { imagery.toggle() }
-                            .sensoryFeedback(.selection, trigger: imagery)
-                        Button("My location", systemImage: "location") {
-                            location.recenter()
-                            if location.settingsAvailable { showLocationNotice = true }
+                        if model.usesPublicRegistry {
+                            Button("All kilns", systemImage: "flag") { model.showAllKilns = true }
                         }
+                    } label: { Label("Map options", systemImage: "ellipsis") }
+                    Button("My location", systemImage: "location") {
+                        location.recenter()
+                        if location.settingsAvailable { showLocationNotice = true }
                     }
-                    .frame(width: 104)
-                    .dynamicTypeSize(...DynamicTypeSize.large)
-                    .labelStyle(.iconOnly).buttonStyle(.glass).buttonBorderShape(.circle).controlSize(.large)
                 }
+                .labelStyle(.iconOnly).buttonStyle(MapControlStyle())
+                Text(model.routeSummary).font(.subheadline.monospacedDigit()).foregroundStyle(.inkSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .redacted(reason: model.route == nil && model.isLoading ? .placeholder : [])
             }
+            .padding(.horizontal, Space.m).padding(.vertical, Space.xs)
+            .glassEffect(.regular, in: .rect(cornerRadius: Radius.card, style: .continuous))
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            ForEach(Array(banners.prefix(2).enumerated()), id: \.offset) { _, banner in
+            ForEach(Array(banners.enumerated()), id: \.offset) { _, banner in
                 QuietBanner(text: banner.text, systemImage: banner.symbol)
             }
         }
@@ -173,7 +161,7 @@ private struct RouteMap: View {
         if let notice = location.notice { result.append((notice, "location")) }
         if case .loaded(_, _, let warning?) = model.routeState { result.append((warning, "exclamationmark.circle")) }
         if let route = model.route, route.hasPassed() {
-            result.append(("This plan was for \(route.dayLabel()) · plan again for a new day. Open Route list → Plan again.", "clock"))
+            result.append(("Plan for \(route.dayLabel()) · Route list → Plan again", "clock"))
         }
         if let route = model.route, route.usableStops.count != route.stops.count {
             result.append(("Some stops have unavailable kiln records", "exclamationmark.circle"))
@@ -195,33 +183,52 @@ private struct RouteMap: View {
     }
 
     private func carousel(maxHeight: CGFloat) -> some View {
-        @Bindable var model = model
-        return VStack(spacing: Space.xs) {
-            ScrollView(.vertical) {
-            ScrollView(.horizontal) {
-                LazyHStack(spacing: Space.s) {
-                    ForEach(model.stops) { stop in
-                        if let kiln = model.kiln(stop.kilnId) {
-                            StopCard(stop: stop, kiln: kiln, zoom: zoom)
-                            .containerRelativeFrame(.horizontal) { width, _ in max(0, width - Space.margin) }
-                            .id(stop.kilnId)
-                        }
-                    }
-                }.scrollTargetLayout()
-            }
-            .scrollTargetBehavior(.viewAligned).scrollPosition(id: $model.selectedStopId, anchor: .leading)
-            .scrollIndicators(.hidden).contentMargins(.horizontal, Space.margin, for: .scrollContent)
-            .scrollClipDisabled().fixedSize(horizontal: false, vertical: true)
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            }
-            .scrollBounceBehavior(.basedOnSize)
-            .frame(maxHeight: .infinity)
+        VStack(spacing: Space.xs) {
+            if typeSize.isAccessibilitySize {
+                ScrollView { stopCarousel }
+                    .scrollBounceBehavior(.basedOnSize).frame(maxHeight: maxHeight)
+            } else { stopCarousel }
             Button(model.routeActive ? "End route" : "Start route") {
                 withAnimation(Motion.layout.animation(reduceMotion: reduceMotion)) { model.toggleRoute() }
             }
             .buttonStyle(model.routeActive ? .secondary : .primary).padding(.horizontal, Space.margin)
         }.padding(.bottom, Space.xxs)
-            .frame(height: maxHeight)
+    }
+
+    private var stopCarousel: some View {
+        @Bindable var model = model
+        return ScrollView(.horizontal) {
+            LazyHStack(spacing: Space.s) {
+                ForEach(model.stops) { stop in
+                    if let kiln = model.kiln(stop.kilnId) {
+                        StopCard(stop: stop, kiln: kiln, zoom: zoom)
+                            .containerRelativeFrame(.horizontal) { width, _ in max(0, width - Space.margin) }
+                            .id(stop.kilnId)
+                    }
+                }
+            }.scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.viewAligned).scrollPosition(id: $model.selectedStopId, anchor: .leading)
+        .scrollIndicators(.hidden).contentMargins(.horizontal, Space.margin, for: .scrollContent)
+        .scrollClipDisabled().fixedSize(horizontal: false, vertical: true)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+    }
+
+    // Opposing labels for close anchors; no coordinate, numbering or geometry changes.
+    private func labelSide(_ stop: Stop) -> HorizontalEdge? {
+        guard let kiln = model.kiln(stop.kilnId), let neighbor = model.stops.first(where: { other in
+            guard other.kilnId != stop.kilnId, let record = model.kiln(other.kilnId) else { return false }
+            return CLLocation(latitude: kiln.coordinate.latitude, longitude: kiln.coordinate.longitude)
+                .distance(from: CLLocation(latitude: record.coordinate.latitude, longitude: record.coordinate.longitude)) < 250
+        }) else { return nil }
+        return stop.order < neighbor.order ? .leading : .trailing
+    }
+    private func pinAnchor(_ stop: Stop) -> UnitPoint {
+        switch labelSide(stop) {
+        case .leading: return .trailing
+        case .trailing: return .leading
+        case nil: return .center
+        }
     }
 
     private var statePanel: some View {
@@ -264,6 +271,13 @@ private struct RouteMap: View {
     }
 }
 
+private struct MapControlStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.frame(minWidth: 44, minHeight: 44)
+            .opacity(configuration.isPressed ? 0.6 : 1)
+    }
+}
+
 private struct StopCard: View {
     let stop: Stop
     let kiln: Kiln
@@ -278,6 +292,7 @@ private struct StopCard: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .accessibilityIdentifier("stop-detail-\(stop.kilnId)")
             HStack(alignment: .top, spacing: Space.xs) {
                 NavigationLink(value: stop.kilnId) {
                     VStack(alignment: .leading, spacing: Space.xxs) {
@@ -302,11 +317,14 @@ private struct StopCard: View {
             }
             NavigationLink(value: stop.kilnId) {
                 VStack(alignment: .leading, spacing: Space.xxs) {
-                    StopSheetSummary(stop: stop, kiln: kiln)
+                    VerdictStatusView(kiln: kiln)
+                    Text(kiln.topViolation.map { $0.compactLine(for: kiln) }
+                         ?? "No rule flags measured · assessment may be incomplete")
+                        .font(.subheadline.monospacedDigit()).foregroundStyle(.inkSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Opens the kiln and its inspection sheet")
+                .accessibilityHint("Opens the kiln, full inspection sheet and access notes")
             }
         }
         .buttonStyle(.plain)

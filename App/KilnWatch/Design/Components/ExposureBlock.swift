@@ -8,6 +8,7 @@ struct ExposureBlock: View {
     var modelled = false
     var sample = false
 
+    @State private var expanded = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -17,18 +18,22 @@ struct ExposureBlock: View {
                 HStack(alignment: .firstTextBaseline, spacing: Space.xs) { figure(exposure.people) }
                 VStack(alignment: .leading, spacing: 0) { figure(exposure.people) }
             }
-            Text("\(exposure.childrenUnderFive.grouped) under 5 · \(exposure.adultsOverSixty.grouped) over 60")
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(.inkSecondary)
             if modelled {
-                Text(Exposure.attribution).font(.footnote).foregroundStyle(.inkSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                Text("Meta/CIESIN HRSL v1.5.2 · CC BY 4.0").font(.footnote).foregroundStyle(.inkSecondary)
             } else if sample {
                 Text("Sample population figures · illustrative, not an HRSL calculation")
                     .font(.footnote).foregroundStyle(.inkSecondary)
             }
+            DisclosureGroup("Age groups and population source", isExpanded: $expanded) {
+                VStack(alignment: .leading, spacing: Space.s) {
+                    Text("\(exposure.childrenUnderFive.grouped) under 5 · \(exposure.adultsOverSixty.grouped) over 60")
+                        .font(.subheadline.monospacedDigit())
+                    if modelled { Text(Exposure.attribution).font(.footnote) }
+                }.foregroundStyle(.inkSecondary).padding(.top, Space.xs)
+            }.font(.subheadline).tint(.ink)
+                .animation(Motion.layout.animation(reduceMotion: reduceMotion), value: expanded)
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .contain)
         } else {
             Text("Population exposure not assessed")
                 .font(.body)
@@ -38,7 +43,7 @@ struct ExposureBlock: View {
 
     @ViewBuilder private func figure(_ people: Int) -> some View {
         Text(people.grouped)
-            .font(.largeTitle.weight(.semibold).monospacedDigit())
+            .font(.title2.weight(.semibold).monospacedDigit())
             .contentTransition(reduceMotion ? .identity : .numericText(value: Double(people)))
             .foregroundStyle(.ink)
         Text(modelled ? "modelled residents within 800 m of the kiln edge" : bufferRadiusM.map { "people within \($0) m" } ?? "people")

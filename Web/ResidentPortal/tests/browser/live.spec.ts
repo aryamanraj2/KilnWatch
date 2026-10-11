@@ -70,6 +70,7 @@ test('real near query, record rule checks, exposure and evidence', async ({ page
   const hab = page.locator('.rule-card', { hasText: 'C-HAB-800' });
   await expect(hab).toContainText('Siting flag · needs inspection'); await expect(hab).toContainText('497'); await expect(hab).toContainText('800');
   await expect(page.locator('.detail-aside').getByText('4,225', { exact: false })).toBeVisible();
+  await page.locator('.exposure-card .fact-details > summary').click();
   await expect(page.getByText('High Resolution Settlement Layer (HRSL) v1.5.2', { exact: false })).toBeVisible();
   await expect(page.getByRole('slider')).toBeEnabled();
   await expect(page.getByText('Contains modified Copernicus Sentinel data 2023', { exact: false })).toBeVisible();
@@ -92,12 +93,12 @@ test('zero-flag record is never clear; non-public record shows not found', async
 
 test('Ask from a record: body, steps, citations and disclaimer; Hindi note', async ({ page }) => {
   const asked = await mockPublicService(page);
-  await page.goto(`/kilns/${REF}`); await page.getByRole('link', { name: 'Ask about this kiln' }).click();
+  await page.goto(`/kilns/${REF}`); await page.locator('.explanation > summary').click(); await page.getByRole('link', { name: 'Ask about this kiln' }).click();
   await page.getByLabel('Your question').fill('  What should I check at this kiln?  ');
   await page.getByRole('button', { name: 'Ask', exact: true }).click();
   await expect(page.locator('.ask-text')).toHaveText(answer.answer);
   expect(asked).toEqual([{ question: 'What should I check at this kiln?', kiln_id: REF }]);
-  await expect(page.locator('.ask-steps')).toContainText(`Gathering evidence for ${REF}`);
+  await page.locator('.ask-trace > summary').click(); await expect(page.locator('.ask-steps')).toContainText(`Gathering evidence for ${REF}`);
   await expect(page.locator('.ask-disclaimer')).toHaveText(answer.disclaimer);
   await expect(page.getByText('Answers cite public registry records. The assistant never records verdicts.')).toBeVisible();
   await page.locator('.ask-citations').getByRole('link', { name: REF }).click();
@@ -139,7 +140,7 @@ test('phone rule list: flags first, other checks grouped; only flags use the sta
   await expect(others).toContainText('Inconclusive · map data incomplete');
   await expect(others.locator('.rule-card', { hasText: 'C-KILN-1K' }).locator('.distance-bar')).toHaveClass(/neutral/);
   await expect(flagged.locator('.distance-bar')).not.toHaveClass(/neutral/);
-  await expect(page.locator('.glance')).toContainText('C-HAB-800'); await expect(page.locator('.glance')).toContainText('4,225');
+  await expect(page.locator('.detail-page')).toContainText('C-HAB-800'); await expect(page.locator('.detail-page')).toContainText('4,225');
   await expect(page.locator('.action-bar').getByRole('link', { name: 'Ask about this kiln' })).toHaveAttribute('href', `/ask?kiln=${REF}`);
 });
 
@@ -156,13 +157,14 @@ async function mockRequests(page: BrowserPage, status = 201) {
 async function openRequest(page: BrowserPage) {
   await page.goto(`/kilns/${REF}`);
   await expect(page.locator('.action-bar a[href="#resident-requests"]')).toHaveText('Request an inspection');
-  await page.locator('.request-panel').getByRole('button', { name: 'Request an inspection', exact: true }).click();
+  if (await page.locator('.action-bar').isVisible()) await page.locator('.action-bar').getByRole('link', { name: 'Request an inspection', exact: true }).click();
+  else await page.locator('.request-panel').getByRole('button', { name: 'Request an inspection', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Send request', exact: true })).toBeDisabled();
   await page.getByLabel('Smoke or ash', { exact: true }).check();
   await page.getByLabel('Near homes', { exact: true }).check();
   await page.getByLabel('Under 1 km', { exact: true }).check();
 }
-function screenshotDir() { const directory = 'docs/screens/requests'; mkdirSync(directory, { recursive: true }); return directory; }
+function screenshotDir() { const directory = process.env.KW_ARTIFACT_DIR ?? 'docs/screens/requests'; mkdirSync(directory, { recursive: true }); return directory; }
 
 test('inspection request: fresh count, browser dedupe, area count and phone screenshots', async ({ page }) => {
   const writes = await mockRequests(page); await page.setViewportSize({ width: 390, height: 844 });
@@ -172,7 +174,7 @@ test('inspection request: fresh count, browser dedupe, area count and phone scre
   await page.locator('.request-panel').screenshot({ path: `${screenshotDir()}/phone-form-en.png`, style: '.action-bar,.tab-bar{visibility:hidden!important}' });
   await page.getByRole('button', { name: 'Send request', exact: true }).evaluate(element => element.scrollIntoView({ block: 'center' }));
   const sendBounds = await page.getByRole('button', { name: 'Send request', exact: true }).boundingBox();
-  const barBounds = await page.locator('.action-bar').boundingBox();
+  const barBounds = await page.locator('.tab-bar').boundingBox();
   expect(sendBounds!.y + sendBounds!.height).toBeLessThan(barBounds!.y);
   await page.screenshot({ path: `${screenshotDir()}/phone-form-send-en.png` });
   await page.getByRole('button', { name: 'Send request', exact: true }).click();
@@ -227,7 +229,7 @@ test('Hindi phone inspection request is fully localized', async ({ page }) => {
   await page.addInitScript(() => { localStorage.setItem('kw-theme', 'light'); localStorage.setItem('kw-language', 'hi'); });
   await page.goto(`/kilns/${REF}`);
   await expect(page.locator('.action-bar').getByRole('link', { name: 'निरीक्षण का अनुरोध करें', exact: true })).toBeVisible();
-  await page.locator('.request-panel').getByRole('button', { name: 'निरीक्षण का अनुरोध करें', exact: true }).click();
+  await page.locator('.action-bar').getByRole('link', { name: 'निरीक्षण का अनुरोध करें', exact: true }).click();
   await page.getByLabel('धुआँ या राख', { exact: true }).check();
   await page.locator('.request-panel').scrollIntoViewIfNeeded();
   await page.locator('.request-panel').screenshot({ path: `${screenshotDir()}/phone-form-hi.png`, style: '.action-bar,.tab-bar{visibility:hidden!important}' });

@@ -55,10 +55,9 @@ struct AskView: View {
     private var suggestions: some View {
         VStack(alignment: .leading, spacing: Space.m) {
             Text(model.usesPublicRegistry
-                 ? "Ask about satellite-flagged registry records. Each question is independent; earlier questions aren't sent to the server."
+                 ? "Ask about satellite-flagged kilns. Each question is independent."
                  : "Sample data · scripted answers demonstrate inspection planning and citation navigation.")
                 .font(.body).foregroundStyle(.inkSecondary)
-            Text("Try").eyebrow()
             let questions = model.usesPublicRegistry
                 ? ["How many kilns are flagged in Hapur?", "What information is available in the registry?"]
                 : AskScript.all.map(\.question)

@@ -1,4 +1,4 @@
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { client, config } from '../../data/client';
 import type { Kiln } from '../../data/model';
 import { browserCode, concernValues, distanceValues, freshRequests, rememberRequest, RequestError, sentOn, subscribeRequests, type RequestBody } from '../../data/requests';
@@ -26,7 +26,12 @@ export function InspectionRequest({ kiln, open, onOpen }: { kiln: Kiln; open: bo
   const [error, setError] = useState<RequestError | null>(null);
   const [added, setAdded] = useState(false);
   const sent = useSyncExternalStore(subscribeRequests, () => sentOn(config.mode, kiln.id));
-  const count = useCount(kiln)?.count;
+  const aggregate = useCount(kiln); const count = aggregate?.count;
+  const form = useRef<HTMLFormElement>(null); const confirmation = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (sent) { if (open) confirmation.current?.focus(); }
+    else if (open) form.current?.querySelector<HTMLInputElement>('input')?.focus();
+  }, [open, sent]);
   const residentsAsked = `${number(count ?? 0)} ${count === 1 ? 'resident has' : 'residents have'} asked for an inspection of this kiln.`;
   const sample = config.mode === 'fixture';
   const shortDate = (day: string) => new Intl.DateTimeFormat(language === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' }).format(new Date(`${day}T12:00:00+05:30`));
@@ -43,12 +48,15 @@ export function InspectionRequest({ kiln, open, onOpen }: { kiln: Kiln; open: bo
   return <section id="resident-requests" className="card request-panel" aria-labelledby="request-heading">
     <h2 id="request-heading">{t('Resident requests', 'निवासियों के अनुरोध')}</h2>
     <RequestCount kiln={kiln} />
+    {!count && <p className="help">{count === 0 ? t('0 inspection requests · not verified', '0 निरीक्षण अनुरोध · पुष्टि नहीं हुई') : t('Request count unavailable', 'अनुरोध संख्या उपलब्ध नहीं')}</p>}
+    <p className="help">{t('Anonymous inspection requests are a signal for KilnWatch inspectors. They are not verified.', 'अनाम निरीक्षण अनुरोध KilnWatch निरीक्षकों के लिए एक संकेत हैं। उनकी पुष्टि नहीं हुई है।')}</p>
+    {!!count && aggregate && <details className="fact-details"><summary>{t('Concerns, distance and latest request', 'चिंताएँ, दूरी और नवीनतम अनुरोध')}</summary><dl>{concernValues.map(value => <div key={value}><dt>{t(...concernLabels[value])}</dt><dd>{number(aggregate.concerns[value])}</dd></div>)}<div><dt>{t('Residents within 1 km', '1 किमी के भीतर निवासी')}</dt><dd>{number(aggregate.within_1km)}</dd></div><div><dt>{t('Latest request', 'नवीनतम अनुरोध')}</dt><dd>{aggregate.last_request_on ? shortDate(aggregate.last_request_on) : '—'}</dd></div></dl><p className="help">{t('Residents may select several concerns.', 'निवासी कई चिंताएँ चुन सकते हैं।')}</p></details>}
     {sample && <p className="sample-tag">{t('Sample request · nothing is sent', 'नमूना अनुरोध · कुछ भेजा नहीं जाता')}</p>}
-    {sent ? <div role="status">
+    {sent ? <div role="status" ref={confirmation} tabIndex={-1}>
       <p className="request-confirmation">{added ? t(`Your request was added. ${residentsAsked}`, `आपका अनुरोध जोड़ा गया। ${number(count ?? 0)} निवासियों ने इस भट्ठे के निरीक्षण का अनुरोध किया है।`) : t(`You asked for an inspection on ${shortDate(sent)}`, `आपने ${shortDate(sent)} को निरीक्षण का अनुरोध किया था`)}</p>
       {!added && count !== undefined && <p>{t(residentsAsked, `${number(count)} निवासियों ने इस भट्ठे के निरीक्षण का अनुरोध किया है।`)}</p>}
       {limits}
-    </div> : !open ? <><p className="help">{t('Anonymous inspection requests are a signal for KilnWatch inspectors. They are not verified.', 'अनाम निरीक्षण अनुरोध KilnWatch निरीक्षकों के लिए एक संकेत हैं। उनकी पुष्टि नहीं हुई है।')}</p><button className="primary full" onClick={onOpen}>{t('Request an inspection', 'निरीक्षण का अनुरोध करें')}</button></> : <form onSubmit={e => { e.preventDefault(); void send(); }}>
+    </div> : !open ? <><button className="primary full request-open-button" onClick={onOpen}>{t('Request an inspection', 'निरीक्षण का अनुरोध करें')}</button></> : <form ref={form} onSubmit={e => { e.preventDefault(); void send(); }}>
       <fieldset disabled={busy}><legend>{t('What concerns you? Choose at least one.', 'आपको किस बात की चिंता है? कम से कम एक चुनें।')}</legend>
         {concernValues.map(value => <label className="request-option" key={value}><input type="checkbox" checked={concerns.includes(value)} onChange={e => setConcerns(previous => e.target.checked ? [...previous, value] : previous.filter(c => c !== value))} />{t(...concernLabels[value])}</label>)}
       </fieldset>

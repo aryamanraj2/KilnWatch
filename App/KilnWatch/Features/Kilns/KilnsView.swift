@@ -117,40 +117,23 @@ private struct KilnRow: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        let layout = typeSize.isAccessibilitySize || model.usesPublicRegistry
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Space.xs))
-            : AnyLayout(HStackLayout(alignment: .top, spacing: Space.s))
-        layout {
-            VStack(alignment: .leading, spacing: Space.xxs) {
-                KilnIDLabel(kiln: kiln, predictionOnly: model.usesPublicRegistry, abbreviatesID: model.usesPublicRegistry)
-                if let top = kiln.topViolation {
-                    Text("\(Text(top.ruleId).monospaced()) · \(top.compactLine(for: kiln))")
-                        .font(.subheadline)
-                        .foregroundStyle(.ink)
-                    if model.usesPublicRegistry && model.status(for: kiln) == .flagged {
-                        Text("Siting flag · needs inspection").font(.footnote).foregroundStyle(.flagged)
-                        ThresholdWarning(verification: kiln.ruleChecks?.first { $0.ruleId == top.ruleId }?.verification)
-                    }
-                } else {
-                    Text("No rule flags measured").font(.subheadline).foregroundStyle(.inkSecondary)
-                    if let note = kiln.assessmentNote { Text(note).font(.footnote).foregroundStyle(.inkSecondary) }
-                }
-            }
-            if !typeSize.isAccessibilitySize && !model.usesPublicRegistry { Spacer(minLength: Space.xs) }
-            VStack(alignment: typeSize.isAccessibilitySize || model.usesPublicRegistry ? .leading : .trailing, spacing: Space.xxs) {
-                VerdictStatusView(kiln: kiln)
-                Text(kiln.exposure.map { model.usesPublicRegistry ? "\($0.people.grouped) modelled residents within 800 m" : "\($0.people.grouped) people · sample" } ?? "Population exposure not assessed")
-                    .font(.footnote.monospacedDigit())
-                    .foregroundStyle(.inkSecondary)
-                if let requests = kiln.residentRequests, requests.count > 0 {
-                    Text("\(requests.count.formatted()) \(requests.count == 1 ? "request" : "requests")")
-                        .font(.footnote).monospacedDigit().foregroundStyle(.inkSecondary)
-                }
-            }
+        VStack(alignment: .leading, spacing: Space.xs) {
+            KilnIDLabel(kiln: kiln, showsType: false, idFont: .footnote.weight(.semibold))
+            VerdictStatusView(kiln: kiln)
+            Text(supportingLine).font(.subheadline.monospacedDigit()).foregroundStyle(.inkSecondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, Space.xxs)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("kiln-row-\(kiln.kilnId)")
+    }
+    private var supportingLine: String {
+        var line = kiln.topViolation.map { "\($0.ruleId) · \($0.compactLine(for: kiln))" }
+            ?? (kiln.assessmentNote == nil ? "No rule flags measured" : "No rule flags measured · assessment incomplete")
+        if let requests = kiln.residentRequests, requests.count > 0 {
+            line += " · \(requests.count.formatted()) \(requests.count == 1 ? "request" : "requests")"
+        }
+        return line
     }
 }
 

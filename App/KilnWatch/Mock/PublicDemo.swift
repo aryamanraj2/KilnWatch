@@ -46,6 +46,13 @@ enum PublicDemo {
                 records[0]["kiln_id"] = fixture["kiln_id"]
             }
         }
+        // Isolated phase-45 navigation rehearsal: the recorded queue uses different IDs
+        // from the recorded registry. Supply a labelled sample detail for its first item.
+        if DemoOptions.bool("reviewDetailDemo"), let id = ReviewDemo.queue?.items.first?.kilnId,
+           var record = R1Demo.records("recorded").first {
+            record["kiln_id"] = id
+            records.append(record)
+        }
         let details = Dictionary(uniqueKeysWithValues: records.map { ($0["kiln_id"] as! String, (try? JSONSerialization.data(withJSONObject: $0)) ?? Data()) })
         let list = (try? JSONSerialization.data(withJSONObject: ["kilns": records, "next_cursor": NSNull()])) ?? Data()
         let config = Configuration(scenario: scenario, detail: DemoOptions.string("publicDetail"), list: list, records: details, askScenario: DemoOptions.string("askDemo"), planScenario: DemoOptions.string("planDemo"))

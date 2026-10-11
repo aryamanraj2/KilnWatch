@@ -237,3 +237,7 @@ Prompt 43b deployment verified on 11 October 2026: live requests and aggregate r
 hosted phone page and inspector display confirmed at 1; the sole test request was then
 reset to 0 (daily counter retained). No sub-agents, staging, commit or push in 43b.
 See `AWS/docs/inspection-requests-report.md`, Deploy (43b), for the complete lead report.
+
+## Local UI polish — prompt 45 (11 October 2026)
+
+Local, unstaged frontend refinement: grouped Today map controls and compact stop card; exact-anchor close-stop label separation; evidence-first kiln hierarchy and named disclosures; compact Review rows/counts; quieter Ask and verdict spacing. Portal follows the same tokens and summary-first hierarchy, including a single phone inspection action and focused form that clears its action bar. See `screens/phase-9/demo-ui-polish-report.md` for captures, verification and limits. No hosted update or live write. User requested a faster wrap-up; remaining capture/journey coverage is explicitly recorded for orchestrator review.

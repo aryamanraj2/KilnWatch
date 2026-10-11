@@ -127,6 +127,28 @@ describe('Ask (POST /ask)', () => {
     expect((await makeClient(live, fetcher).ask('How many kilns are flagged in Hapur?', null)).fallback).toBe(true);
     expect(JSON.parse(String(fetcher.mock.calls[0][1]!.body))).toEqual({ question: 'How many kilns are flagged in Hapur?' });
   });
+  it('passes the confirmed search centre in latitude/longitude order', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json(success));
+    await makeClient(live, fetcher).ask('Plan a route near my area', null, undefined, [77.7759, 28.7306]);
+    expect(JSON.parse(String(fetcher.mock.calls[0][1]!.body))).toEqual({ question: 'Plan a route near my area', lat: 28.7306, lon: 77.7759 });
+  });
+  it('rejects an invalid centre without sending a question', async () => {
+    const fetcher = vi.fn<typeof fetch>();
+    await expect(makeClient(live, fetcher).ask('Hello', null, undefined, [77, 999])).rejects.toMatchObject({ kind: 'invalid' });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+  it('reports a timeout and never automatically submits another question', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetcher = vi.fn<typeof fetch>().mockImplementation((_url, init) => new Promise((_resolve, reject) => {
+        init!.signal!.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+      }));
+      const result = expect(makeClient(live, fetcher).ask('Hello', null)).rejects.toMatchObject({ kind: 'timeout', retryable: true });
+      await vi.advanceTimersByTimeAsync(35000);
+      await result;
+      expect(fetcher).toHaveBeenCalledOnce();
+    } finally { vi.useRealTimers(); }
+  });
   it.each(['', '   ', 'x'.repeat(501)])('rejects an invalid question locally without a request', async q => {
     const fetcher = vi.fn<typeof fetch>();
     await expect(makeClient(live, fetcher).ask(q, null)).rejects.toMatchObject({ kind: 'invalid' });
@@ -136,8 +158,9 @@ describe('Ask (POST /ask)', () => {
     [400, { error: { code: 'invalid_request', message: 'Bad', retryable: false } }, 'invalid', false],
     [429, { error: { code: 'daily_cap_reached', message: 'Cap', retryable: false } }, 'cap', false],
     [429, { message: 'Too Many Requests' }, 'busy', true],
-    [503, { error: { code: 'model_unavailable', message: 'Down', retryable: true } }, 'unavailable', true],
-    [503, { error: { code: 'model_unavailable', message: 'Config', retryable: false } }, 'unavailable', false],
+    [503, { error: { code: 'model_unavailable', message: 'Down', retryable: true } }, 'model', true],
+    [503, { error: { code: 'model_unavailable', message: 'Config', retryable: false } }, 'model', false],
+    [503, { error: { code: 'upstream_unavailable', message: 'Down', retryable: true } }, 'registry', true],
   ] as const)('maps %s %j without retrying', async (status, body, kind, retryable) => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json(body, status));
     await expect(makeClient(live, fetcher).ask('How many kilns?', null)).rejects.toMatchObject({ kind, retryable });

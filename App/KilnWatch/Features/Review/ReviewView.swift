@@ -73,11 +73,13 @@ struct ReviewView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }.listRowBackground(Color.canvas)
             }
+            .contentMargins(.top, Space.xs, for: .scrollContent)
+            .listSectionSpacing(Space.m)
             .scrollContentBackground(.hidden).background(.canvas)
             .scrollEdgeEffectStyle(.hard, for: .top)
-            .navigationTitle("Review")
+            .navigationTitle("Review").navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     DataSourceLabel(text: model.demo == .live ? model.dataSourceLabel : "Sample data")
                 }
             }
@@ -115,9 +117,14 @@ private struct ReviewHeader: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let queue {
-                Text("\(queue.counts.newCandidate) not detected in 2023 · \(queue.counts.noLongerDetected) no longer detected · \(queue.counts.possibleZigzagConversion) possible zigzag conversions · \(queue.counts.lowConfidence) low detector scores")
-                    .font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                LazyVGrid(columns: [GridItem(.flexible(), alignment: .leading), GridItem(.flexible(), alignment: .leading)], alignment: .leading, spacing: Space.s) {
+                    ForEach(ReviewGroup.ordered, id: \.self) { group in
+                        VStack(alignment: .leading, spacing: Space.xxs) {
+                            Text(queue.counts[group], format: .number).font(.title3.weight(.semibold).monospacedDigit()).foregroundStyle(.ink)
+                            Text(group.label).font(.caption).foregroundStyle(.inkSecondary).fixedSize(horizontal: false, vertical: true)
+                        }.accessibilityElement(children: .combine)
+                    }
+                }
                 if queue.truncated { Text("Showing the first 500").font(.footnote).foregroundStyle(.inkSecondary) }
             }
         }.padding(.vertical, Space.xxs)
@@ -132,44 +139,39 @@ private struct ReviewRow: View {
     @Environment(\.dynamicTypeSize) private var size
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
-        VStack(alignment: .leading, spacing: Space.xs) {
-            VStack(alignment: .leading, spacing: Space.xs) {
-                    Text(item.kilnId ?? "Not in registry")
-                        .font(.subheadline.weight(.semibold).monospaced()).foregroundStyle(.ink)
-                        .typesettingLanguage(.explicit(.init(identifier: "zxx")))
-                        .fixedSize(horizontal: false, vertical: true)
-                    let layout = size.isAccessibilitySize
-                        ? AnyLayout(VStackLayout(alignment: .leading, spacing: Space.xs))
-                        : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Space.s))
-                    layout {
-                        VStack(alignment: .leading, spacing: Space.xxs) {
-                            if let prediction = item.current {
-                                Text("\(prediction.type.rawValue) · score \(reviewScore(prediction.score))")
-                            }
-                            if let prediction = item.baseline {
-                                Text("2023: \(prediction.type.rawValue) · \(reviewScore(prediction.score))")
-                            }
-                        }.font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
-                        ReviewPendingBadge(known: item.state == .pending)
+        VStack(alignment: .leading, spacing: Space.xxs) {
+            Button(action: open) {
+                HStack(alignment: .top, spacing: Space.xs) {
+                    VStack(alignment: .leading, spacing: Space.xxs) {
+                        Text(item.kilnId ?? "Not in registry")
+                            .font(.footnote.weight(.semibold).monospaced()).foregroundStyle(.ink)
+                            .typesettingLanguage(.explicit(.init(identifier: "zxx")))
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text(item.displayGroup.label).font(.footnote).foregroundStyle(.inkSecondary)
                     }
-            }
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-            Text(item.reason).font(.subheadline).foregroundStyle(.ink)
-                .lineLimit(expanded ? nil : 3).fixedSize(horizontal: false, vertical: true)
-            Button(expanded ? "Less" : "More") {
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.inkSecondary)
+                }.frame(minHeight: 44, alignment: .leading).contentShape(.rect)
+            }.buttonStyle(.plain).accessibilityHint(item.kilnId == nil ? "Opens the historical location" : "Opens the kiln record")
+            ReviewPendingBadge(known: item.state == .pending)
+            DisclosureGroup(isExpanded: Binding(get: { expanded }, set: { _ in
                 withAnimation(Motion.layout.animation(reduceMotion: reduceMotion)) { toggle() }
-            }
-            .font(.footnote.weight(.semibold)).foregroundStyle(.inkSecondary)
-            .frame(minWidth: 44, minHeight: 44, alignment: .leading).buttonStyle(.plain)
+            })) {
+                VStack(alignment: .leading, spacing: Space.xs) {
+                    Text(item.reason).font(.subheadline).foregroundStyle(.ink).fixedSize(horizontal: false, vertical: true)
+                    if let prediction = item.current {
+                        Text("Predicted \(prediction.type.rawValue) · detector score \(reviewScore(prediction.score)) · unverified")
+                    }
+                    if let prediction = item.baseline {
+                        Text("2023: \(prediction.type.rawValue) · detector score \(reviewScore(prediction.score)) · unverified")
+                    }
+                    if let iou = item.iou { Text("Footprint overlap · \(reviewScore(iou))") }
+                }.font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary).padding(.top, Space.xs)
+            } label: { Text("Reason and scores").font(.footnote.weight(.medium)).frame(minHeight: 44) }
+                .tint(.inkSecondary)
         }
         .padding(.vertical, Space.xxs)
-        .contentShape(.rect)
-        .onTapGesture(perform: open)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(item.kilnId ?? "Not in registry"), \(spokenGroup), \(item.state == .pending ? "pending review" : "unrecognised change"). Reason: \(item.reason)")
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction { open() }
-        .accessibilityAction(named: Text(expanded ? "Show less reason" : "Show full reason")) { toggle() }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("review-row-\(item.id)")
     }
     private var spokenGroup: String {

@@ -56,6 +56,7 @@ struct VerdictSheet: View {
                         .foregroundStyle(.inkSecondary)
                 }
                 .padding(.horizontal, Space.margin)
+                .padding(.top, Space.s)
                 .padding(.bottom, Space.xl)
                 .disabled(saved)
             }

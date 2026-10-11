@@ -43,7 +43,7 @@ test('two, single, absent, and failed evidence; rule limits and keyboard compari
   await page.getByRole('button', { name: 'Show before', exact: true }).click(); await expect(slider).toHaveValue('100');
   await page.getByRole('button', { name: 'Show after', exact: true }).click(); await expect(slider).toHaveValue('0');
   if (info.project.name === 'chromium') await page.screenshot({ path: `${artifacts}/evidence-en.png`, fullPage: true });
-  await page.getByRole('button', { name: 'What is missing?', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Some rules have not been assessed');
+  await page.locator('.explanation > summary').click(); await page.getByRole('button', { name: 'What is missing?', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Some rules have not been assessed');
   await page.getByRole('link', { name: 'C-HAB-800' }).click(); await expect(page.getByRole('heading', { name: 'Distance from homes', exact: true })).toBeVisible(); await expect(page.getByText('Not established', { exact: true })).toBeVisible();
   await page.goto('/kilns/SAMPLE-KW-002'); await expect(page.getByRole('img', { name: 'Later synthetic scene for this sample record' })).toBeVisible(); await expect(page.getByRole('slider')).toHaveCount(0);
   await page.goto('/kilns/SAMPLE-KW-003?demo=image-error'); await expect(page.getByText('This image could not be loaded.', { exact: true })).toBeVisible(); await page.getByRole('button', { name: 'Retry images' }).click(); await expect(page.getByText('This image could not be loaded.', { exact: true })).toBeVisible();
@@ -55,7 +55,7 @@ test('English multi-record draft, personal-data boundaries, edits, download, and
   page.on('request', r => { if (!r.url().startsWith('http://127.0.0.1:5173') && !r.url().startsWith('https://tile.openstreetmap.org/') && !r.url().startsWith('data:')) unexpected.push(r.url()); });
   await page.goto('/'); await sampleSearch(page); await openFirst(page); await page.getByRole('button', { name: 'Add to inspection draft', exact: true }).click();
   await page.getByRole('link', { name: 'Back to area' }).click(); await page.getByRole('link', { name: 'SAMPLE-KW-002' }).click(); await page.getByRole('button', { name: 'Add to inspection draft', exact: true }).click();
-  await page.getByRole('button', { name: 'Prepare a written request', exact: true }).click(); await expect(page.getByRole('heading', { name: '2 selected' })).toBeVisible();
+  await page.locator('.draft-callout > summary').click(); await page.getByRole('button', { name: 'Prepare a written request', exact: true }).click(); await expect(page.getByRole('heading', { name: '2 selected' })).toBeVisible();
   await page.getByLabel('Name (optional)', { exact: true }).fill('Sample Resident'); await page.getByLabel('Your own observations', { exact: true }).fill('Fictional resident observation for export testing.');
   await page.getByRole('button', { name: 'Create editable draft', exact: true }).click();
   const editor = page.getByLabel('Edit your inspection request', { exact: true }); const content = await editor.inputValue();
@@ -149,7 +149,7 @@ test('phone tab bar navigates Area, Ask and Draft without horizontal overflow', 
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeHidden();
   await expect(tabs.getByRole('link', { name: 'Area' })).toHaveAttribute('aria-current', 'page');
   await tabs.getByRole('link', { name: 'Ask' }).click(); await expect(page).toHaveURL(/\/ask$/);
-  await expect(page.getByRole('heading', { name: 'Ask about kilns near you' })).toBeVisible(); await expect(tabs.getByRole('link', { name: 'Ask' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('heading', { name: 'Ask KilnWatch' })).toBeVisible(); await expect(tabs.getByRole('link', { name: 'Ask' })).toHaveAttribute('aria-current', 'page');
   await tabs.getByRole('link', { name: 'Draft' }).click(); await expect(page).toHaveURL(/\/complaint$/); await expect(tabs.getByRole('link', { name: 'Draft' })).toHaveAttribute('aria-current', 'page');
   await tabs.getByRole('link', { name: 'Area' }).click(); await expect(page.getByText('3 results loaded')).toBeVisible();
   // After results the search folds to one line, so the map starts high on the page.

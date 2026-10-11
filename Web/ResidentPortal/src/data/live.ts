@@ -82,7 +82,7 @@ export const askSchema = z.object({
   fallback: z.boolean(), disclaimer: z.string().max(2000),
 });
 export type AskAnswer = z.infer<typeof askSchema>;
-export type AskErrorKind = 'invalid' | 'cap' | 'busy' | 'unavailable' | 'network' | 'malformed' | 'configuration';
+export type AskErrorKind = 'invalid' | 'cap' | 'busy' | 'unavailable' | 'model' | 'registry' | 'timeout' | 'network' | 'malformed' | 'configuration';
 export class AskError extends Error {
   constructor(public kind: AskErrorKind, public retryable: boolean) { super(kind); }
 }
@@ -91,7 +91,7 @@ export function askError(status: number, body: unknown): AskError {
   const code = typeof error?.code === 'string' ? error.code : null;
   if (status === 400) return new AskError('invalid', false);
   if (status === 429) return code === 'daily_cap_reached' ? new AskError('cap', false) : new AskError('busy', true);
-  if (status === 503) return new AskError('unavailable', error?.retryable === true);
+  if (status === 503) return new AskError(code === 'model_unavailable' ? 'model' : code === 'upstream_unavailable' ? 'registry' : 'unavailable', error?.retryable === true);
   return new AskError('unavailable', status >= 500);
 }
 

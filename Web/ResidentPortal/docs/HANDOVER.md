@@ -85,3 +85,7 @@ Prompt 43b deployment verified on 11 October 2026: live requests and aggregate r
 hosted phone page and inspector display confirmed at 1; the sole test request was then
 reset to 0 (daily counter retained). No sub-agents, staging, commit or push in 43b.
 See `AWS/docs/inspection-requests-report.md`, Deploy (43b), for the complete lead report.
+
+## Local UI polish — prompt 45 (11 October 2026)
+
+Full monospaced identity is quieter; evidence opens earlier; secondary checks, provenance, request breakdowns, explanations and written drafting expand explicitly. Phone search folds after successful confirmation. One phone Request action opens and focuses the native form while clearing the sticky action bar. Shared tokens and existing client/dedupe/count behavior remain. See `../../../App/docs/screens/phase-9/demo-ui-polish-report.md`. Hosted portal unchanged; all work local, unstaged and uncommitted. User asked to wrap up quickly; review the documented verification limits before further work.

@@ -183,19 +183,21 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
       throw new DataError('configuration');
     },
     // POST /ask: one request, never retried automatically. Rejects with AskError.
-    async ask(question: string, kilnId: string | null, signal?: AbortSignal): Promise<AskAnswer> {
+    async ask(question: string, kilnId: string | null, signal?: AbortSignal, center?: Search['center']): Promise<AskAnswer> {
       let base: URL;
       try { base = new URL(cfg.base); } catch { throw new AskError('configuration', false); }
       if (cfg.mode !== 'live' || base.protocol !== 'https:' || base.username || base.password || base.search || base.hash) throw new AskError('configuration', false);
       const trimmed = question.trim();
       if (!trimmed || trimmed.length > 500) throw new AskError('invalid', false);
+      if (center && !validateSearch({ center, radius_m: 1000 })) throw new AskError('invalid', false);
       const controller = new AbortController();
       const abort = () => controller.abort();
       signal?.addEventListener('abort', abort, { once: true });
-      const timer = setTimeout(abort, 35000); // The server budget is 28 s.
+      let timedOut = false;
+      const timer = setTimeout(() => { timedOut = true; abort(); }, 35000); // The server budget is 28 s.
       try {
         const res = await fetcher(`${base.href.replace(/\/$/, '')}/ask`, { method: 'POST', signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer',
-          headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ question: trimmed, ...(kilnId ? { kiln_id: kilnId } : {}) }) });
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ question: trimmed, ...(kilnId ? { kiln_id: kilnId } : {}), ...(center ? { lat: center[1], lon: center[0] } : {}) }) });
         let body: unknown = null;
         try { body = await readJSON(res); } catch { /* Error bodies may be empty or non-JSON. */ }
         if (!res.ok) throw askError(res.status, body);
@@ -204,6 +206,7 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
         return answer.data;
       } catch (e) {
         if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (timedOut) throw new AskError('timeout', true);
         if (e instanceof AskError) throw e;
         throw new AskError('network', true);
       } finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }

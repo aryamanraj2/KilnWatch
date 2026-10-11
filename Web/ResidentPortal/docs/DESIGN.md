@@ -52,3 +52,11 @@ Up to 600 px wide the portal follows the iOS app's structure. Tablet and desktop
 ## Inspection requests (prompt 43, 11 October 2026)
 
 The record places a neutral Resident requests card before evidence, with an ink primary **Request an inspection** action. On phones the sticky action bar links to this card; Ask remains secondary. Native concern checkboxes and distance-band radio controls have 44 px rows. Send is disabled until at least one concern is selected. The privacy line explains the random browser code and excluded personal details. Confirmation, unverified count and already-requested date use neutral ink and tabular figures. Positive counts also appear in area records. The existing written draft/export remains secondary as **Prepare a written request**. English and Hindi copy use `t()` throughout; fixture requests carry a sample/no-send notice. No status or design-token changes.
+
+## Summary-first polish (prompt 45, 11 October 2026)
+
+This addition supersedes the earlier At a glance and request-before-evidence defaults. Record identity is full, small and monospaced; provisional status and unverified type precede evidence. The leading flag stays visible, with remaining checks and rule sources in named native disclosures. Model context, population source/date and anonymous request breakdowns also expand explicitly. Exposure precedes requests. Desktop retains its evidence/sidebar workspace.
+
+Phone search folds after a successful confirmed result; Edit and errors retain the full form. The request action appears once in the phone action bar; opening the form clears that bar, focuses the first concern, and leaves Send above the tabs. Desktop uses the request card action. Confirmation retains View your request, neutral fresh counts and browser dedupe. Written drafting/export and deterministic explanations remain secondary disclosures.
+
+Small press feedback and local disclosure fades are allowed for this phase. Reduced Motion removes them. Navigation and grouped map controls may use restrained translucency with a solid fallback; content and forms remain solid. Existing fonts, palette, corner/spacing tokens, provider attribution, explicit search and no automatic map flights remain binding.

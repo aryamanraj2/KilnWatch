@@ -10,6 +10,7 @@ struct RuleDistanceBar: View {
     var color: Color = .flagged
 
     @State private var appeared = false
+    @State private var sourcesExpanded = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(AppModel.self) private var model
 
@@ -21,10 +22,9 @@ struct RuleDistanceBar: View {
                 guard visible, !appeared else { return }
                 withAnimation(Motion.layout.animation(reduceMotion: reduceMotion)) { appeared = true }
             }
-            .accessibilityRepresentation {
-                Text(accessibilityText)
-                    .accessibilityAction(named: "Show rule \(violation.ruleId)") { showSource() }
-            }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(accessibilityText)
+            .accessibilityAction(named: "Show rule \(violation.ruleId)") { showSource() }
     }
 
     private var content: some View {
@@ -47,8 +47,11 @@ struct RuleDistanceBar: View {
                     .foregroundStyle(.ink)
             }
             ThresholdWarning(verification: check?.verification)
-            Text(violation.source.isEmpty ? "Source unavailable" : violation.source)
-                .font(.footnote).foregroundStyle(.inkSecondary)
+            DisclosureGroup("Rule source", isExpanded: $sourcesExpanded) {
+                Text(violation.source.isEmpty ? "Source unavailable" : violation.source)
+                    .font(.footnote).foregroundStyle(.inkSecondary).padding(.top, Space.xs)
+            }.font(.footnote).tint(.inkSecondary)
+                .animation(Motion.layout.animation(reduceMotion: reduceMotion), value: sourcesExpanded)
             if let check, check.status != .withinThreshold {
                 Text("Supplied check: \(check.status.label). Flag and check differ; inspect on site.")
                     .font(.footnote).foregroundStyle(.inkSecondary)
