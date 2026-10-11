@@ -401,7 +401,9 @@ Malformed IDs or other detail query keys return **400** `invalid_id`.
 - API Gateway stage throttling: public routes 10 requests/s with a burst of 20; other
   routes 50/s, burst 100. Throttled requests get the gateway's own 429 body. No Lambda
   reserved concurrency.
-- CORS is still the placeholder origin; the portal step sets the real `frontend_origin`.
+- CORS allows `http://localhost:5173` (local development) and the hosted portal origin
+  (`https://<portal-distribution>.cloudfront.net`), plus `frontend_origin` when set. Methods
+  and headers are unchanged.
 
 
 ## Phase 3 iOS public configuration and presentation (2026-10-10)
@@ -504,13 +506,14 @@ returns the gateway's own body, `{"message":"Too Many Requests"}`, with **no `er
 the client should slow down and retry. `daily_cap_reached` has `error.code` and should not
 be retried today.
 
-**Daily cap:** **50 questions per UTC day across all callers**, counted atomically in one
+**Daily cap:** **100 questions per UTC day across all callers** (raised for the hackathon demo;
+back to 50 afterwards), counted atomically in one
 on-demand DynamoDB item before any model call. A question counts once, even if it later fails
 or is regenerated. A gateway timeout (504 with the gateway's body) is possible only if the
 Lambda exceeds its 28 s budget.
 
-**Cost at the cap (Nova 2 Lite):** typical $0.0027 × 50 × 30 ≈ $4, worst case
-$0.0312 × 50 × 30 ≈ $47 per 30 days.
+**Cost at the cap (Nova 2 Lite):** typical $0.0027 × 100 × 30 ≈ $8, worst case
+$0.0312 × 100 × 30 ≈ $94 per 30 days.
 
 ## R1: rules, exposure and rule checks (live, 2026-10-10)
 

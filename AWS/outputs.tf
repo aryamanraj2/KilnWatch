@@ -64,3 +64,16 @@ output "registry_reader_secret_arn" { value = aws_secretsmanager_secret.registry
 output "registry_admin_secret_arn" { value = aws_db_instance.main.master_user_secret[0].secret_arn }
 output "registry_runner_id" { value = var.create_registry_runner ? aws_instance.registry_runner[0].id : null }
 output "cognito_issuer" { value = "https://${aws_cognito_user_pool.main.endpoint}" }
+
+output "portal_url" {
+  value     = var.enable_portal_hosting ? "https://${aws_cloudfront_distribution.portal[0].domain_name}" : null
+  sensitive = true
+}
+output "portal_bucket" {
+  value     = one(aws_s3_bucket.portal[*].id)
+  sensitive = true
+}
+output "portal_distribution_id" {
+  value     = one(aws_cloudfront_distribution.portal[*].id)
+  sensitive = true
+}

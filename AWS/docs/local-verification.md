@@ -1340,3 +1340,31 @@ verdicts per UTC day**. Replays return fresh PUT URLs for every photo and re-upl
 replaces the same object. A cached outcome can take 60 seconds to appear. Resets need
 the runner and a fresh operator go. Successful real verdict/photo behavior is left
 for prompt 22, as required; this step deliberately committed no verdict.
+
+## Portal hosting (37) — live (2026-10-11)
+
+The resident portal is hosted as a private S3 bucket in the main account, served only by a
+CloudFront distribution with an OAC in the second account (`aws.cdn`), gated by
+`enable_portal_hosting`. A CloudFront Function (viewer request) rewrites extensionless paths to
+`/index.html`; there is no custom error page, so a missing asset stays a 403, never HTML. The
+managed `Managed-CachingOptimized` and `Managed-SecurityHeadersPolicy` policies apply. API CORS
+now allows `http://localhost:5173`, `frontend_origin` when set, and the portal origin.
+
+- Preflight: prompts 36/36b/36c present, `npm run build` passed, and the second-account profile
+  could read CloudFront distributions, functions and OACs.
+- One targeted plan and apply: 8 added (bucket, public access block, ownership, SSE, policy,
+  OAC, function, distribution) and 1 in-place change (API CORS `allow_origins`), 0 destroyed.
+- Upload: 5 `assets/*` with `public, max-age=31536000, immutable` and 4 root files with
+  `no-cache`, correct content types, first upload (no invalidation).
+- Live checks on the hosted HTTPS origin: area search near 28.7306, 77.7759 returned real kilns;
+  `/kilns/<ref>` direct load and refresh showed C-HAB-800 497 m against 800 m, 4,225 people and
+  before/after images with attribution; at 393 px the tab bar shows and `/ask` loads on refresh;
+  `/assets/nope.js` returned 403 XML; direct S3 returned 403; HTTP redirects to HTTPS; HSTS,
+  nosniff and frame options are present; CORS echoes the portal origin and localhost and
+  not an unlisted origin; no console errors. Two live `POST /ask` from the hosted site: both
+  200 with `fallback=false`.
+- Provider lock unchanged. Outputs live only in the ignored `.local/portal/outputs.json`.
+
+Open limits: the Ask cap (100 a day) and route cap are shared with anyone who finds the site,
+so share the link only for the demo. No custom domain. No CSP yet. Rollback needs a go:
+`enable_portal_hosting = false` and one targeted apply.

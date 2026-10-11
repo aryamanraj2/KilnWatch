@@ -258,3 +258,9 @@ variable "route_daily_cap" {
     error_message = "route_daily_cap must be a positive integer."
   }
 }
+
+variable "enable_portal_hosting" {
+  description = "Resident portal hosting: private S3 bucket in the main account plus a CloudFront distribution (OAC) in the second account via aws.cdn. Adds the portal origin to API CORS."
+  type        = bool
+  default     = false
+}

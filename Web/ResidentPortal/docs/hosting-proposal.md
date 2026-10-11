@@ -1,44 +1,44 @@
-# AWS Amplify hosting proposal — not activated
+# Resident portal hosting
 
-Intended hosting remains AWS Amplify. No Site was registered, no infrastructure was changed, and no deployment or automatic-build connection was made.
+**Hosted: S3 (main account, private) + CloudFront (second account, OAC).** Live since prompt 37 (2026-10-11).
 
-The AWS teammate should review the following monorepo build configuration after the runtime/contract decisions are final. It assumes the repository root is the Amplify build root and the app root is `Web/ResidentPortal`:
+The main account still can't create CloudFront, so the portal reuses the evidence CDN pattern from `AWS/bridge.tf`. Everything is in `AWS/portal.tf`, behind `enable_portal_hosting` (default `false`):
 
-```yaml
-version: 1
-applications:
-  - appRoot: Web/ResidentPortal
-    frontend:
-      phases:
-        preBuild:
-          commands:
-            - nvm install 24.21.0
-            - nvm use 24.21.0
-            - npm ci
-        build:
-          commands:
-            - npm run build
-      artifacts:
-        baseDirectory: dist
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - node_modules/**/*
+- a private bucket in the main account (`bucket_prefix = "<project>-portal-"`) with all public access blocked, SSE-S3, ownership enforced and versioning off. Its policy allows `s3:GetObject` only to the portal distribution, through an `AWS:SourceArn` condition;
+- in the second account (`aws.cdn` provider), an OAC, a CloudFront Function and the distribution. The distribution uses `redirect-to-https`, GET/HEAD only, compression, `PriceClass_200` and the default certificate, with the managed `Managed-CachingOptimized` and `Managed-SecurityHeadersPolicy` policies;
+- the SPA rewrite: a viewer-request function sends any path without a file extension (`/kilns/<id>`, `/rules/<id>`, `/ask`, `/about`, `/privacy`, `/complaint`) to `/index.html`. There is no custom error page, so a missing `/assets/*.js` stays a 403 from S3 and never turns into HTML;
+- API CORS (`AWS/api.tf`): `http://localhost:5173`, `frontend_origin` when set, and `https://<portal-distribution>.cloudfront.net`.
+
+Outputs `portal_url`, `portal_bucket` and `portal_distribution_id` are sensitive. Keep them only in the ignored `.local/portal/outputs.json`, never in git.
+
+## Deploy
+
+Build config lives in the ignored `Web/ResidentPortal/.env.production.local`. It sets `VITE_DATA_MODE=live`, the public API base URL and the evidence image host, and never holds credentials. The built JavaScript contains the API URL, as any public web app must; `dist/` is ignored.
+
+```sh
+cd Web/ResidentPortal
+npm run build
+
+# Hashed assets: cache for a year. Everything else: revalidate.
+aws s3 sync dist/assets s3://<portal-bucket>/assets --profile kilnwatch --delete \
+  --cache-control "public, max-age=31536000, immutable"
+aws s3 sync dist s3://<portal-bucket> --profile kilnwatch --delete --exclude "assets/*" \
+  --cache-control "no-cache"
+
+# Only when re-uploading over an existing build:
+aws cloudfront create-invalidation --profile <cdn-profile> \
+  --distribution-id <portal-distribution-id> --paths "/*"
 ```
 
-Set the Amplify monorepo app-root variable consistently. Confirm runtime availability in the actual build image rather than assuming the local runtime exists there. Keep the lockfile install and the app-local `dist` directory; never publish the repository root, `.runtime`, `.cache`, tests, private `.local` data, or model artifacts.
+## Roll back (needs a go)
 
-Preview environments should explicitly set `VITE_DATA_MODE=fixture`. Only an authorized R2/R4 production environment receives the approved public API prefix and exact image-host list. No inspector token, AWS key, secret, or private endpoint belongs in Vite variables. The current R1 HTML uses `noindex,nofollow`; keep prototypes out of indexing and revisit public record metadata only after publication approval.
+1. Empty the bucket: `aws s3 rm s3://<portal-bucket> --recursive --profile kilnwatch`. The bucket has no `force_destroy`.
+2. Set `enable_portal_hosting = false` in the ignored `AWS/terraform.tfvars`.
+3. Run one targeted plan and apply over the `portal.tf` resources and `aws_apigatewayv2_api.http`. Expect the portal resources destroyed and 1 in-place CORS change back to localhost (plus `frontend_origin` if set). CloudFront disables the distribution before deleting it, which takes several minutes.
 
-Hosting needs the API's `frontend_origin` set to the exact hosted origin (one targeted apply, needs a go).
+## Open limits
 
-Configure SPA rewrites only for actual frontend routes (`/`, `/area`, `/kilns/<id>`, `/rules/<id>`, `/ask`, `/complaint`, `/about`, `/privacy`). Missing `/assets/*.js`, styles, and images must remain 404s; a broad HTML fallback for missing JavaScript is incorrect. Verify direct-link refresh and missing assets on the hosted environment.
-
-Proposed production header policy, to be reviewed against actual origins: HTTPS/HSTS after domain validation, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, restrictive `frame-ancestors`, and a CSP covering self-hosted scripts/styles, approved `connect-src`/`img-src`, and no object embedding. Current React style attributes for the map/comparator need an explicit compatible style policy. Do not declare a CSP that breaks these controls or simply allow every origin. No remote fonts or workers are used in R1; later MapLibre sources/worker policy require review. Geolocation should be limited to the site's own secure context.
-
-Source maps are disabled in the local production build. Test source-map and caching behavior against actual hosted responses. Personal locations, drafts, and complaint content must never enter deployment metadata, page URLs, analytics, or server logs beyond the deliberately agreed public search request.
-
-R4 proof: hosted HTTPS, direct links/refresh, correct asset MIME/404 behavior, anonymous publication boundary, real API/evidence loading, exact origins/headers, opt-in location, both-language exports, and incremental cost/quotas. A hosted fixture preview does not prove a released public registry or live resident assistant.
-
-References for the AWS teammate: [Amplify monorepos](https://docs.aws.amazon.com/amplify/latest/userguide/monorepo-configuration.html), [rewrites](https://docs.aws.amazon.com/amplify/latest/userguide/redirects.html), [headers](https://docs.aws.amazon.com/amplify/latest/userguide/custom-headers.html). This proposal has not been deployed or validated against an Amplify build image.
+- The Ask cap (100 a day) and the route cap are shared with anyone who finds the site, so share the link only for the demo.
+- There is no custom domain; it uses the default `*.cloudfront.net` certificate.
+- There is no CSP yet. The managed security headers policy sends HSTS, `nosniff`, `X-Frame-Options`, `Referrer-Policy` and XSS protection. A CSP must cover self-hosted scripts and styles, the API and evidence hosts in `connect-src`/`img-src`, and the React style attributes the map and comparator use, without allowing every origin.
+- Source maps are disabled in the production build. Personal locations, drafts and complaint content must never enter deployment metadata, URLs or logs.
