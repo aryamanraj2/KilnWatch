@@ -6,13 +6,27 @@
 
 ### From satellite evidence to a field inspection.
 
+**Turning IIT Gandhinagar's brick-kiln detection research into a closed-loop application.**
+
 **An inspector app. A resident portal. One shared kiln registry.**
 
 Built for the **WeMakeDevs × AWS Bharat Builds Tour — Environmental Hacks**.
 
-[Product](#the-product) · [AWS architecture](#aws-architecture) · [Agents](#three-agent-roles-with-bounded-authority) · [Model](#the-model-and-what-its-results-mean) · [Demo](#a-three-minute-demo) · [Evidence](#evidence-for-a-technical-review)
+[Research foundation](#from-research-to-a-closed-loop-application) · [Product](#the-product) · [AWS architecture](#aws-architecture) · [Agents](#three-agent-roles-with-bounded-authority) · [Model](#the-model-and-what-its-results-mean) · [Demo](#a-three-minute-demo) · [Evidence](#evidence-for-a-technical-review)
 
 </div>
+
+---
+
+## From research to a closed-loop application
+
+**KilnWatch's central goal is to turn research into a usable inspection workflow.** Its research foundation is [SentinelKilnDB (NeurIPS 2025 Datasets & Benchmarks)](https://openreview.net/pdf?id=efGzsxVSEC), developed by researchers at **IIT Gandhinagar's Sustainability Lab**, with a collaborator from **IIIT Surat**. The work provides a large, hand-validated brick-kiln dataset and detection benchmarks using freely available Sentinel-2 imagery. [Research project and authors](https://sustainability-lab.github.io/sentinelkilndb/).
+
+We build on that foundation by connecting detection to evidence, measured siting checks, resident questions and requests, inspector routes, and a recorded field verdict—all through a shared AWS backend, native iOS app and web portal.
+
+**Detect → examine evidence → prioritise → inspect → record the outcome → inform the next review.**
+
+This is the operational loop KilnWatch aims to close. The prototype captures human outcomes in the registry; feeding those outcomes into model retraining remains future work. Our contribution is the application and its integration around the research. The model section separately identifies the supplied benchmark results and the checks performed on this implementation.
 
 ---
 
