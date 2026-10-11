@@ -1105,3 +1105,238 @@ validator `pass` on the first answer, no fallback.
 
 **Log privacy:** both log groups hold counts and latencies only; no kiln IDs, coordinates,
 districts or question text.
+
+# V1: verdicts (39) — 2026-10-11
+
+**Current status: live after prompt 39b.** Both targeted applies and all authorized
+checks passed; see the completed deployment entry below. The initial stop is kept
+as historical evidence.
+
+## Initial preparation (before prompt 39b)
+
+**Prepared and verified locally; stopped before AWS writes. Not deployed.**
+Prompt 39 authorizes only new verdict resources, the API Lambda code update and
+stage settings. Source inspection found two prerequisites beyond that allowlist:
+`aws_vpc_endpoint.secrets` does not permit the new verdict secret, and the runner's
+existing policy permits PutSecretValue only for the reader secret. The endpoint
+must permit verdict GetSecretValue and runner-only PutSecretValue; runner IAM must
+permit writing that secret. An execution-role policy alone cannot bypass the
+[Secrets Manager endpoint policy](https://docs.aws.amazon.com/secretsmanager/latest/userguide/vpc-endpoint-overview.html).
+Neither existing resource was edited by this lane. A read-only Terraform state pull
+also failed with no valid credentials for the approved profile (credential refresh
+requires the user's terminal). Live policy read-back was therefore not completed;
+the permission blocker is based on source inspection, not a claimed live audit.
+
+## Changes
+
+- Migration 003: verdict history, UTC-day counter, NOLOGIN writer role and exact
+  reader column grants. Runtime login provisioning generates the password in memory,
+  writes only the new secret and commits the role afterwards, like reader bootstrap.
+- `verdicts/handler.py` and `store.py`: no auth, unknown/duplicate-key rejection,
+  full IDs, timestamp/coordinate/byte/photo limits, transaction-wide daily cap 30,
+  UUID/body idempotency, late-device-time ordering and private PUT URLs (900 seconds,
+  image/jpeg). Logs contain only photo count, outcome and latency. Signing failures
+  roll back the transaction; cleanup failures cannot expose connection exceptions.
+- Public `include=inspected` for both list shapes and detail. The default SQL and
+  response stay flagged-only, with no inspection key. Opt-in uses only the three
+  reader-permitted verdict columns; its public projection exposes outcome/time only.
+  Flagged/reset records have null inspection. Equal recorded times apply in serialized
+  transaction order; the opt-in read selects the matching current outcome on a tie.
+- Operator reset helper and CLI requiring `--kiln` and `--confirm`, retaining history.
+  New gated Terraform resources (default disabled) and POST stage throttle 1/s, burst 2.
+  The only edit to existing `api.tf` adds this route to the tight-throttle list.
+- Verdict packaging script and API package rebuild. Contract/runbook updated to say
+  prepared, not live, because deployment stopped. No iOS source changes. Existing
+  unrelated working/staged changes were preserved; no staging, commits or pushes.
+
+## Verification
+
+| Check | Result |
+|---|---|
+| Baseline suite | 153 run: 143 pass, 10 opt-in PostGIS skips |
+| Final standard suite | 176 run: 160 pass, 16 opt-in PostGIS skips |
+| Full suite with disposable local PostGIS | **176 run, 176 pass, 0 skipped** |
+| Validation, handler, operator and inspection tests | 23 new tests, including 6 actual database tests |
+| Concurrent identical UUID | 1 insert, 4 replays, day count 1 |
+| Concurrent new UUIDs near cap | Total day count 30; 6 excess requests rejected |
+| Late verdict | Stored in history; newer status retained |
+| Unknown kiln and conflicting replay | 404/409, counter unchanged |
+| Rolled-back store + reset | Candidate-row checksum unchanged; verdicts and days empty |
+| Migration replay and privileges | Applied twice locally; writer table/column grants exact; reader denied note/photos/verdict ID |
+| Public default against original HEAD | 6 responses byte-for-byte equal across list, near, detail, paging and errors |
+| Opt-in read | All three shapes work using the reader role; private verdict fields excluded; reset is null |
+| Packaging | Both ZIPs: isolated imports, syntax, contents and RDS CA trust parse pass |
+| Terraform | Format check and validate pass, 0 diagnostics |
+| Provider lock | Unchanged against HEAD and working diff |
+| Identifier leak scan | 0 private matches across lane files and all other existing changed/untracked files against local/config identifiers |
+
+The opt-in suite exposed an existing assessor-test fixture with missing rule-check
+fields. Only that synthetic fixture was updated to the current serializer contract;
+assessment production behavior was not changed. Existing raster/NumPy deprecation
+warnings and a legacy image-file resource warning remain in private test logs.
+The broad leak scan initially matched the public AWS CA-distribution host as if it
+were a private RDS host. The expanded scan also matched existing public AWS-managed
+policy and standard service-integration constants. These verified public constants
+were excluded, yielding 0 private matches. The lane-only diff whitespace check passes; an existing trailing blank line
+in unrelated `workflow.tf` was preserved. Plans, diagnostic logs and scan fingerprints
+stay under `.local/v1/`.
+
+## Artifacts
+
+SHA-256 (artifact content only, no deployment identifiers):
+
+- Verdict ZIP: `be4cca0ec91cedf37cf2e979109d4ad2dc80668bd983b2a2e05e8733f63f1461`.
+- API ZIP: `2b571ca6c7d563341019996cc39ca55c2b348f1dbb4245c840a047cb66c1beeb`.
+
+## Not run / required next go
+
+- No RDS migration, verdict login or secret provisioning; no runner SSM commands.
+- No targeted plan or apply was created/executed; no `v1.tfplan` exists. The authorized
+  single plan/apply was not consumed on a deployment that cannot access its secret.
+- No live CodeSha256 comparison, POST probes, public reads or candidate checksum proof.
+- No successful live verdict, reset, destroy, auth/sign-in change, CORS/CDN edit,
+  provider-lock edit, Ask/route code edit or live Ask/route call.
+
+Continuation needs refreshed credentials plus explicit scope for the existing
+Secrets Manager endpoint policy and runner secret-write permission, with a reviewed
+order for empty-secret creation and runner provisioning. Keep the current no-login
+user decision. The first successful real verdict remains for the app in prompt 22.
+
+Open limits after eventual deployment: anyone with the deployment URL can record
+up to 30 new verdicts per day; every replay returns fresh URLs for every photo and
+re-upload overwrites its key; resets need the runner and a fresh operator go; cached
+inspection outcomes can take 60 seconds to appear.
+
+## Prompt 39b continuation — credential stop (2026-10-11)
+
+The user widened deployment authorization to two targeted applies and the endpoint /
+runner secret-write prerequisites. `bridge.tf` now conditionally includes the verdict
+secret in endpoint GetSecretValue and runner-only PutSecretValue resources, plus a
+verdict-only PutSecretValue statement on the runner policy. Existing comments,
+descriptions and deleted example files were preserved. The ignored tfvars enables
+verdicts for the authorized plans; no infrastructure changes have been applied.
+
+The local SDK initially lacked its login-provider dependency; that was installed
+only in the ignored integration environment. The actual approved-profile check then
+returned LoginRefreshRequired. Terraform also failed while refreshing its cached
+login credentials. As required by prompt 39b, cloud work stopped immediately.
+
+- Plan A: attempted, failed before a saved plan; no resource-change summary exists.
+- Apply A: not run.
+- Runner migration/login/rolled-back live DB test: not run.
+- Plan B / Apply B: not run.
+- Live code-hash and HTTP checks: not run.
+- AWS writes: 0. No staging, commits, iOS edits or provider-lock changes.
+
+The user must refresh the explicitly approved profile in their terminal with
+`aws login --profile kilnwatch` before continuation. Do not substitute another
+profile or initiate sign-in from the agent. Package hashes and completed local
+verification remain as reported in V1 above.
+
+## Prompt 39b completed deployment — live (2026-10-11)
+
+The refreshed approved profile was verified against the deployed main-account
+identity without printing identifiers. The authorization in prompt 39b covered the
+existing endpoint / runner policy changes and the two sequential applies. Other
+sessions' comment/description edits and the deleted examples were preserved.
+
+### Apply A
+
+Saved plan: `.local/v1/v1-a.tfplan`. Reviewed managed actions were exactly **1 add,
+2 in-place changes, 0 destroy**:
+
+- Add the empty `aws_secretsmanager_secret.verdicts[0]`.
+- Update only the policy field of `aws_vpc_endpoint.secrets`: include the verdict
+  secret in GetSecretValue resources and in the existing runner-only PutSecretValue
+  statement, retaining its principal condition.
+- Update only the policy field of `aws_iam_role_policy.registry_runner[0]`: add
+  PutSecretValue on the verdict secret only, gated by enable_verdicts.
+
+The saved plan was applied successfully. Both live policies were read back and
+checked before runner provisioning. No other managed resources changed.
+
+### Runner migration, login and rollback proof
+
+SSM applied migration 003 through the existing transactional/checksummed migrator,
+then replayed migrations with no checksum mismatch. The new tables initially had
+zero rows. Bootstrap created `kilnwatch_verdicts`, granted only the NOLOGIN writer
+role, and populated only the new Secrets Manager secret. Its password stayed in
+memory and Secrets Manager; no password was written to a file or command.
+An in-memory wrapper around the secret PUT captured the generated credential for
+immediate TLS login verification, so runner GetSecretValue on the verdict secret
+was unnecessary and was not granted.
+
+Read-only checks proved exact writer table/column privileges, exact reader columns,
+no elevated login/role attributes, and only the writer role membership. As the actual
+verdict login, one transaction exercised insert, day cap increment, status/review
+apply, replay without a second increment, and operator reset retaining history.
+It was then **rolled back**. All 39 candidates remained flagged/pending; verdicts
+and verdict_days had zero rows.
+
+Candidate-row SHA-256 before migration, after rollback and after HTTP probes:
+`43ec96dff92dbe1cf7c42e9c13a08f94ca96beb58651536476ad1eb8b4b538cf`
+(equal in all three checks). The checksum covers complete candidate rows, including
+assessment data, with a consistent UTC session.
+
+### Apply B
+
+Saved plan: `.local/v1/v1-b.tfplan`. Reviewed managed actions were exactly **7 add,
+2 in-place changes, 0 destroy**:
+
+- Add verdict Lambda, role, inline policy, log group, integration, public route and
+  Lambda invocation permission.
+- Update only API Lambda source_code_hash (plus computed last_modified).
+- Update only stage route_settings to add POST /verdicts at 1/s, burst 2.
+
+Existing route settings matched the before-plan values exactly. The route has
+AuthorizationType NONE and no authorizer. Both planned package hashes matched the
+ZIPs before apply. The saved plan was applied successfully; both functions report
+Active / Successful and their live CodeSha256 values equal the ZIP SHA-256 values:
+
+| Artifact | Live and local SHA-256 |
+|---|---|
+| Verdict ZIP | `be4cca0ec91cedf37cf2e979109d4ad2dc80668bd983b2a2e05e8733f63f1461` |
+| API ZIP | `2b571ca6c7d563341019996cc39ca55c2b348f1dbb4245c840a047cb66c1beeb` |
+
+### Live checks (no successful verdict)
+
+| Probe | Result |
+|---|---|
+| POST bad body | 400 invalid_request |
+| POST random unknown full kiln ID, matching UUID key | 404 not_found |
+| POST mismatched UUID key | 400 invalid_request |
+| Public Hapur default list | 200, 39 rows, no inspection key; response body byte-for-byte equal before/after B |
+| Public Hapur list, include=inspected | 200, 39 rows, every inspection null |
+| Public include=bogus | 400 |
+| Cache header, both valid public list reads | public, max-age=60 |
+| Live route / stage read-back | No authorizer; 1 request/s, burst 2 |
+| Post-probe runner read | Same checksum, 39 flagged/pending; verdicts=0 and verdict_days=0 |
+
+No POST targeted a real kiln. No successful live verdict or photo upload was sent.
+The unknown-ID 404 did not consume the daily cap. Ask and route were not called.
+The initial rolled-back reset was the only reset; no committed reset occurred.
+Temporary runner work folders were removed and the uploaded operator archive was
+cleaned up (0 active keys under its dedicated temporary import prefix). The runner
+remains available for future explicitly approved resets.
+
+### Verification and limits
+
+The standard AWS suite was rerun: **176 run, 160 pass, 16 opt-in PostGIS skips**.
+The earlier full disposable PostGIS suite remains **176 pass, 0 skipped**; this
+continuation additionally proved migration/grants and rollback on actual RDS.
+Contract and runbook now say live; demo sign-in remains deferred by the user.
+
+Identifier scan: 0 private matches across this lane and all other existing changed /
+untracked files, checked against local output, plan, SSM and configuration values.
+The public AWS certificate host, AWS-managed policies and standard service-integration
+constants are excluded as verified public constants. Provider lock remains unchanged;
+other sessions' comments/descriptions and deleted examples were preserved. No staging,
+commits, iOS changes, extra endpoints, CORS/CDN changes, auth implementation, untargeted
+apply or destroy occurred. Saved plans, apply logs, SSM requests/results and HTTP bodies
+stay in `.local/v1/`; no deployment identifiers appear in this report.
+
+Open limits: **anyone with the deployment URL can record a verdict within 30 new
+verdicts per UTC day**. Replays return fresh PUT URLs for every photo and re-upload
+replaces the same object. A cached outcome can take 60 seconds to appear. Resets need
+the runner and a fresh operator go. Successful real verdict/photo behavior is left
+for prompt 22, as required; this step deliberately committed no verdict.

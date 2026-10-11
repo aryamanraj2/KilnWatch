@@ -83,6 +83,12 @@ final class AppModel {
     private var detailRecords: [String: Kiln] = [:]
     private var detailRefreshing: Set<String> = []
     private(set) var kilns: [String: Kiln]
+    private var preparingOutbox: Task<VerdictOutbox, any Error>?
+    private var outbox: VerdictOutbox?
+    private(set) var verdictEntries: [VerdictOutbox.Entry] = []
+    private(set) var recordedVerdicts: [Verdict] = []
+    var verdictError: String?
+    private var flushingVerdicts = false
     private var verdictOverrides: [String: KilnStatus] = [:]
     private(set) var routeState: TodayRouteState = .loading
     private(set) var routeActive = false
@@ -134,12 +140,17 @@ final class AppModel {
             configuredPublic = KilnWatchAPI(baseURL: url, session: KilnWatchAPI.publicReadSession())
         }
         #if DEBUG
-        if !useFixtures, let scenario = DemoOptions.string("publicDemo") ?? (DemoOptions.string("askDemo") != nil || DemoOptions.string("rulesDemo") != nil || DemoOptions.string("planDemo") != nil ? "loaded" : nil) {
+        if !useFixtures, let scenario = DemoOptions.string("publicDemo") ?? (DemoOptions.string("askDemo") != nil || DemoOptions.string("rulesDemo") != nil || DemoOptions.string("planDemo") != nil || DemoOptions.string("verdictDemo") != nil ? "loaded" : nil) {
             configuredPublic = PublicDemo.api(scenario: scenario)
             isPublicDemo = true
         } else { isPublicDemo = false }
         #else
         isPublicDemo = false
+        #endif
+        #if DEBUG
+        configuredPublic?.verdictHTTPStatus = { photo, code in
+            VerdictDiagnostics.record(photo: photo, code: code)
+        }
         #endif
         ask = AskConversation(api: configuredPublic)
         askConnectivity = AskConnectivity(observing: configuredPublic != nil && !isPublicDemo)
@@ -165,6 +176,7 @@ final class AppModel {
         let planDistrict = district
         planner = configuredPublic.map { RoutePlanner(api: $0, district: planDistrict, cache: routeCache) }
         if let id = DemoOptions.string("open") { open(kiln: id) }
+        showAllKilns = DemoOptions.bool("allKilns")
         shownRule = DemoOptions.string("rule").map(RuleReference.catalog)
     }
 
@@ -172,7 +184,69 @@ final class AppModel {
     func usesIllustrativeEvidence(for kiln: Kiln) -> Bool {
         !usesPublicRegistry && api == nil && Fixtures.kilns.contains(kiln)
     }
-    func status(for kiln: Kiln) -> KilnStatus { verdictOverrides[kiln.kilnId] ?? kiln.status }
+    func status(for kiln: Kiln) -> KilnStatus {
+        if let sent = recordedVerdicts.last(where: { $0.kilnId == kiln.kilnId }) { return KilnStatus(rawValue: sent.outcome.rawValue) }
+        return verdictOverrides[kiln.kilnId] ?? kiln.status
+    }
+    func pendingVerdict(_ id: String) -> VerdictOutbox.Entry? { verdictEntries.last { $0.verdict.kilnId == id } }
+    var waitingVerdictLine: String? {
+        verdictEntries.isEmpty ? nil : "\(verdictEntries.count) verdict\(verdictEntries.count == 1 ? "" : "s") waiting to sync"
+    }
+    func recordedLine(_ kiln: Kiln) -> String? {
+        if recordedVerdicts.contains(where: { $0.kilnId == kiln.kilnId }) { return "Recorded · syncing" }
+        guard let inspection = kiln.inspection else { return nil }
+        var format = Date.FormatStyle.dateTime.day().month(.abbreviated).locale(Locale(identifier: "en_IN"))
+        format.timeZone = TimeZone(identifier: "Asia/Kolkata")!
+        let date = inspection.recordedAt.formatted(format)
+        return "Recorded on site · \(date)"
+    }
+    private func prepareOutbox() async {
+        guard usesPublicRegistry, outbox == nil else { return }
+        let directory = URL.kilnWatchStore.appending(path: isPublicDemo ? "DebugVerdictOutbox-\(UUID().uuidString)" : "Outbox")
+        let preparation = preparingOutbox ?? Task { try await Self.makeOutbox(directory) }
+        preparingOutbox = preparation
+        defer { preparingOutbox = nil }
+        do { outbox = try await preparation.value; await readOutbox() }
+        catch { verdictError = "Saved verdicts could not be opened. Verdict recording is unavailable." }
+    }
+    @concurrent private static func makeOutbox(_ directory: URL) async throws -> VerdictOutbox { try VerdictOutbox(directory: directory) }
+    private func readOutbox() async {
+        guard let outbox else { return }
+        verdictEntries = await outbox.pending
+        recordedVerdicts = await outbox.recorded
+    }
+    func enqueueVerdict(_ verdict: Verdict, photos: [Photo.ID: Data]) async -> Bool {
+        guard usesPublicRegistry else { recordVerdict(KilnStatus(rawValue: verdict.outcome.rawValue), for: verdict.kilnId); return true }
+        await prepareOutbox()
+        guard let outbox else { return false }
+        do {
+            try await outbox.enqueue(verdict, photos: photos)
+            await readOutbox()
+            return true
+        } catch { verdictError = "The verdict could not be saved on this phone. Try again."; return false }
+    }
+    func flushVerdicts() async {
+        guard !flushingVerdicts, let outbox, let publicAPI else { return }
+        flushingVerdicts = true
+        defer { flushingVerdicts = false }
+        let delivered = await outbox.flush(using: publicAPI)
+        await readOutbox()
+        for verdict in delivered {
+            // Exactly one detail refresh per successful delivery, including cache-lag responses.
+            if let record = try? await publicAPI.publicKiln(id: verdict.kilnId, includeInspected: true), record.kilnId == verdict.kilnId {
+                detailRecords[record.kilnId] = record
+                kilns[record.kilnId] = record
+                detailStates[record.kilnId] = .loaded
+                try? await outbox.reconcile(record)
+            }
+        }
+        await readOutbox()
+    }
+    func discardVerdict(_ id: UUID) async {
+        do { try await outbox?.discard(id); await readOutbox() }
+        catch { verdictError = "The rejected verdict could not be discarded. Try again." }
+    }
+
     func stopNumber(for id: String) -> Int? { stops.first { $0.kilnId == id }?.order }
     func recordVerdict(_ status: KilnStatus, for id: String) {
         guard !usesPublicRegistry, kilns[id] != nil else { return }
@@ -183,8 +257,10 @@ final class AppModel {
     func isRefreshingDetail(_ id: String) -> Bool { detailRefreshing.contains(id) }
 
     func loadData() async {
+        await prepareOutbox()
         if usesPublicRegistry { await loadSavedPlan(); await loadRegistry() }
         else { await loadRoute() }
+        await flushVerdicts()
     }
 
     /// Disk only: launch shows the saved plan, if any, and never sends a plan request.
@@ -228,9 +304,11 @@ final class AppModel {
         if DemoOptions.string("publicDemo") == "loading" { return }
         #endif
         guard let result = await publicRead(state: { registryState = $0 }, operation: { () async throws(APIError) -> [Kiln] in
-            try await publicAPI.publicKilns(district: district)
+            try await publicAPI.publicKilns(district: district, includeInspected: true)
         }) else { return }
         kilns = Dictionary(result.map { ($0.kilnId, $0) }, uniquingKeysWith: { _, new in new })
+        for record in result where detailRecords[record.kilnId] != nil { detailRecords[record.kilnId] = record }
+        if let outbox { for record in result { try? await outbox.reconcile(record) }; await readOutbox() }
         registryState = result.isEmpty ? .empty : .loaded
         didLoadRegistry = true
     }
@@ -242,11 +320,12 @@ final class AppModel {
         detailStates[id] = .loading
         defer { detailRefreshing.remove(id) }
         guard let record = await publicRead(state: { detailStates[id] = $0 }, operation: { () async throws(APIError) -> Kiln in
-            try await publicAPI.publicKiln(id: id)
+            try await publicAPI.publicKiln(id: id, includeInspected: true)
         }) else { return }
         guard record.kilnId == id else { detailStates[id] = .failure; return }
         detailRecords[id] = record
         detailStates[id] = .loaded
+        if let outbox { try? await outbox.reconcile(record); await readOutbox() }
     }
 
     /// One bounded automatic backoff for throttling; view tasks own cancellation.
@@ -398,6 +477,7 @@ final class AppModel {
 }
 
 struct RootView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(AppModel.self) private var model
 
     var body: some View {
@@ -409,12 +489,21 @@ struct RootView: View {
                 SignInView().transition(.opacity)
             }
         }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await model.flushVerdicts() } }
+        }
+        .onChange(of: model.askConnectivity.isOffline) { old, offline in
+            if old && !offline { Task { await model.flushVerdicts() } }
+        }
         .environment(\.openURL, OpenURLAction { model.handle($0) })
         .sheet(item: $model.shownRule) { RuleSheet(reference: $0) }
         .alert("Use kiln location?", isPresented: Binding(get: { model.maps.confirmation != nil }, set: { if !$0 { model.maps.cancel() } })) {
             Button("Open Maps") { model.maps.openPending() }
             Button("Cancel", role: .cancel) { model.maps.cancel() }
         } message: { Text(model.maps.confirmation ?? "") }
+        .alert("Verdict storage", isPresented: Binding(get: { model.verdictError != nil }, set: { if !$0 { model.verdictError = nil } })) {
+            Button("Close", role: .cancel) { model.verdictError = nil }
+        } message: { Text(model.verdictError ?? "") }
         .alert("Maps unavailable", isPresented: Binding(get: { model.maps.error != nil }, set: { if !$0 { model.maps.error = nil } })) {
             Button("Close", role: .cancel) { model.maps.error = nil }
         } message: { Text(model.maps.error ?? "") }

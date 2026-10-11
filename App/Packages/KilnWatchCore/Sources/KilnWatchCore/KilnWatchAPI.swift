@@ -1,6 +1,8 @@
 import Foundation
 
 public enum APIError: Error {
+    case unsafeUploadURL
+    case invalidReceipt
     case invalidPagination
     /// No HTTP response: offline, timeout, TLS, cancelled.
     case transport(any Error)
@@ -16,7 +18,7 @@ public enum APIError: Error {
         switch self {
         case .transport, .token: true
         case .status(let code, _): code >= 500 || [401, 408, 429].contains(code)
-        case .decoding, .invalidPagination: false
+        case .decoding, .invalidPagination, .unsafeUploadURL, .invalidReceipt: false
         }
     }
 }
@@ -25,6 +27,8 @@ public enum APIError: Error {
 public struct KilnWatchAPI: Sendable {
     public var baseURL: URL
     public var session: URLSession
+    /// Optional count-only diagnostic. Never includes a URL, body, or photo metadata.
+    public var verdictHTTPStatus: (@Sendable (_ isPhoto: Bool, _ status: Int) -> Void)?
     /// Returns a Cognito JWT, refreshing it if needed.
     public var token: @Sendable () async throws -> String
 
@@ -55,20 +59,24 @@ public struct KilnWatchAPI: Sendable {
     }
 
     /// Reads every public district page, with the same cursor safety as inspector reads.
-    public func publicKilns(district: String) async throws(APIError) -> [Kiln] {
-        try await list(path: "public/kilns", query: [URLQueryItem(name: "district", value: district)], authorized: false)
+    public func publicKilns(district: String, includeInspected: Bool = false) async throws(APIError) -> [Kiln] {
+        try await list(path: "public/kilns", query: [URLQueryItem(name: "district", value: district)] + inspectedQuery(includeInspected), authorized: false)
     }
 
     /// Nearby public results may include distance_m, which the kiln decoder safely ignores.
-    public func publicKilns(latitude: Double, longitude: Double, radiusM: Double) async throws(APIError) -> [Kiln] {
+    public func publicKilns(latitude: Double, longitude: Double, radiusM: Double, includeInspected: Bool = false) async throws(APIError) -> [Kiln] {
         let query = [URLQueryItem(name: "lat", value: String(latitude)),
                      URLQueryItem(name: "lon", value: String(longitude)),
-                     URLQueryItem(name: "radius_m", value: String(radiusM))]
+                     URLQueryItem(name: "radius_m", value: String(radiusM))] + inspectedQuery(includeInspected)
         return try await send(URLRequest(url: baseURL.appending(path: "public/kilns").appending(queryItems: query)), as: KilnList.self, authorized: false).kilns
     }
 
-    public func publicKiln(id: String) async throws(APIError) -> Kiln {
-        try await send(URLRequest(url: baseURL.appending(path: "public/kilns").appending(path: id)), as: Kiln.self, authorized: false)
+    public func publicKiln(id: String, includeInspected: Bool = false) async throws(APIError) -> Kiln {
+        try await send(URLRequest(url: baseURL.appending(path: "public/kilns").appending(path: id).appending(queryItems: inspectedQuery(includeInspected))), as: Kiln.self, authorized: false)
+    }
+
+    private func inspectedQuery(_ include: Bool) -> [URLQueryItem] {
+        include ? [URLQueryItem(name: "include", value: "inspected")] : []
     }
 
     private func list(path: String, query: [URLQueryItem], authorized: Bool) async throws(APIError) -> [Kiln] {
@@ -108,15 +116,22 @@ public struct KilnWatchAPI: Sendable {
         } catch {
             preconditionFailure("Only a NaN coordinate fails to encode, and VerdictOutbox.enqueue rejects those first: \(error)")
         }
-        return try await send(request, as: VerdictReceipt.self)
+        return try await send(request, as: VerdictReceipt.self, authorized: false)
     }
 
     /// PUTs a JPEG to a presigned S3 URL from a `VerdictReceipt`. No bearer token: S3 rejects two auth schemes.
     public func upload(_ jpeg: Data, to url: URL) async throws(APIError) {
+        guard Self.isAllowedUploadURL(url) else { throw .unsafeUploadURL }
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
         _ = try await perform(request, body: jpeg)
+    }
+
+    public static func isAllowedUploadURL(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https", let host = url.host?.lowercased(),
+              url.user == nil, url.password == nil, url.port == nil || url.port == 443 else { return false }
+        return host == "amazonaws.com" || host.hasSuffix(".amazonaws.com")
     }
 
     private func send<T: Decodable>(_ request: URLRequest, as type: T.Type, authorized: Bool = true) async throws(APIError) -> T {
@@ -154,6 +169,8 @@ public struct KilnWatchAPI: Sendable {
             throw .transport(error)
         }
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if request.httpMethod == "PUT" { verdictHTTPStatus?(true, code) }
+        else if request.httpMethod == "POST", request.url?.path == baseURL.appending(path: "verdicts").path { verdictHTTPStatus?(false, code) }
         guard (200..<300).contains(code) else { throw .status(code, body: data) }
         return data
     }

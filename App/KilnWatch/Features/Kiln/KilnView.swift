@@ -13,9 +13,12 @@ struct KilnView: View {
                     KilnDetailView(id: id, kiln: kiln)
                 } else {
                     ScrollView {
-                        RegistryStateView(state: model.detailStates[id] ?? .loading, district: model.district,
-                                          retrying: model.isRefreshingDetail(id)) {
-                            await model.loadDetail(id, force: true)
+                        VStack(alignment: .leading, spacing: Space.s) {
+                            PendingVerdictView(kilnId: id).padding(.horizontal, Space.margin)
+                            RegistryStateView(state: model.detailStates[id] ?? .loading, district: model.district,
+                                              retrying: model.isRefreshingDetail(id)) {
+                                await model.loadDetail(id, force: true)
+                            }
                         }
                     }
                     .background(.canvas)
@@ -88,11 +91,6 @@ private struct KilnDetailView: View {
                 section("Check on site", id: "checks") {
                     SiteChecklist(kiln: kiln, sheet: model.stops.first { $0.kilnId == id }?.sheet).card()
                 }
-                } else {
-                    Text("Sign-in coming soon. Inspection actions aren't available yet.")
-                        .font(.footnote)
-                        .foregroundStyle(.inkSecondary)
-                        .id("checks")
                 }
                 Button {
                     model.askAboutKiln(kiln.kilnId)
@@ -120,7 +118,7 @@ private struct KilnDetailView: View {
         .scrollPosition($scroll)
         .background(.canvas)
         .navigationBarTitleDisplayMode(.inline)
-        .safeAreaBar(edge: .bottom) { if isFixture { actions } }
+        .safeAreaBar(edge: .bottom) { actions }
         .sheet(isPresented: $showVerdict) { VerdictSheet(kilnId: id) }
         #if DEBUG
         .task { await debugAutoplay() }
@@ -136,7 +134,7 @@ private struct KilnDetailView: View {
             if reduceMotion { scroll.scrollTo(id: target, anchor: .top) }
             else { withAnimation(Motion.layout.animation(reduceMotion: false)) { scroll.scrollTo(id: target, anchor: .top) } }
         }
-        if isFixture, defaults.bool(forKey: "verdict") {
+        if defaults.bool(forKey: "verdict") {
             try? await Task.sleep(for: .seconds(1))
             showVerdict = true
         }
@@ -162,7 +160,7 @@ private struct KilnDetailView: View {
             Text(typeLine)
                 .font(.subheadline)
                 .foregroundStyle(.inkSecondary)
-            StatusBadge(status: model.status(for: kiln), detailed: true)
+            VerdictStatusView(kiln: kiln)
                 .padding(.top, Space.xxs)
             if !isFixture {
                 Text("Model score \(kiln.typeConfidence.formatted(.number.precision(.fractionLength(2))))")
@@ -208,7 +206,7 @@ private struct KilnDetailView: View {
             .buttonStyle(.secondary)
         Button("Record verdict") { showVerdict = true }
             .buttonStyle(.primary)
-            .disabled(model.isLoading)
+            .disabled(model.isLoading || model.pendingVerdict(id) != nil)
     }
 
     private func section<Content: View>(_ title: String, id: String, @ViewBuilder content: () -> Content) -> some View {

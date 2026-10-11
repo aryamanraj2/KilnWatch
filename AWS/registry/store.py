@@ -1,6 +1,7 @@
 """Parameterized PostGIS import/read queries. DB-API connection owned by caller."""
 import json
 from contextlib import closing
+from datetime import timezone
 from .contract import RULE_KEYS, assessment_patches, canonical, digest, serialize
 
 
@@ -72,7 +73,7 @@ READ = '''SELECT c.kiln_id,c.status,c.review_state,c.assessment,c.first_seen,c.l
 FROM kilnwatch.candidates c JOIN LATERAL
 (SELECT payload,observation_id,footprint FROM kilnwatch.observations WHERE kiln_id=c.kiln_id
  ORDER BY acquired_at DESC,observation_id LIMIT 1) o ON true'''
-# Public reads hard-code the flagged-only policy in SQL, never as a caller-supplied parameter.
+# Default public reads hard-code flagged-only in SQL; inspected reads explicitly opt in.
 PUBLIC = " WHERE c.status='flagged'"
 # ponytail: geography cast skips the gist index; fine at this scale, add a geography index or ST_DWithin on geometry with a bbox prefilter if it grows past tens of thousands.
 POINT = 'ST_SetSRID(ST_MakePoint(%s::float8,%s::float8),4326)::geography'
@@ -86,14 +87,24 @@ class Registry:
     def __init__(self, connection):
         self.connection = connection
 
-    def _records(self, clause, args, extra='', extra_args=()):
+    def _records(self, clause, args, extra='', extra_args=(), include_inspected=False):
         with closing(self.connection.cursor()) as cur:
-            cur.execute(READ.format(extra=extra) + clause, tuple(extra_args) + tuple(args))
+            sql = READ.format(extra=extra + (',v.outcome,v.recorded_at' if include_inspected else ''))
+            if include_inspected:
+                sql += ''' LEFT JOIN LATERAL (SELECT outcome,recorded_at FROM kilnwatch.verdicts
+ WHERE kiln_id=c.kiln_id ORDER BY recorded_at DESC,(outcome=c.status) DESC LIMIT 1) v ON true'''
+            cur.execute(sql + clause, tuple(extra_args) + tuple(args))
             rows = cur.fetchall()
             result = []
             for kiln_id,status,review,assessment,first,last,payload,key,*more in rows:
                 if isinstance(payload,str): payload=json.loads(payload)
                 if isinstance(assessment,str): assessment=json.loads(assessment)
+                inspection = None
+                if include_inspected:
+                    outcome, recorded_at = more[-2:]
+                    more = more[:-2]
+                    if status != 'flagged' and outcome is not None:
+                        inspection = {'outcome': outcome, 'recorded_at': recorded_at.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z')}
                 if more: payload['distance_m']=int(more[0])
                 payload['first_seen']=first.isoformat().replace('+00:00','Z')
                 payload['last_seen']=last.isoformat().replace('+00:00','Z')
@@ -103,7 +114,9 @@ class Registry:
                     if isinstance(meta,str): meta=json.loads(meta)
                     payload['evidence'][side+'_metadata']=meta
                     payload['evidence'][side]=meta.get('published_url')
-                result.append(serialize(payload,status,review,assessment))
+                record = serialize(payload,status,review,assessment)
+                if include_inspected: record['inspection'] = inspection
+                result.append(record)
             return result
 
     def list(self, district, status=None, cursor='', limit=100):
@@ -115,15 +128,22 @@ class Registry:
         rows = self._records(' WHERE c.kiln_id=%s AND c.district=%s', (kiln_id,district))
         return rows[0] if rows else None
 
-    def public_near(self, lat, lon, radius_m, limit=50):
+    def public_near(self, lat, lon, radius_m, limit=50, include_inspected=False):
         # CEIL keeps distance_m within radius_m and 0 only when the point touches or lies inside the footprint.
-        rows = self._records(PUBLIC+' AND ST_DWithin(o.footprint::geography,'+POINT+',%s::float8) ORDER BY distance_m,c.kiln_id LIMIT %s',
-                             (lon,lat,radius_m,limit), ',CEIL(ST_Distance(o.footprint::geography,'+POINT+'))::int AS distance_m', (lon,lat))
+        rows = self._records((' WHERE true' if include_inspected else PUBLIC)+' AND ST_DWithin(o.footprint::geography,'+POINT+',%s::float8) ORDER BY distance_m,c.kiln_id LIMIT %s',
+                             (lon,lat,radius_m,limit), ',CEIL(ST_Distance(o.footprint::geography,'+POINT+'))::int AS distance_m', (lon,lat), include_inspected=include_inspected)
         return {'kilns': rows, 'next_cursor': None}
 
-    def public_list(self, district, cursor='', limit=100):
-        return page(self._records(PUBLIC+' AND c.district=%s AND c.kiln_id>%s ORDER BY c.kiln_id LIMIT %s', (district,cursor,limit+1)), limit)
+    def public_list(self, district, cursor='', limit=100, include_inspected=False):
+        return page(self._records((' WHERE true' if include_inspected else PUBLIC)+' AND c.district=%s AND c.kiln_id>%s ORDER BY c.kiln_id LIMIT %s', (district,cursor,limit+1), include_inspected=include_inspected), limit)
 
-    def public_detail(self, kiln_id):
-        rows = self._records(PUBLIC+' AND c.kiln_id=%s', (kiln_id,))
+    def public_detail(self, kiln_id, include_inspected=False):
+        rows = self._records((' WHERE true' if include_inspected else PUBLIC)+' AND c.kiln_id=%s', (kiln_id,), include_inspected=include_inspected)
         return rows[0] if rows else None
+
+
+def reset_verdict(connection, kiln_id):
+    """Operator-only reset; caller owns transaction. Verdict history is retained."""
+    with closing(connection.cursor()) as cur:
+        cur.execute("UPDATE kilnwatch.candidates SET status='flagged',review_state='pending' WHERE kiln_id=%s", (kiln_id,))
+        if cur.rowcount != 1: raise ValueError('Kiln not found; nothing reset.')

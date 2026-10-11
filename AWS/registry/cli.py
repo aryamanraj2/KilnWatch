@@ -1,13 +1,13 @@
-"""python -m registry.cli {validate,import,migrate,validate-assessment,apply-assessment};
-writes require explicit import/migrate/apply-assessment."""
+"""Registry validation, import, migration, assessment and operator reset.
+Resets require --kiln and --confirm plus a fresh operator go."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
-from .contract import assessment_patches, convert, serialize
+from .contract import ID, assessment_patches, convert, serialize
 from .evidence import attach
-from .store import apply_assessments, persist
+from .store import apply_assessments, persist, reset_verdict
 from .db import connect_from_env
 
 
@@ -42,15 +42,28 @@ def migrate(connection):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['validate','import','migrate','validate-assessment','apply-assessment'])
+    parser.add_argument('command',choices=['validate','import','migrate','validate-assessment','apply-assessment','reset-verdict'])
     parser.add_argument('--detections',type=Path)
     parser.add_argument('--district')
     parser.add_argument('--evidence',type=Path)
     parser.add_argument('--publication-receipt',type=Path)
     parser.add_argument('--preview',type=Path)
     parser.add_argument('--assessment',type=Path,help='rules engine output (python -m rules.cli assess)')
+    parser.add_argument('--kiln')
+    parser.add_argument('--confirm', action='store_true')
     args=parser.parse_args()
     try:
+        if args.command=='reset-verdict':
+            if not args.confirm or not args.kiln or not ID.fullmatch(args.kiln):
+                raise ValueError('--kiln and --confirm required; obtain operator approval each time')
+            connection=connect_from_env()
+            try:
+                reset_verdict(connection,args.kiln)
+                connection.commit()
+            except Exception:
+                connection.rollback(); raise
+            finally: connection.close()
+            print('{"reset":true,"history_retained":true}'); return
         if args.command=='migrate':
             connection=connect_from_env()
             try: migrate(connection)

@@ -8,7 +8,7 @@ import Observation
 
     init(observing: Bool) {
         #if DEBUG
-        isOffline = ["offline", "offlineRecovery"].contains(DemoOptions.string("askDemo") ?? "")
+        isOffline = ["offline", "offlineRecovery"].contains(DemoOptions.string("askDemo") ?? "") || DemoOptions.string("verdictDemo") == "offline"
         #endif
         guard observing else { monitor = nil; return }
         let monitor = NWPathMonitor()

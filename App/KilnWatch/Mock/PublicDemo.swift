@@ -47,6 +47,13 @@ enum PublicDemo {
     static func response(for request: URLRequest) -> (Int, Data) {
         configurations.withLock { configs in
             guard let host = request.url?.host, var config = configs[host] else { return (503, Data()) }
+            if request.url?.path == "/verdicts" {
+                switch DemoOptions.string("verdictDemo") {
+                case "rejected": return (409, Data())
+                case "cap": return (429, Data(#"{"error":{"code":"daily_cap_reached"}}"#.utf8))
+                default: return (-1, Data())
+                }
+            }
             if request.url?.path == "/ask" {
                 config.askCalls += 1; configs[host] = config
                 return AskDemo.response(scenario: config.askScenario ?? "unavailable", call: config.askCalls)

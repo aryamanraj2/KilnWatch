@@ -218,3 +218,7 @@ In live mode, Today plans a route on a tap ("Plan tomorrow in Hapur") through `P
 ## Prompt 21: demo polish — 2026-10-10
 Today gains viewport-driven framing, compact controls/banners, a scrollable carousel, passed-day guidance and an accessible rule representation; Plan again is first in the route list. Core: 77 passed; root build: zero warnings; seven stubbed screenshots; live plan/Ask POSTs: 0/0.
 See `screens/phase-5/polish-report.md`: zero confirmed leaks (one compressed-PNG pattern coincidence); close stops 3/4 still overlap and nine-pin fixture UI verification remains open. No staging/commits; stopped for orchestrator review.
+
+**Prompt 22 — verdict loop (2026-10-11):** Real geotagged photos, public no-auth verdict submission, durable outbox/retry/discard, and inspected-inclusive status presentation are implemented; no sign-in by user decision.
+Core runner: 90 tests (89 passed, one existing opt-in skip); prescribed root build: zero warnings. Six live/stub screenshots reviewed; confirmed leak counts: 0. See [verdict-loop report](screens/phase-6/verdict-loop-report.md).
+One live confirmed verdict for `KW-00c562060b40502fb4a7ed2016ce7576`: POST 201, photo PUT 200, outbox empty; public flagged count/Ask/planning now see 38 until operator reset. Route/Ask POSTs 0/0; no AWS CLI, backend/contract edits, agents, staging or commits by this lane. Stopped for orchestrator review.

@@ -17,28 +17,16 @@ The examples come from the fixtures in `Packages/KilnWatchCore/Sources/KilnWatch
 
 ## Auth
 
-Every request except the presigned photo upload carries:
+**User decision: sign-in is deferred for the demo.** The public reads, Ask and route
+planner require no login. V1 `POST /verdicts` is live (2026-10-11) as a public demo route,
+with no authorizer, no district scope and no required token. An `Authorization`
+header is ignored. See the V1 verification entry for deployment checks.
 
-```
-Authorization: Bearer <Cognito JWT>
-```
-
-The JWT comes from the Cognito user pool through the hosted UI (Phase 5). The target architecture proposes Amazon Verified Permissions (concept p.10), which is not provisioned. Integration 1 enforces read permissions in Lambda; the eventual roles are:
-
-| Principal | Allowed |
-|---|---|
-| Resident (or anonymous web) | No login. Read public fields of flagged kilns only (`/public/kilns`, Integration 2C). |
-| Inspector | Read kilns, rules and their own route. `POST /verdicts` **only for kilns in `principal.district`**. |
-| Reviewer | Approves registry changes (review console). Not used by this app. |
-| Agent | **Forbidden** from `RecordVerdict`, whatever else is true. |
-
-```cedar
-permit (principal in Role::"Inspector", action == Action::"RecordVerdict", resource)
-when { resource.district == principal.district };
-forbid (principal is Agent, action == Action::"RecordVerdict", resource);
-```
-
-Proposal: the app sends the **ID token**. The inspector's district is a custom attribute (`custom:district`), and Cognito puts custom attributes in ID tokens, not access tokens, unless a pre-token-generation trigger is added. Please confirm which token the authorizer expects.
+The existing `/kilns` and `/kilns/{id}` inspector reads still require a Cognito ID
+token and enforce inspector group/district claims. They are unchanged. Cognito
+sign-in and district-scoped verdict authorization remain deferred proposals.
+Agents can read through their existing tools; there is no verdict-writing tool,
+and there must never be one.
 
 ## Errors
 
@@ -203,53 +191,86 @@ Primary Maps handoff uses MKMapItem driving directions to `access`, or asks befo
 
 ### POST /verdicts
 
-Records an inspector's verdict. This is the only way a kiln's status changes.
+**V1 live (2026-10-11). Public for the demo, no auth.**
+Records an on-site inspector verdict and changes registry status when the device
+`recorded_at` is at least as recent as every previous verdict for that kiln. Older
+verdicts remain in history without overwriting the latest status. Equal-time
+verdicts apply in transaction order. `confirmed` means the inspector confirmed the
+siting concern on site.
 
 Headers:
 
 ```
-Authorization: Bearer <JWT>
 Content-Type: application/json
 Idempotency-Key: 6F9619FF-8B86-D011-B42D-00C04FC964FF
 ```
 
-The `Idempotency-Key` is the verdict's client-generated UUID, the same value as `id` in the body. The app retries on every reconnect, so the server **must** treat a repeat key with the same body as a replay: return the original result and don't record the verdict twice. A repeat key with a different body returns `409`. Compare UUIDs case-insensitively; iOS sends them in upper case.
+The `Idempotency-Key` is the client-generated UUID, equal to `id` in the body,
+compared case-insensitively. New IDs return **201**; the same ID and canonical body
+return **200** with fresh upload URLs; a different body returns **409**
+`idempotency_conflict`. UUID casing and JSON object order/whitespace do not change
+the canonical hash. Missing and null notes are equivalent.
 
-Request:
+Request (synthetic full kiln ID):
 
 ```json
 {
   "id": "6F9619FF-8B86-D011-B42D-00C04FC964FF",
-  "kiln_id": "KW-0412",
+  "kiln_id": "KW-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "outcome": "confirmed",
   "photos": [
     { "id": "1B4E28BA-2FA1-11D2-883F-0016D3CCA427", "latitude": 28.7158, "longitude": 77.6561,
-      "horizontal_accuracy_m": 6, "taken_at": "2026-10-10T04:12:31.204Z" }
+      "horizontal_accuracy_m": 6, "taken_at": "2026-10-11T04:12:31.204Z" }
   ],
   "note": "Chimney fixed, coal on site",
-  "recorded_at": "2026-10-10T04:13:02.881Z"
+  "recorded_at": "2026-10-11T04:13:02.881Z"
 }
 ```
 
-`outcome` is one of `confirmed` (violation confirmed), `compliant`, `not_a_kiln` or `closed` (closed or not firing). `recorded_at` is the time on the device. Verdicts can arrive hours late, so order them by `recorded_at`, not by arrival time.
+Body limit **16 KB** after base64 decoding, unknown/duplicate keys rejected.
+`id`, `kiln_id`, `outcome`, `photos` and `recorded_at` are required. `note` is optional
+or null and at most **2,000 characters**. The kiln ID must have the full `KW-` plus
+32 lowercase hex digits form and exist; unknown IDs return **404** without counting.
+Outcomes: `confirmed`, `compliant`, `not_a_kiln`, `closed` (closed or not firing).
+`recorded_at` must be an ISO timestamp with timezone, no later than now + 10 minutes;
+old offline verdicts are allowed. At most **8 photos**, unique UUIDs, finite latitude
+−90..90 and longitude −180..180, finite accuracy ≥ 0 and timezone-bearing ISO
+`taken_at`. Validation failures return **400** `invalid_request`.
 
-Response: `201` on first receipt, `200` on a replay.
+**30 new verdicts per UTC day**, atomically counted in RDS in the insert transaction.
+Replays do not count. The cap returns **429** `daily_cap_reached` (`retryable: true`).
+Database failures return **503** `registry_unavailable` (`retryable: true`). Handler
+errors have `{"error":{"code":"...","message":"...","retryable":false}}`;
+API Gateway throttling may return its own 429 body. Stage rate: 1 request/s, burst 2.
+
+Response:
 
 ```json
 {
-  "id": "6F9619FF-8B86-D011-B42D-00C04FC964FF",
+  "id": "6f9619ff-8b86-d011-b42d-00c04fc964ff",
   "photo_uploads": [
-    { "photo_id": "1B4E28BA-2FA1-11D2-883F-0016D3CCA427",
-      "upload_url": "https://kilnwatch-evidence.s3.us-west-2.amazonaws.com/verdicts/...&X-Amz-Signature=..." }
+    { "photo_id": "1b4e28ba-2fa1-11d2-883f-0016d3cca427",
+      "upload_url": "<presigned PUT URL>" }
   ]
 }
 ```
 
-`photo_uploads` holds a presigned S3 PUT URL for every photo the server has **not yet received**. A replay returns fresh URLs for any photos still missing. The app then sends `PUT <upload_url>` with `Content-Type: image/jpeg` and the JPEG bytes. That request carries **no** `Authorization` header, because S3 rejects a request that uses two auth schemes. The URL must be signed for `image/jpeg`. The app deletes its local copy only after the POST and every PUT succeed. Photos go to S3 directly because API Gateway (10 MB) and Lambda (6 MB) payload limits are too small for several full-resolution photos.
+`photo_uploads` returns a fresh presigned **PUT for every photo**, including replays.
+The Lambda cannot check arrivals because its VPC has no S3 network path. Re-upload
+replaces the same private `verdicts/<verdict_id>/<photo_id>.jpg` key. URLs expire in
+**15 minutes** and are signed for `Content-Type: image/jpeg`. Upload JPEG bytes
+directly to S3, with no Authorization header on that PUT. The app may remove its
+local photo only after POST and every PUT succeed.
+
+Anyone with the deployment URL can record a verdict within the daily cap; no
+identity or district authorization is enforced. Agents expose no verdict tool.
+Operator rehearsal reset: `registry.cli reset-verdict --kiln <full-id> --confirm`
+on the runner, requiring a fresh operator go each time. Resets restore
+`flagged` / `pending` and retain history. No live reset was run for V1.
 
 ### Agent stream (planner, "Ask")
 
-**v1 is the non-streaming `POST /ask` in "Phase 4A — Ask" below.** Streaming remains a later decision; see `docs/research/agent-streaming.md`. That document is owned by the research spike. Agents can read through their tools but cannot call `POST /verdicts` (see the Cedar `forbid` above).
+**v1 is the non-streaming `POST /ask` in "Phase 4A — Ask" below.** Streaming remains a later decision; see `docs/research/agent-streaming.md`. That document is owned by the research spike. Agents can read through their tools but have no tool for `POST /verdicts`.
 
 ## Open questions for the backend owner
 
@@ -330,13 +351,17 @@ Routes, measured rules, jobs, agents, verdicts and live app registry loading are
 
 Two `GET` routes with **no `Authorization` header**. The resident portal and the iOS
 demo use them. The inspector routes (`/kilns`, `/kilns/{id}`) are unchanged and still
-require a Cognito ID token. Present every public record as
-"Flagged by satellite · pending inspection".
+require a Cognito ID token. Present flagged records as
+"Flagged by satellite · pending inspection"; inspected records use their outcome.
 
-**Publication policy:** only `status = flagged` is public, enforced in the SQL `WHERE`
-clause of every public query (not only in Python). A kiln that a person later marks
-`not_a_kiln`, `compliant`, `closed` or `confirmed` disappears from the public API until a
-separate publication policy covers those outcomes.
+**Default publication policy:** only `status = flagged` is public, enforced in SQL.
+V1 adds an opt-in `include=inspected` on both list shapes and detail. With it, all
+candidate statuses are eligible and each record adds `inspection: {"outcome",
+"recorded_at"}` from the latest verdict, or null while flagged (including an operator
+reset). Notes, photos, verdict IDs and review internals remain private. Without
+`include`, the existing SQL filtering and serialized response remain unchanged,
+with no `inspection` key. Ask, route planning and the portal keep that default.
+This opt-in is live as of 2026-10-11.
 
 **Projection (allowlist, `registry/contract.py` `public_view`):** `kiln_id`,
 `footprint`, `type`, `type_confidence`, `detection_confidence`, `type_verification`,
@@ -349,7 +374,7 @@ existing `KilnList` / `Kiln` (`provenance` is optional; `distance_m` is ignored)
 
 ### GET /public/kilns
 
-Exactly one of two query shapes:
+Exactly one of two query shapes, optionally with `include=inspected`:
 
 | Shape | Keys | Rules | Result |
 |---|---|---|---|
@@ -361,15 +386,18 @@ Anything else is **400** `invalid_filter`: an empty query, mixed shapes, unknown
 
 ### GET /public/kilns/{kiln_id}
 
-The public detail of a flagged kiln. **404** `not_found` with an identical body whether
-the ID is unknown or the kiln is not flagged. A malformed ID or any query is 400
-`invalid_id`.
+The default public detail is flagged-only. **404** `not_found` has an identical body
+whether the ID is unknown or the kiln is not flagged. `include=inspected` opts into
+all statuses and the public `inspection` field. No other query is accepted.
+`include` accepts exactly `inspected`; any other value is **400** `invalid_filter`.
+Malformed IDs or other detail query keys return **400** `invalid_id`.
 
 ### Errors, caching, throttling
 
 - Database or secret failure: **503** `registry_unavailable`, never an empty list.
 - Successful public responses send `cache-control: public, max-age=60`; all errors send
-  `no-store`. Inspector responses stay `no-store`.
+  `no-store`. Outcomes can take up to **60 seconds** to appear through a cached read.
+  Inspector responses stay `no-store`.
 - API Gateway stage throttling: public routes 10 requests/s with a burst of 20; other
   routes 50/s, burst 100. Throttled requests get the gateway's own 429 body. No Lambda
   reserved concurrency.

@@ -6,16 +6,18 @@ struct HoldToConfirmButton: View {
     let title: String
     /// `.success` online, `.warning` when the verdict is queued offline.
     var feedback: SensoryFeedback = .success
-    let action: () -> Void
+    let action: () async -> Bool
 
     @State private var progress: CGFloat = 0
     @State private var pressing = false
     @State private var completed = false
+    @State private var saving = false
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: Space.xs) {
+            if saving { ProgressView().tint(.canvas) }
             if completed {
                 Image(systemName: "checkmark")
                     .transition(.symbolEffect(.drawOn))
@@ -78,21 +80,23 @@ struct HoldToConfirmButton: View {
     #endif
 
     private func complete() {
-        guard isEnabled, !completed else { return }
-        withAnimation(Motion.confirm.animation(reduceMotion: reduceMotion)) {
-            pressing = false
-            progress = 1
-            completed = true
+        guard isEnabled, !completed, !saving else { return }
+        saving = true
+        pressing = false
+        Task {
+            let saved = await action()
+            withAnimation(Motion.confirm.animation(reduceMotion: reduceMotion)) {
+                saving = false
+                progress = saved ? 1 : 0
+                completed = saved
+            }
         }
-        action()
     }
 }
 
 #Preview {
     VStack(spacing: Space.xl) {
-        HoldToConfirmButton(title: "Hold to submit verdict") {}
-        HoldToConfirmButton(title: "Hold to submit verdict") {}.disabled(true)
-    }
-    .padding(Space.margin)
-    .background(.canvas)
+        HoldToConfirmButton(title: "Hold to submit verdict") { true }
+        HoldToConfirmButton(title: "Hold to submit verdict") { true }.disabled(true)
+    }.padding(Space.margin).background(.canvas)
 }

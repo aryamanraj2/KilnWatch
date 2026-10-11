@@ -754,3 +754,56 @@ any excluded services under Billing → Credits.
   CloudFront disables a distribution before it can delete it, so that step takes several minutes.
 - **After the hackathon:** remove the second-account distribution and OAC (targeted, with the
   user's go) and delete the Bedrock role in that account (Phase 4A, `local-verification.md`).
+
+## V1 verdict operations (prompt 39, 2026-10-11)
+
+**Live as of 2026-10-11 (prompt 39b).** Two reviewed targeted applies completed:
+A added the empty verdict secret and changed only the existing endpoint and runner
+policies; B added the runtime/API resources and changed only the API Lambda code and
+stage. The verdict secret is now allowed in endpoint GetSecretValue, and in the
+runner-only endpoint PutSecretValue statement. Runner IAM can write that secret only
+when verdicts are enabled. No additional endpoint was created.
+
+Migration 003, login provisioning, exact grants and rolled-back store/reset checks
+passed on the SSM runner. All 39 candidate rows retain flagged/pending status and the
+same checksum; verdicts and verdict_days are empty. Both live Lambda code hashes
+match their ZIPs. The authorized invalid-body, unknown-ID and mismatched-key probes
+passed; public default bytes are unchanged and the inspected opt-in is live.
+
+Provisioning used `python -m verdicts.bootstrap`'s implementation through the runner
+check process. Its private environment supplied the administrative DB secret and
+`VERDICTS_SECRET`; the generated password was captured only in memory from the
+successful PutSecretValue for immediate login proof, never written to a local file.
+The runner needs no GetSecretValue permission on the verdict secret. Do not rerun
+bootstrap against an existing login; credential rotation requires a separate go.
+`kilnwatch_verdicts` receives only `kilnwatch_verdict_writer`; its generated password
+exists in memory and the new Secrets Manager secret only, following the reader
+bootstrap pattern. Never put a password into an SSM command or file. A secret-write
+failure rolls back login creation. If commit acknowledgement fails, inspect whether
+the login exists before retrying; never rotate blindly.
+
+For any future approved migration, capture a candidate-row checksum privately;
+afterwards verify unchanged rows and exact grants. Future approved store/reset tests
+must stay inside one transaction followed by rollback, with a matching checksum
+and empty verdict/verdict-day tables when that is the baseline. Only malformed, mismatched-key and
+unknown-kiln live POSTs are authorized by prompt 39. No successful live verdict is
+authorized. Keep SSM scripts, outputs, plans and identifiers under `.local/v1/`.
+On macOS, operator archives use `COPYFILE_DISABLE=1 tar --no-xattrs`.
+
+Rehearsal reset (runner only, **requires a fresh go every time**):
+
+```sh
+python -m registry.cli reset-verdict --kiln <full-id> --confirm
+```
+
+It restores flagged/pending and retains verdict history. The public opt-in read
+shows `inspection: null` while flagged, including after a reset. The reset helper
+owns no commit so it can be tested inside a rolled-back transaction; the CLI commits
+only after its explicit confirmation. No live reset was run in this phase.
+
+Kill switch: set `enable_verdicts = false` in ignored local configuration and perform
+a reviewed targeted plan/apply for the verdict resources, stage, Secrets Manager
+endpoint policy and runner policy, **with a new go**.
+This removes the public route and its runtime resources; review deletions and secret
+recovery before applying. It does not erase database history. Prompt 39 forbids any
+destroy in the present step, so no kill-switch apply was performed.

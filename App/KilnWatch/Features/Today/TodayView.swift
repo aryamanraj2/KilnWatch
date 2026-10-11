@@ -141,8 +141,8 @@ private struct RouteMap: View {
                     LazyVGrid(columns: [GridItem(.fixed(48)), GridItem(.fixed(48))], spacing: Space.xs) {
                         Button("Route list", systemImage: "list.number") { showList = true }.disabled(!model.hasRoute)
                         if model.usesPublicRegistry {
-                            Button("All flagged kilns", systemImage: "flag") { model.showAllKilns = true }
-                                .accessibilityHint("Shows every flagged kiln. The saved plan is kept.")
+                            Button("All kilns", systemImage: "flag") { model.showAllKilns = true }
+                                .accessibilityHint("Shows all kiln statuses. The saved plan is kept.")
                         }
                         Button(imagery ? "Standard map" : "Satellite imagery", systemImage: imagery ? "map" : "globe.asia.australia") { imagery.toggle() }
                             .sensoryFeedback(.selection, trigger: imagery)
@@ -167,6 +167,7 @@ private struct RouteMap: View {
     /// Errors and connectivity take priority; at most two banners reserve map space.
     private var banners: [(text: String, symbol: String?)] {
         var result: [(String, String?)] = []
+        if let line = model.waitingVerdictLine { result.append((line, "clock")) }
         if let message = model.planner?.failureMessage { result.append((message, "exclamationmark.circle")) }
         if model.isOffline { result.append(("Offline · showing saved route", "wifi.slash")) }
         if let notice = location.notice { result.append((notice, "location")) }
@@ -325,7 +326,7 @@ private struct StopSheetSummary: View {
     let kiln: Kiln
     @Environment(AppModel.self) private var model
     var body: some View {
-        StatusBadge(status: model.status(for: kiln), detailed: model.usesPublicRegistry)
+        VerdictStatusView(kiln: kiln)
         if stop.sheet.rulesFlagged.isEmpty {
             Text("No rule flags measured").font(.subheadline).foregroundStyle(.inkSecondary)
             if let note = kiln.assessmentNote { Text(note).font(.footnote).foregroundStyle(.inkSecondary).fixedSize(horizontal: false, vertical: true) }

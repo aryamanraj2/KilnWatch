@@ -88,10 +88,14 @@ PUBLIC_KEYS = ('kiln_id', 'footprint', 'type', 'type_confidence', 'detection_con
 PUBLIC_EVIDENCE = ('before', 'after', 'before_metadata', 'after_metadata')
 
 
-def public_view(record):
+def public_view(record, include_inspected=False):
     """Resident projection of a serialized record. Allowlist only: any new internal field stays private."""
     view = {k: record[k] for k in PUBLIC_KEYS if k in record}
     view['evidence'] = {k: record['evidence'][k] for k in PUBLIC_EVIDENCE if k in record['evidence']}
+    if include_inspected:
+        inspection = record.get('inspection')
+        view['inspection'] = ({k: inspection[k] for k in ('outcome', 'recorded_at')}
+                              if record.get('status') != 'flagged' and inspection else None)
     return view
 
 

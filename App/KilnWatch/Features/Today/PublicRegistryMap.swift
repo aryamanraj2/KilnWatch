@@ -20,14 +20,14 @@ struct PublicRegistryMap: View {
                     ForEach(mappedKilns) { kiln in
                         if kiln.footprint.polygon.count >= 3, kiln.footprint.polygon.allSatisfy(\.isValid) {
                             MapPolygon(coordinates: kiln.footprint.polygon.map(\.clLocation))
-                                .foregroundStyle(Color.flagged.opacity(0.12))
-                                .stroke(Color.flagged, lineWidth: 2)
+                                .foregroundStyle(model.status(for: kiln).color.opacity(0.12))
+                                .stroke(model.status(for: kiln).color, lineWidth: 2)
                         }
                         Annotation(kiln.kilnId, coordinate: kiln.coordinate) {
                             Button { model.open(kiln: kiln.kilnId) } label: {
-                                Image(systemName: "flag.fill")
+                                Image(systemName: model.status(for: kiln).symbol)
                                     .font(.caption2.weight(.semibold))
-                                    .foregroundStyle(.flagged)
+                                    .foregroundStyle(model.status(for: kiln).color)
                                     .frame(width: 22, height: 22)
                                     .background(.surface, in: .circle)
                                     .frame(minWidth: 44, minHeight: 44)
@@ -36,7 +36,7 @@ struct PublicRegistryMap: View {
                             .buttonStyle(.plain)
                             .matchedTransitionSource(id: kiln.kilnId, in: zoom)
                             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                            .accessibilityLabel("\(kiln.kilnId). Flagged by satellite · pending inspection")
+                            .accessibilityLabel("\(kiln.kilnId). \(model.status(for: kiln).detail)")
                             .accessibilityHint("Opens the satellite record")
                             .accessibilityIdentifier("kiln-pin-\(kiln.kilnId)")
                         }
@@ -53,6 +53,7 @@ struct PublicRegistryMap: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Space.s) {
                         Text("Today · \(model.district)").font(.title.weight(.semibold)).foregroundStyle(.ink)
+                        if let line = model.waitingVerdictLine { Label(line, systemImage: "clock").font(.footnote).foregroundStyle(.inkSecondary) }
                         DataSourceLabel(text: model.dataSourceLabel)
                         RegistryStateView(state: model.registryState, district: model.district,
                                           retrying: model.registryRefreshing) { await model.loadRegistry(force: true) }
@@ -75,8 +76,9 @@ struct PublicRegistryMap: View {
                     .buttonStyle(.plain)
                     .accessibilityHint("Opens the searchable registry")
             }
-            Text("\(model.allKilns.count) satellite-flagged candidates")
+            Text("\(model.allKilns.count) kilns · all statuses")
                 .font(.subheadline.monospacedDigit()).foregroundStyle(.inkSecondary)
+            if let line = model.waitingVerdictLine { Label(line, systemImage: "clock").font(.footnote).foregroundStyle(.inkSecondary) }
             DataSourceLabel(text: model.dataSourceLabel)
         }
         .padding(Space.m)
@@ -89,8 +91,7 @@ struct PublicRegistryMap: View {
     private var planPanel: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Space.s) {
-                StatusBadge(status: .flagged, detailed: true)
-                Text("Showing satellite-flagged kilns in \(model.district). Tap a pin to view its record.")
+                Text("Showing all kiln statuses in \(model.district). Tap a pin to view its record.")
                     .font(.subheadline).foregroundStyle(.inkSecondary)
                 if let message = model.planner?.failureMessage {
                     Label(message, systemImage: "exclamationmark.circle").font(.subheadline).foregroundStyle(.ink)

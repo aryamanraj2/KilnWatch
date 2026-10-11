@@ -21,6 +21,7 @@ public struct Kiln: Codable, Hashable, Sendable, Identifiable {
     public let exposure: Exposure?
     /// Changed only by an inspector's verdict or an approved review.
     public let status: KilnStatus
+    public let inspection: Inspection?
     public let evidence: Evidence
     /// Optional in older records; never an authorization claim.
     public let district: String?
@@ -38,6 +39,11 @@ public struct Kiln: Codable, Hashable, Sendable, Identifiable {
     }
 
     public var id: String { kilnId }
+}
+
+public struct Inspection: Codable, Hashable, Sendable {
+    public let outcome: Verdict.Outcome
+    public let recordedAt: Date
 }
 
 public struct Coordinate: Codable, Hashable, Sendable {

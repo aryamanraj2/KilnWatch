@@ -50,28 +50,33 @@ def read(registry_factory, query):
 
 
 def public(path, query, registry_factory):
-    """No-login resident read. Only flagged kilns (enforced in SQL), only allowlisted fields."""
+    """No-login resident read. Flagged-only by default (SQL); inspected outcomes require an explicit opt-in."""
+    include_inspected = query.get('include') == 'inspected'
+    if 'include' in query and not include_inspected:
+        return error(400,'invalid_filter','Include must be inspected.')
+    query = {k: v for k, v in query.items() if k != 'include'}
+    options = {'include_inspected': True} if include_inspected else {}
     def ok(body):
-        if 'kilns' in body: body={**body,'kilns':[public_view(k) for k in body['kilns']]}
+        if 'kilns' in body: body={**body,'kilns':[public_view(k, include_inspected) for k in body['kilns']]}
         return response(200,body,'public, max-age=60')
     if path!='/public/kilns':
         kiln_id=path.removeprefix('/public/kilns/')
         if not ID.fullmatch(kiln_id) or query:
             return error(400,'invalid_id','Kiln ID or query is invalid.')
         def detail(registry):
-            record=registry.public_detail(kiln_id)
-            return ok(public_view(record)) if record else error(404,'not_found','Kiln not found.')
+            record=registry.public_detail(kiln_id, **options)
+            return ok(public_view(record, include_inspected)) if record else error(404,'not_found','Kiln not found.')
         return read(registry_factory,detail)
     keys=set(query)
     if keys and keys<={'lat','lon','radius_m'} and {'lat','lon'}<=keys:
         lat,lon,radius=query['lat'],query['lon'],query.get('radius_m','2000')
         if (COORDINATE.fullmatch(lat) and COORDINATE.fullmatch(lon) and re.fullmatch(r'[0-9]{3,4}',radius)
             and -90<=float(lat)<=90 and -180<=float(lon)<=180 and 100<=int(radius)<=5000):
-            return read(registry_factory,lambda r:ok(r.public_near(float(lat),float(lon),int(radius))))
+            return read(registry_factory,lambda r:ok(r.public_near(float(lat),float(lon),int(radius), **options)))
     elif 'district' in keys and keys<={'district','cursor','limit'}:
         district,cursor,limit=query['district'],query.get('cursor',''),query.get('limit','100')
         if DISTRICT.fullmatch(district) and (not cursor or ID.fullmatch(cursor)) and re.fullmatch(r'[0-9]{1,3}',limit) and 1<=int(limit)<=200:
-            return read(registry_factory,lambda r:ok(r.public_list(district,cursor,int(limit))))
+            return read(registry_factory,lambda r:ok(r.public_list(district,cursor,int(limit), **options)))
     return error(400,'invalid_filter','Use either lat, lon and optional radius_m, or district with optional cursor and limit.')
 
 

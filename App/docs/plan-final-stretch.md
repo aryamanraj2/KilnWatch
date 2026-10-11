@@ -1,4 +1,4 @@
-# KilnWatch — final-stretch plan (2026-10-10)
+# KilnWatch — final-stretch plan (2026-10-10; current handover: `prompts/41-orchestrator-handover.md`)
 
 This maps every feature in the concept PDF (`App/docs/concept.txt`) to its current state and the next step, by owner.
 - **AWS orchestrator:** the Claude Code session. It writes the backend prompts.
@@ -27,8 +27,8 @@ Product language everywhere: "Flagged by satellite · pending inspection". Rule 
 
 | Lane | Order |
 |---|---|
-| AWS | **39** verdicts backend (`POST /verdicts`, Cognito inspector, photo uploads; needed by iOS 22) → *on hold until iOS is done:* **37** host the portal, **38** detector on AWS (ECR + CodeBuild + Fargate + Step Functions), optional **40** change triage (Agent 2) |
-| iOS | **21** polish (running) → **22** inspector sign-in + verdict sync (after 39) |
+| AWS | **39/39b** verdicts backend (**live 2026-10-11**; public `POST /verdicts`, **no sign-in by user decision**, cap 30/day, photo uploads, opt-in `include=inspected` read; needed by iOS 22) → *on hold until iOS is done:* **37** host the portal, **38** detector on AWS (ECR + CodeBuild + Fargate + Step Functions), optional **40** change triage (Agent 2) |
+| iOS | **21** polish (done) → **22** verdict sync + outcome display, no sign-in (**done 2026-10-11**; loop closed) |
 | Web | *on hold until iOS is done:* **36** live data + Ask → hosted by **37** |
 | M1: better model | ML team mate training; not blocking |
 

@@ -1,5 +1,7 @@
 import KilnWatchCore
 import SwiftUI
+import PhotosUI
+import AVFoundation
 
 /// The only way a kiln's status changes. Presented from Kiln at the large detent.
 struct VerdictSheet: View {
@@ -10,8 +12,17 @@ struct VerdictSheet: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var selection
     @State private var choice: KilnStatus?
-    @State private var photos: [SitePhoto] = [SitePhoto(asset: "sitePhoto1", time: "10:42"), SitePhoto(asset: "sitePhoto2", time: "10:44")]
+    @State private var photos: [VerdictPhoto] = []
+    @State private var location = ForegroundLocation()
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var showCamera = false
+    @State private var processingPhoto = false
+    @State private var photoNotice: String?
+    @State private var savedID: UUID?
+    @State private var submitError: String?
     @State private var note = ""
+    @FocusState private var noteFocused: Bool
     @State private var saved = false
     @Environment(\.dynamicTypeSize) private var typeSize
 
@@ -32,10 +43,14 @@ struct VerdictSheet: View {
                     VStack(alignment: .leading, spacing: Space.xs) {
                         Text("Note").eyebrow()
                         TextField("Chimney type, fuel on site, anything unusual", text: $note, axis: .vertical)
+                            .focused($noteFocused)
+                            .accessibilityIdentifier("verdict-note")
                             .lineLimit(3...6)
+                            .onChange(of: note) { _, value in note = String(String.UnicodeScalarView(value.unicodeScalars.prefix(2000))) }
                             .padding(Space.s)
                             .background(.surface, in: .inner)
                     }
+                    Text("\(note.unicodeScalars.count) / 2000 characters").font(.footnote.monospacedDigit()).foregroundStyle(.inkSecondary)
                     Text("This changes \(kilnId)'s status for everyone.")
                         .font(.footnote)
                         .foregroundStyle(.inkSecondary)
@@ -44,10 +59,15 @@ struct VerdictSheet: View {
                 .padding(.bottom, Space.xl)
                 .disabled(saved)
             }
+            .scrollDismissesKeyboard(.interactively)
             .background(.canvas)
             .navigationTitle("Record verdict")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { noteFocused = false }
+                }
                 ToolbarItem(placement: .cancellationAction) {
                     Button(saved ? "Close" : "Cancel", role: saved ? .close : .cancel) { dismiss() }
                 }
@@ -55,7 +75,33 @@ struct VerdictSheet: View {
             .safeAreaBar(edge: .bottom) { submitBar }
         }
         .presentationDetents([.large])
-        .interactiveDismissDisabled(choice != nil && !saved)
+        .interactiveDismissDisabled((choice != nil || !photos.isEmpty || !note.isEmpty) && !saved)
+        .fullScreenCover(isPresented: $showCamera) {
+            VerdictCamera { data in
+                showCamera = false
+                if let data {
+                    processingPhoto = true
+                    Task { await attach(data); processingPhoto = false }
+                }
+            }.ignoresSafeArea()
+        }
+        .task(id: selectedPhoto) {
+            guard let selectedPhoto else { return }
+            processingPhoto = true
+            defer { processingPhoto = false; self.selectedPhoto = nil }
+            do {
+                if let data = try await selectedPhoto.loadTransferable(type: Data.self) { await attach(data) }
+                else { photoNotice = "This photo could not be opened. Choose another." }
+            } catch { photoNotice = "This photo could not be opened. Choose another." }
+        }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            location.setActive(phase == .active)
+            if phase == .active { location.recenter() }
+        }
+        .onAppear { location.setActive(scenePhase == .active); if scenePhase == .active { location.recenter() } }
+        .onDisappear { location.setActive(false) }
+        .onChange(of: saved) { _, saved in if saved { Task { await model.flushVerdicts() } } }
+
         #if DEBUG
         .task {
             // `-verdictChoice confirmed` preselects a row for screenshots.
@@ -122,60 +168,103 @@ struct VerdictSheet: View {
 
     private var photoSection: some View {
         VStack(alignment: .leading, spacing: Space.xs) {
-            Text("\(photos.count) photos · geotagged").eyebrow()
+            Text("\(photos.count) photo\(photos.count == 1 ? "" : "s") · \(photos.isEmpty ? "up to 8" : "geotagged")").eyebrow()
+            if let photoNotice { Text(photoNotice).font(.footnote).foregroundStyle(.inkSecondary) }
+            if location.fix == nil {
+                Text("Location unavailable · photo can't be geotagged").font(.footnote).foregroundStyle(.inkSecondary)
+                Button("Try location again") { location.recenter() }.frame(minHeight: 44)
+            }
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: Space.s, alignment: .top)], spacing: Space.s) {
                 ForEach(photos) { photo in
                     VStack(alignment: .leading, spacing: Space.xxs) {
-                        Image(photo.asset)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(minWidth: 0, maxWidth: .infinity)
-                            .aspectRatio(1, contentMode: .fit)
-                            .clipShape(.inner)
-                            .accessibilityLabel("Site photo taken at \(photo.time)")
-                        Text(geotag(photo))
-                            .font(.caption2.monospaced())
-                            .foregroundStyle(.inkSecondary)
+                        if let image = UIImage(data: photo.jpeg) {
+                            Image(uiImage: image).resizable().scaledToFit()
+                                .frame(maxWidth: .infinity).clipShape(.inner).accessibilityLabel("Geotagged site photo")
+                        }
+                        Text(geotag(photo.record)).font(.caption2.monospaced()).foregroundStyle(.inkSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Button("Remove photo", role: .destructive) { photos.removeAll { $0.id == photo.id } }.frame(minHeight: 44)
                     }
                 }
-                if photos.count < 6 {
-                    Button(action: addPhoto) {
-                        Label("Add photo", systemImage: "camera")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.ink)
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(1, contentMode: .fit)
-                            .background(.surface2, in: .inner)
-                    }
-                    .buttonStyle(.plain)
+                if photos.count < 8 {
+                    photoButton.disabled(processingPhoto)
                 }
             }
         }
     }
 
-    private func geotag(_ photo: SitePhoto) -> String {
-        guard let c = model.kiln(kilnId)?.coordinate else { return "Location unavailable" }
-        let lat = c.latitude.formatted(.number.precision(.fractionLength(4)))
-        let lon = c.longitude.formatted(.number.precision(.fractionLength(4)))
-        return "\(lat)° N, \(lon)° E · ±6 m · \(photo.time)"
+    private var cameraAvailable: Bool {
+        #if targetEnvironment(simulator)
+        false
+        #else
+        UIImagePickerController.isSourceTypeAvailable(.camera)
+        #endif
+    }
+
+    @ViewBuilder private var photoButton: some View {
+        let label = photoButtonLabel
+        if cameraAvailable {
+            Button(action: addPhoto) { label }.buttonStyle(.plain)
+        } else {
+            PhotosPicker(selection: $selectedPhoto, matching: .images) { label }
+                .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded { location.recenter(); photoNotice = nil })
+        }
+    }
+
+    private var photoButtonLabel: VerdictPhotoButtonLabel { VerdictPhotoButtonLabel(preparing: processingPhoto) }
+
+    private func geotag(_ photo: Photo) -> String {
+        let lat = photo.latitude.formatted(.number.precision(.fractionLength(4)))
+        let lon = photo.longitude.formatted(.number.precision(.fractionLength(4)))
+        var format = Date.FormatStyle.dateTime.hour().minute()
+        format.timeZone = TimeZone(identifier: "Asia/Kolkata")!
+        let time = photo.takenAt.formatted(format)
+        return "\(lat), \(lon) · ±\(photo.horizontalAccuracyM.formatted(.number.precision(.fractionLength(0)))) m · \(time) IST"
     }
 
     private func addPhoto() {
-        let minute = 44 + photos.count * 2
-        photos.append(SitePhoto(asset: photos.count.isMultiple(of: 2) ? "sitePhoto1" : "sitePhoto2", time: "10:\(minute)"))
+        location.recenter()
+        photoNotice = nil
+        Task {
+            var allowed = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
+            if AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined { allowed = await AVCaptureDevice.requestAccess(for: .video) }
+            if allowed { showCamera = true }
+            else { photoNotice = "Camera access unavailable. Allow it in Settings to take a site photo." }
+        }
+    }
+
+    private func attach(_ data: Data) async {
+        let captureTime = Date.now
+        guard photos.count < 8, let fix = location.fix,
+              captureTime.timeIntervalSince(fix.takenAt) >= -10,
+              captureTime.timeIntervalSince(fix.takenAt) <= 120 else {
+            photoNotice = "Location unavailable · photo can't be geotagged"; return
+        }
+        guard let jpeg = await VerdictJPEG.prepare(data) else { photoNotice = "This photo could not be prepared. Choose another."; return }
+        guard photos.count < 8, !saved else { return }
+        let record = Photo(latitude: fix.latitude, longitude: fix.longitude, horizontalAccuracyM: fix.horizontalAccuracyM, takenAt: captureTime)
+        photos.append(VerdictPhoto(record: record, jpeg: jpeg))
+        photoNotice = nil
     }
 
     // MARK: Submit
 
     private var submitBar: some View {
         VStack(spacing: Space.xs) {
-            HoldToConfirmButton(title: "Hold to submit verdict", feedback: model.isOffline ? .warning : .success) {
-                guard let choice else { return }
-                model.recordVerdict(choice, for: kilnId)
+            HoldToConfirmButton(title: "Hold to submit verdict", feedback: model.askConnectivity.isOffline || model.isOffline ? .warning : .success) {
+                guard let choice, let outcome = Verdict.Outcome(rawValue: choice.rawValue) else { return false }
+                let verdict = Verdict(kilnId: kilnId, outcome: outcome, photos: photos.map(\.record), note: note)
+                guard await model.enqueueVerdict(verdict, photos: Dictionary(uniqueKeysWithValues: photos.map { ($0.id, $0.jpeg) })) else {
+                    submitError = "The verdict could not be saved on this phone. Try again."; return false
+                }
+                savedID = verdict.id
                 saved = true
                 AccessibilityNotification.Announcement(savedText).post()
+                return true
             }
-            .disabled(choice == nil)
+            .disabled(choice == nil || processingPhoto || saved)
+            if let submitError { Text(submitError).font(.footnote).foregroundStyle(.ink) }
             Text(saved ? savedText : (choice == nil ? "Choose a verdict to continue" : "Hold for one second to submit"))
                 .font(.footnote.weight(saved ? .semibold : .regular))
                 .foregroundStyle(saved ? Color.ink : Color.inkSecondary)
@@ -186,14 +275,26 @@ struct VerdictSheet: View {
     }
 
     private var savedText: String {
-        model.isOffline ? "Verdict saved · will sync when online" : "Verdict recorded"
+        guard model.usesPublicRegistry else { return "Sample verdict recorded" }
+        if let entry = model.verdictEntries.first(where: { $0.id == savedID }) {
+            return entry.rejected == true ? "Verdict rejected · \(entry.lastError ?? "Could not be accepted")" : entry.lastError ?? "Verdict saved · will sync when online"
+        }
+        return saved ? "Verdict recorded" : "Verdict saved · will sync when online"
     }
 }
 
-private struct SitePhoto: Identifiable {
-    let id = UUID()
-    let asset: String
-    let time: String
+private struct VerdictPhotoButtonLabel: View, Sendable {
+    let preparing: Bool
+    var body: some View {
+        HStack(spacing: Space.xs) {
+            Image(systemName: "camera")
+            Text(preparing ? "Preparing photo" : "Add photo")
+        }
+        .font(.subheadline.weight(.medium)).foregroundStyle(.ink)
+        .frame(maxWidth: .infinity, minHeight: 104)
+        .background(.surface2, in: .inner)
+        .contentShape(.rect)
+    }
 }
 
 extension KilnStatus {

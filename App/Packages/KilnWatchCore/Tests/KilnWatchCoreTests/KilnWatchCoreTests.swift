@@ -123,8 +123,8 @@ private func tempDirectory() -> URL {
         switch (request.httpMethod, request.url?.path) {
         case ("POST", "/v1/verdicts"):
             #expect(request.value(forHTTPHeaderField: "Idempotency-Key") == verdict.id.uuidString)
-            #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer test-token")
-            let uploads = verdict.photos.map { #"{"photo_id":"\#($0.id)","upload_url":"https://\#(request.url!.host!)/upload/\#($0.id)"}"# }
+            #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
+            let uploads = verdict.photos.map { #"{"photo_id":"\#($0.id)","upload_url":"https://amazonaws.com/upload/\#(request.url!.host!)/\#($0.id)"}"# }
             return (201, Data(#"{"id":"\#(verdict.id)","photo_uploads":[\#(uploads.joined(separator: ","))]}"#.utf8))
         case ("PUT", _):
             #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
@@ -193,7 +193,7 @@ private final class StubProtocol: URLProtocol {
     override func stopLoading() {}
 
     override func startLoading() {
-        guard let url = request.url, let handler = Stub.handlers.withLock({ $0[url.host ?? ""] }) else {
+        guard let url = request.url, let handler = Stub.handlers.withLock({ $0[url.host == "amazonaws.com" ? url.pathComponents.dropFirst(2).first ?? "" : url.host ?? ""] }) else {
             client?.urlProtocol(self, didFailWithError: URLError(.cannotFindHost))
             return
         }
@@ -601,4 +601,189 @@ private extension Data {
         _ = try await EvidenceImageData.load(from: invalid)
         Issue.record("Expected invalid image failure")
     } catch { #expect(error as? EvidenceImageError == .invalidPNG) }
+}
+
+// MARK: - Public verdict loop
+@Test func publicVerdictNeverRequestsATokenAndDecodesReceipt() async throws {
+    let verdict = Verdict(kilnId: "KW-0412", outcome: .confirmed, photos: [], note: "")
+    let stub = Stub { request in
+        #expect(request.httpMethod == "POST")
+        #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
+        #expect(request.value(forHTTPHeaderField: "Idempotency-Key") == verdict.id.uuidString)
+        return (201, Data(#"{"id":"\#(verdict.id)","photo_uploads":[]}"#.utf8))
+    }
+    var api = stub.api
+    api.token = { throw URLError(.userAuthenticationRequired) }
+    let receipt = try await api.submit(verdict)
+    #expect(receipt.id == verdict.id && receipt.photoUploads.isEmpty)
+}
+
+@Test func verdictReceiptDecodesPhotoUUIDs() throws {
+    let id = UUID(), photoID = UUID()
+    let data = Data(#"{"id":"\#(id.uuidString.lowercased())","photo_uploads":[{"photo_id":"\#(photoID.uuidString.lowercased())","upload_url":"https://amazonaws.com/upload"}]}"#.utf8)
+    let receipt = try JSONDecoder.kilnWatch.decode(VerdictReceipt.self, from: data)
+    #expect(receipt.id == id && receipt.photoUploads.first?.photoId == photoID)
+}
+
+@Test func uploadAllowlistRejectsLookalikesCredentialsAndInsecureURLs() async throws {
+    #expect(KilnWatchAPI.isAllowedUploadURL(URL(string: "https://amazonaws.com/upload")!))
+    let allowed = URL(string: "https://amazonaws.com")!.appending(path: "upload")
+    #expect(KilnWatchAPI.isAllowedUploadURL(allowed))
+    var credentials = URLComponents(string: "https://amazonaws.com/upload")!
+    credentials.user = "user"
+    for address in ["http://amazonaws.com/upload", "https://amazonaws.com.example/upload", "https://notamazonaws.com/upload", "https://amazonaws.com:8443/upload", credentials.string!] {
+        let url = URL(string: address)!
+        #expect(!KilnWatchAPI.isAllowedUploadURL(url))
+        do { try await Stub { _ in Issue.record("Unsafe upload reached transport"); return (200, Data()) }.api.upload(Data(), to: url); Issue.record("Expected unsafe URL rejection") }
+        catch { guard case .unsafeUploadURL = error else { Issue.record("Wrong error type"); continue } }
+    }
+}
+
+@Test(arguments: [201, 200]) func verdictDeliveryAndReplayLeaveOnlyAcknowledgement(code: Int) async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    let outbox = try VerdictOutbox(directory: dir)
+    let verdict = Verdict(kilnId: "KW-0412", outcome: .confirmed, photos: [], note: "")
+    try await outbox.enqueue(verdict, photos: [:])
+    let completed = await outbox.flush(using: Stub { _ in (code, Data(#"{"id":"\#(verdict.id)","photo_uploads":[]}"#.utf8)) }.api)
+    #expect(completed.map(\.id) == [verdict.id])
+    #expect(await outbox.pending.isEmpty)
+    #expect(try await VerdictOutbox(directory: dir).recorded.map(\.id) == [verdict.id])
+}
+
+@Test(arguments: [400, 404, 409]) func rejectedVerdictsStayUntilExplicitDiscard(code: Int) async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    let outbox = try VerdictOutbox(directory: dir)
+    let (verdict, photos) = makeVerdict()
+    try await outbox.enqueue(verdict, photos: photos)
+    let calls = Mutex(0)
+    let api = Stub { _ in calls.withLock { $0 += 1 }; return (code, Data("untrusted error body".utf8)) }.api
+    await outbox.flush(using: api)
+    await outbox.flush(using: api)
+    #expect(calls.withLock { $0 } == 1)
+    #expect(await outbox.pending.first?.rejected == true)
+    #expect(await outbox.pending.first?.lastError?.contains("untrusted") == false)
+    #expect(FileManager.default.fileExists(atPath: outbox.fileURL(for: verdict.photos[0], of: verdict).path))
+    try await outbox.discard(verdict.id)
+    #expect(try await VerdictOutbox(directory: dir).pending.isEmpty)
+    #expect(!FileManager.default.fileExists(atPath: outbox.fileURL(for: verdict.photos[0], of: verdict).path))
+}
+
+@Test func dailyCapDefersUntilNextUTCDayWithoutTimers() async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    let outbox = try VerdictOutbox(directory: dir)
+    let verdict = Verdict(kilnId: "KW-0412", outcome: .confirmed, photos: [], note: "")
+    try await outbox.enqueue(verdict, photos: [:])
+    let now = Date(timeIntervalSince1970: 1_791_696_000)
+    let calls = Mutex(0)
+    let api = Stub { _ in
+        let count = calls.withLock { $0 += 1; return $0 }
+        return count == 1 ? (429, Data(#"{"error":{"code":"daily_cap_reached"}}"#.utf8)) : (200, Data(#"{"id":"\#(verdict.id)","photo_uploads":[]}"#.utf8))
+    }.api
+    await outbox.flush(using: api, now: now)
+    let entry = try #require(await outbox.pending.first)
+    let retry = try #require(entry.retryAfter)
+    #expect(entry.lastError == "Verdict limit reached for today · will send after 05:30 IST")
+    #expect(retry > now && retry.timeIntervalSince(now) <= 86400)
+    await outbox.flush(using: api, now: retry.addingTimeInterval(-1))
+    #expect(calls.withLock { $0 } == 1)
+    await outbox.flush(using: api, now: retry)
+    #expect(calls.withLock { $0 } == 2)
+    #expect(await outbox.pending.isEmpty)
+}
+
+@Test(arguments: [503, -1, 429]) func temporaryFailuresRetainQueueAndSanitizeErrors(code: Int) async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    let outbox = try VerdictOutbox(directory: dir)
+    let (verdict, photos) = makeVerdict()
+    try await outbox.enqueue(verdict, photos: photos)
+    await outbox.flush(using: Stub { _ in (code, Data()) }.api)
+    let entry = try #require(await outbox.pending.first)
+    #expect(entry.id == verdict.id && entry.rejected != true && entry.retryAfter == nil)
+    #expect(entry.lastError == "Verdict waiting to sync")
+    #expect(try Data(contentsOf: outbox.fileURL(for: verdict.photos[0], of: verdict)) == photos[verdict.photos[0].id])
+}
+
+@Test(arguments: ["missing", "duplicate", "wrongID", "unsafe", "putFailure"])
+func incompletePhotoDeliveryKeepsAllLocalFiles(kind: String) async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    let outbox = try VerdictOutbox(directory: dir)
+    let (verdict, photos) = makeVerdict()
+    try await outbox.enqueue(verdict, photos: photos)
+    let api = Stub { request in
+        if request.httpMethod == "PUT" { return (503, Data()) }
+        var ids = verdict.photos.map(\.id)
+        if kind == "missing" { ids.removeLast() }
+        if kind == "duplicate" { ids[1] = ids[0] }
+        let uploads = ids.map { id in
+            let address = kind == "unsafe" ? "https://example.com/upload" : "https://amazonaws.com/upload/\(request.url!.host!)/\(id)"
+            return #"{"photo_id":"\#(id)","upload_url":"\#(address)"}"#
+        }
+        let responseID = kind == "wrongID" ? UUID() : verdict.id
+        return (201, Data(#"{"id":"\#(responseID)","photo_uploads":[\#(uploads.joined(separator: ","))]}"#.utf8))
+    }.api
+    await outbox.flush(using: api)
+    #expect(await outbox.pending.map(\.id) == [verdict.id])
+    for photo in verdict.photos { #expect(FileManager.default.fileExists(atPath: outbox.fileURL(for: photo, of: verdict).path)) }
+}
+
+@Test func pendingVerdictCannotBeDiscardedOrEnqueuedTwice() async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    let outbox = try VerdictOutbox(directory: dir)
+    let (verdict, photos) = makeVerdict()
+    try await outbox.enqueue(verdict, photos: photos)
+    do { try await outbox.enqueue(verdict, photos: photos); Issue.record("Expected duplicate rejection") } catch {}
+    do { try await outbox.discard(verdict.id); Issue.record("Expected discard rejection") } catch {}
+    #expect(await outbox.pending.count == 1)
+}
+
+@Test func inspectionAndLegacyPayloadsDecode() throws {
+    let original = try JSONEncoder.kilnWatch.encode(Fixtures.kilns[0])
+    var object = try #require(JSONSerialization.jsonObject(with: original) as? [String: Any])
+    object.removeValue(forKey: "inspection")
+    #expect(try JSONDecoder.kilnWatch.decode(Kiln.self, from: JSONSerialization.data(withJSONObject: object)).inspection == nil)
+    object["status"] = "confirmed"
+    object["inspection"] = ["outcome": "confirmed", "recorded_at": "2026-10-11T05:00:00Z"]
+    let kiln = try JSONDecoder.kilnWatch.decode(Kiln.self, from: JSONSerialization.data(withJSONObject: object))
+    #expect(kiln.inspection?.outcome == .confirmed && kiln.status == .confirmed)
+    #expect(try JSONDecoder.kilnWatch.decode(Kiln.self, from: JSONEncoder.kilnWatch.encode(kiln)).inspection == kiln.inspection)
+}
+
+@Test func inspectedOptionIsPresentOnBothListsAndDetail() async throws {
+    let near = try publicBody("near"), detail = try publicBody("detail")
+    let stub = Stub { request in
+        let items = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        #expect(items.contains(URLQueryItem(name: "include", value: "inspected")))
+        #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
+        return (200, request.url?.lastPathComponent == "kilns" ? near : detail)
+    }
+    _ = try await stub.api.publicKilns(district: "Hapur", includeInspected: true)
+    _ = try await stub.api.publicKilns(latitude: 28, longitude: 77, radiusM: 1000, includeInspected: true)
+    _ = try await stub.api.publicKiln(id: "KW-0412", includeInspected: true)
+}
+
+@Test func recordedAcknowledgementWaitsForAnAgreeingFreshRead() async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    let outbox = try VerdictOutbox(directory: dir)
+    let verdict = Verdict(kilnId: Fixtures.kilns[0].kilnId, outcome: .confirmed, photos: [], note: "", recordedAt: Date(timeIntervalSince1970: 1_791_696_000))
+    try await outbox.enqueue(verdict, photos: [:])
+    await outbox.flush(using: Stub { _ in (201, Data(#"{"id":"\#(verdict.id)","photo_uploads":[]}"#.utf8)) }.api)
+    try await outbox.reconcile(Fixtures.kilns[0])
+    #expect(await outbox.recorded.count == 1)
+    var object = try #require(JSONSerialization.jsonObject(with: JSONEncoder.kilnWatch.encode(Fixtures.kilns[0])) as? [String: Any])
+    object["status"] = "confirmed"
+    object["inspection"] = ["outcome": "confirmed", "recorded_at": "2026-10-11T08:00:00Z"]
+    let fresh = try JSONDecoder.kilnWatch.decode(Kiln.self, from: JSONSerialization.data(withJSONObject: object))
+    try await outbox.reconcile(fresh)
+    #expect(try await VerdictOutbox(directory: dir).recorded.isEmpty)
+}
+
+@Test func oldQueueErrorsAreSanitizedOnRelaunch() async throws {
+    let dir = tempDirectory(); defer { try? FileManager.default.removeItem(at: dir) }
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let verdict = Verdict(kilnId: "KW-0412", outcome: .confirmed, photos: [], note: "")
+    let body = try JSONSerialization.jsonObject(with: JSONEncoder.kilnWatch.encode(verdict))
+    try JSONSerialization.data(withJSONObject: [["verdict": body, "attempts": 1, "last_error": "untrusted legacy error"]]).write(to: dir.appending(path: "queue.json"))
+    let outbox = try VerdictOutbox(directory: dir)
+    #expect(await outbox.pending.first?.lastError == "Verdict waiting to sync")
+    #expect(!(try String(contentsOf: dir.appending(path: "queue.json"), encoding: .utf8)).contains("untrusted"))
 }

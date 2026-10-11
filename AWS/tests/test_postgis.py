@@ -176,7 +176,9 @@ class PostGISTests(unittest.TestCase):
         def body(*ids):
             return {'rules_version':'kilnwatch-rules-v1','assessed_at':'2026-10-10T06:00:00Z','inputs':{},
                     'assessments':[{'kiln_id':i,'rules_version':'kilnwatch-rules-v1','rules_assessment':'partially_evaluated',
-                                    'violations':[flag],'rules_results':[{'rule_id':'UP-RAIL-200','status':'within_threshold'}]} for i in ids]}
+                                    'violations':[flag],'rules_results':[{'rule_id':'UP-RAIL-200','check':'Distance to railway',
+                                        'status':'within_threshold','verification':'unverified',
+                                        'source':'UP siting rules (2012)','threshold_m':200,'measured_distance_m':142}]} for i in ids]}
         try:
             self.assertEqual(apply_assessments(assessor,body(kiln_id))['assessed'],1)
             apply_assessments(assessor,body(kiln_id))

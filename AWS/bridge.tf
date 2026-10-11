@@ -156,12 +156,12 @@ resource "aws_vpc_endpoint" "secrets" {
       Effect    = "Allow"
       Principal = "*"
       Action    = ["secretsmanager:GetSecretValue"]
-      Resource  = [aws_secretsmanager_secret.registry_reader.arn, aws_db_instance.main.master_user_secret[0].secret_arn]
+      Resource  = concat([aws_secretsmanager_secret.registry_reader.arn, aws_db_instance.main.master_user_secret[0].secret_arn], aws_secretsmanager_secret.verdicts[*].arn)
       }], var.create_registry_runner ? [{
       Effect    = "Allow"
       Principal = "*"
       Action    = ["secretsmanager:PutSecretValue"]
-      Resource  = [aws_secretsmanager_secret.registry_reader.arn]
+      Resource  = concat([aws_secretsmanager_secret.registry_reader.arn], aws_secretsmanager_secret.verdicts[*].arn)
       Condition = { ArnEquals = { "aws:PrincipalArn" = aws_iam_role.registry_runner[0].arn } }
     }] : [])
   })
@@ -186,11 +186,11 @@ resource "aws_iam_role_policy" "registry_runner" {
   role  = aws_iam_role.registry_runner[0].id
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement = concat([
       { Effect = "Allow", Action = "secretsmanager:GetSecretValue", Resource = aws_db_instance.main.master_user_secret[0].secret_arn },
       { Effect = "Allow", Action = "secretsmanager:PutSecretValue", Resource = aws_secretsmanager_secret.registry_reader.arn },
       { Effect = "Allow", Action = "s3:GetObject", Resource = "${aws_s3_bucket.data.arn}/imports/*" }
-    ]
+    ], var.enable_verdicts ? [{ Effect = "Allow", Action = "secretsmanager:PutSecretValue", Resource = aws_secretsmanager_secret.verdicts[0].arn }] : [])
   })
 }
 resource "aws_iam_instance_profile" "registry_runner" {

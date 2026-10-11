@@ -67,6 +67,13 @@ struct KilnsView: View {
                     }
                 }
             }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if let line = model.waitingVerdictLine {
+                    Label(line, systemImage: "clock").font(.footnote).foregroundStyle(.inkSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, Space.margin).padding(.vertical, Space.xs).background(.canvas)
+                }
+            }
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Kiln or rule ID")
             .navigationTitle("Kilns")
             .toolbar {
@@ -120,7 +127,7 @@ private struct KilnRow: View {
                     Text("\(Text(top.ruleId).monospaced()) · \(top.compactLine(for: kiln))")
                         .font(.subheadline)
                         .foregroundStyle(.ink)
-                    if model.usesPublicRegistry {
+                    if model.usesPublicRegistry && model.status(for: kiln) == .flagged {
                         Text("Siting flag · needs inspection").font(.footnote).foregroundStyle(.flagged)
                         ThresholdWarning(verification: kiln.ruleChecks?.first { $0.ruleId == top.ruleId }?.verification)
                     }
@@ -131,7 +138,7 @@ private struct KilnRow: View {
             }
             if !typeSize.isAccessibilitySize && !model.usesPublicRegistry { Spacer(minLength: Space.xs) }
             VStack(alignment: typeSize.isAccessibilitySize || model.usesPublicRegistry ? .leading : .trailing, spacing: Space.xxs) {
-                StatusBadge(status: model.status(for: kiln), detailed: model.usesPublicRegistry)
+                VerdictStatusView(kiln: kiln)
                 Text(kiln.exposure.map { model.usesPublicRegistry ? "\($0.people.grouped) modelled residents within 800 m" : "\($0.people.grouped) people · sample" } ?? "Population exposure not assessed")
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.inkSecondary)

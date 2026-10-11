@@ -1,3 +1,4 @@
+import KilnWatchCore
 import CoreLocation
 import SwiftUI
 
@@ -13,6 +14,7 @@ final class ForegroundLocation: NSObject, CLLocationManagerDelegate {
     var settingsAvailable = false
     var coordinate: CLLocationCoordinate2D?
     var fixSerial = 0
+    var fix: Photo?
 
     override init() {
         super.init()
@@ -64,10 +66,12 @@ final class ForegroundLocation: NSObject, CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let fix = locations.last, fix.horizontalAccuracy >= 0 else { return }
         let latitude = fix.coordinate.latitude, longitude = fix.coordinate.longitude
+        let accuracy = fix.horizontalAccuracy, timestamp = fix.timestamp
         let approximate = manager.accuracyAuthorization == .reducedAccuracy
         Task { @MainActor [weak self] in
             guard let self, self.active, self.requesting else { return }
             self.requesting = false
+            self.fix = Photo(latitude: latitude, longitude: longitude, horizontalAccuracyM: accuracy, takenAt: timestamp)
             self.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             self.notice = approximate ? "Approximate location · route browsing remains available" : nil
             self.fixSerial += 1
