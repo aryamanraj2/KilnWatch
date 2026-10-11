@@ -114,3 +114,33 @@ resource "aws_lambda_permission" "verdicts" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/POST/verdicts"
 }
+
+variable "enable_requests" {
+  description = "Enable public anonymous inspection requests using the existing verdicts writer."
+  type        = bool
+  default     = false
+}
+
+# Deployment pending: prompt 43 needs explicit approval for the additional invocation permission.
+resource "aws_apigatewayv2_route" "requests" {
+  count              = var.enable_requests ? 1 : 0
+  api_id             = aws_apigatewayv2_api.http.id
+  route_key          = "POST /requests"
+  target             = "integrations/${aws_apigatewayv2_integration.verdicts[0].id}"
+  authorization_type = "NONE"
+  lifecycle {
+    precondition {
+      condition     = var.enable_verdicts
+      error_message = "Inspection requests require the existing verdicts Lambda and integration."
+    }
+  }
+}
+
+resource "aws_lambda_permission" "requests" {
+  count         = var.enable_requests ? 1 : 0
+  statement_id  = "AllowRequestsApiGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.verdicts[0].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/POST/requests"
+}

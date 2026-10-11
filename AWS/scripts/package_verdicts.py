@@ -14,8 +14,8 @@ staging.mkdir(parents=True)
 subprocess.run([sys.executable, '-m', 'pip', 'install', '--platform', 'manylinux2014_x86_64',
                 '--python-version', '3.12', '--implementation', 'cp', '--only-binary=:all:',
                 '--no-compile', '--target', str(staging), '-r', str(root / 'lambda' / 'requirements.txt')], check=True)
-for package, names in [('verdicts', ('__init__.py', 'handler.py', 'store.py')),
-                       ('registry', ('__init__.py', 'db.py'))]:
+for package, names in [('verdicts', ('__init__.py', 'handler.py', 'store.py', 'requests.py')),
+                       ('registry', ('__init__.py', 'db.py', 'requests.py'))]:
     (staging / package).mkdir()
     for name in names: shutil.copy(root / package / name, staging / package / name)
 (staging / 'rds-ca.pem').write_bytes(urllib.request.urlopen(

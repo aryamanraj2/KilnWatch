@@ -1,6 +1,7 @@
 import { DataError, type Kiln, type Page, type Rule, type Search } from './model';
 import { distance, validateSearch } from './geo';
 import { askError, AskError, askSchema, liveKilnSchema, toKiln, toPage, type AskAnswer } from './live';
+import { RequestError, requestBodySchema, requestResponseSchema, zeroRequests, type RequestBody, type RequestResponse, type ResidentRequests } from './requests';
 
 export type Config = { mode: 'fixture' | 'live' | 'invalid'; base: string; imageHosts: string[]; scenario: string };
 export const config: Config = {
@@ -65,6 +66,8 @@ function appendItems(previous: Page['items'], next: Page['items']): Page['items'
   return items;
 }
 export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
+  const sampleRequests = new Map<string, RequestResponse>();
+  const sampleAggregates = new Map<string, ResidentRequests>();
   async function read(path: string, signal?: AbortSignal): Promise<unknown> {
     let base: URL;
     try { base = new URL(cfg.base); } catch { throw new DataError('configuration'); }
@@ -108,6 +111,45 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
     return import('./fixtures');
   }
   return {
+    async request(body: RequestBody, signal?: AbortSignal): Promise<RequestResponse> {
+      if (cfg.mode === 'fixture') {
+        const f = await fixtures(signal);
+        const kiln = f.kilns.find(k => k.id === body.kiln_id);
+        if (!kiln) throw new RequestError('not_found');
+        const pair = `${body.kiln_id}:${body.client_id}`;
+        const existing = sampleRequests.get(pair);
+        if (existing) return { ...existing, created: false, resident_requests: sampleAggregates.get(kiln.id)! };
+        const previous = sampleAggregates.get(kiln.id) ?? kiln.resident_requests ?? zeroRequests();
+        const aggregate = { ...previous, concerns: { ...previous.concerns }, count: previous.count + 1, within_1km: previous.within_1km + Number(body.distance_band === 'under_1km'), last_request_on: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()) };
+        for (const concern of body.concerns) aggregate.concerns[concern]++;
+        const result = { kiln_id: kiln.id, created: true, resident_requests: aggregate };
+        sampleRequests.set(pair, result); sampleAggregates.set(kiln.id, aggregate); return result;
+      }
+      let base: URL;
+      try { base = new URL(cfg.base); } catch { throw new RequestError('unavailable'); }
+      if (cfg.mode !== 'live' || base.protocol !== 'https:' || base.username || base.password || base.search || base.hash || !requestBodySchema.safeParse(body).success) throw new RequestError('invalid');
+      const controller = new AbortController();
+      const abort = () => controller.abort();
+      signal?.addEventListener('abort', abort, { once: true });
+      if (signal?.aborted) controller.abort();
+      const timer = setTimeout(abort, 15000);
+      try {
+        const res = await fetcher(`${base.href.replace(/\/$/, '')}/requests`, { method: 'POST', signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        let data: unknown = null;
+        try { data = await readJSON(res); } catch { /* Empty gateway errors are still handled by status. */ }
+        if (res.status === 404) throw new RequestError('not_found');
+        if (res.status === 429) throw new RequestError((data as { error?: { code?: string } } | null)?.error?.code === 'daily_cap_reached' ? 'cap' : 'busy');
+        if (res.status === 400) throw new RequestError('invalid');
+        if (![200, 201].includes(res.status)) throw new RequestError('unavailable');
+        const result = requestResponseSchema.safeParse(data);
+        if (!res.headers.get('content-type')?.includes('application/json') || !result.success || result.data.kiln_id !== body.kiln_id || result.data.created !== (res.status === 201)) throw new RequestError('unavailable');
+        return result.data;
+      } catch (error) {
+        if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (error instanceof RequestError) throw error;
+        throw new RequestError('unavailable');
+      } finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }
+    },
     async nearby(query: Search, cursor: string | null, signal?: AbortSignal): Promise<Page> {
       if (!validateSearch(query)) throw new DataError('malformed');
       if (cfg.mode === 'fixture') {

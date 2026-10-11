@@ -4,6 +4,19 @@ test.beforeEach(async ({ page }) => { await mockMapTiles(page); });
 import AxeBuilder from '@axe-core/playwright';
 import { mkdir, readFile } from 'node:fs/promises';
 const artifacts = process.env.KW_ARTIFACT_DIR || 'docs/screens';
+test('sample inspection request is labelled, counted and never sent', async ({ page }) => {
+  const submissions: string[] = [];
+  page.on('request', request => { if (request.method() === 'POST') submissions.push(request.url()); });
+  await page.goto('/kilns/SAMPLE-KW-001');
+  await expect(page.locator('.request-panel')).toContainText('Sample request · nothing is sent');
+  await page.locator('.request-panel').getByRole('button', { name: 'Request an inspection', exact: true }).click();
+  await page.getByLabel('Smoke or ash', { exact: true }).check();
+  await page.getByRole('button', { name: 'Send request', exact: true }).click();
+  await expect(page.locator('.request-panel')).toContainText('Your request was added. 13 residents');
+  expect(submissions).toEqual([]);
+  await page.getByRole('link', { name: 'Back to area' }).click();
+  await expect(page.locator('.result-list')).toContainText('13 inspection requests · not verified');
+});
 async function sampleSearch(page: Page) {
   await page.getByRole('button', { name: 'Pilkhuwa · sample area' }).click();
   await page.getByRole('button', { name: 'Confirm area & search' }).click();
@@ -42,7 +55,7 @@ test('English multi-record draft, personal-data boundaries, edits, download, and
   page.on('request', r => { if (!r.url().startsWith('http://127.0.0.1:5173') && !r.url().startsWith('https://tile.openstreetmap.org/') && !r.url().startsWith('data:')) unexpected.push(r.url()); });
   await page.goto('/'); await sampleSearch(page); await openFirst(page); await page.getByRole('button', { name: 'Add to inspection draft', exact: true }).click();
   await page.getByRole('link', { name: 'Back to area' }).click(); await page.getByRole('link', { name: 'SAMPLE-KW-002' }).click(); await page.getByRole('button', { name: 'Add to inspection draft', exact: true }).click();
-  await page.getByRole('button', { name: 'Prepare an inspection request', exact: true }).click(); await expect(page.getByRole('heading', { name: '2 selected' })).toBeVisible();
+  await page.getByRole('button', { name: 'Prepare a written request', exact: true }).click(); await expect(page.getByRole('heading', { name: '2 selected' })).toBeVisible();
   await page.getByLabel('Name (optional)', { exact: true }).fill('Sample Resident'); await page.getByLabel('Your own observations', { exact: true }).fill('Fictional resident observation for export testing.');
   await page.getByRole('button', { name: 'Create editable draft', exact: true }).click();
   const editor = page.getByLabel('Edit your inspection request', { exact: true }); const content = await editor.inputValue();
@@ -69,7 +82,7 @@ test('Hindi mobile journey, Devanagari coordinates, preserved language, and prin
   await page.getByRole('button', { name: 'सूची', exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   if (info.project.name === 'chromium') await page.screenshot({ path: `${artifacts}/mobile-area-hi-dark.png`, fullPage: true });
-  await page.getByRole('link', { name: 'SAMPLE-KW-001' }).click(); await expect(page.getByRole('slider')).toBeEnabled(); await page.getByRole('button', { name: 'निरीक्षण का अनुरोध तैयार करें' }).click();
+  await page.getByRole('link', { name: 'SAMPLE-KW-001' }).click(); await expect(page.getByRole('slider')).toBeEnabled(); await page.getByRole('button', { name: 'लिखित अनुरोध तैयार करें' }).click();
   await page.getByRole('button', { name: 'संपादन योग्य मसौदा बनाएँ' }).click(); const editor = page.getByLabel('अपना निरीक्षण अनुरोध संपादित करें'); await expect(editor).toHaveValue(/निरीक्षण का अनुरोध/);
   await editor.fill((await editor.inputValue()) + '\n\nकृपया जाँच करें।');
   const downloadPromise = page.waitForEvent('download'); await page.getByRole('button', { name: 'पाठ डाउनलोड करें' }).click(); const download = await downloadPromise;
@@ -121,6 +134,7 @@ test('demo opens populated, map controls preserve selection, and comparison drag
   await expect(page.getByRole('button', { name: 'Remove from draft', exact: true })).toBeVisible();
   await page.goto('/kilns/SAMPLE-KW-001');
   await expect(page.getByRole('slider', { name: 'Compare images' })).toBeEnabled();
+  await page.locator('.comparator').scrollIntoViewIfNeeded();
   const box = await page.locator('.comparator').boundingBox();
   await page.mouse.move(box!.x + box!.width * .5, box!.y + box!.height * .6);
   await page.mouse.down();

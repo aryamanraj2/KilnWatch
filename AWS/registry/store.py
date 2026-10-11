@@ -87,9 +87,11 @@ class Registry:
     def __init__(self, connection):
         self.connection = connection
 
-    def _records(self, clause, args, extra='', extra_args=(), include_inspected=False):
+    def _records(self, clause, args, extra='', extra_args=(), include_inspected=False, requests=False):
         with closing(self.connection.cursor()) as cur:
-            sql = READ.format(extra=extra + (',v.outcome,v.recorded_at' if include_inspected else ''))
+            from .requests import AGGREGATE_JOIN, public_requests
+            sql = READ.format(extra=(',rr.resident_requests' if requests else '') + extra + (',v.outcome,v.recorded_at' if include_inspected else ''))
+            if requests: sql += AGGREGATE_JOIN
             if include_inspected:
                 sql += ''' LEFT JOIN LATERAL (SELECT outcome,recorded_at FROM kilnwatch.verdicts
  WHERE kiln_id=c.kiln_id ORDER BY recorded_at DESC,(outcome=c.status) DESC LIMIT 1) v ON true'''
@@ -99,6 +101,8 @@ class Registry:
             for kiln_id,status,review,assessment,first,last,payload,key,*more in rows:
                 if isinstance(payload,str): payload=json.loads(payload)
                 if isinstance(assessment,str): assessment=json.loads(assessment)
+                request_counts = more.pop(0) if requests else None
+                if isinstance(request_counts,str): request_counts=json.loads(request_counts)
                 inspection = None
                 if include_inspected:
                     outcome, recorded_at = more[-2:]
@@ -115,6 +119,7 @@ class Registry:
                     payload['evidence'][side+'_metadata']=meta
                     payload['evidence'][side]=meta.get('published_url')
                 record = serialize(payload,status,review,assessment)
+                if requests: record['resident_requests'] = public_requests(request_counts)
                 if include_inspected: record['inspection'] = inspection
                 result.append(record)
             return result
@@ -131,14 +136,14 @@ class Registry:
     def public_near(self, lat, lon, radius_m, limit=50, include_inspected=False):
         # CEIL keeps distance_m within radius_m and 0 only when the point touches or lies inside the footprint.
         rows = self._records((' WHERE true' if include_inspected else PUBLIC)+' AND ST_DWithin(o.footprint::geography,'+POINT+',%s::float8) ORDER BY distance_m,c.kiln_id LIMIT %s',
-                             (lon,lat,radius_m,limit), ',CEIL(ST_Distance(o.footprint::geography,'+POINT+'))::int AS distance_m', (lon,lat), include_inspected=include_inspected)
+                             (lon,lat,radius_m,limit), ',CEIL(ST_Distance(o.footprint::geography,'+POINT+'))::int AS distance_m', (lon,lat), include_inspected=include_inspected, requests=True)
         return {'kilns': rows, 'next_cursor': None}
 
     def public_list(self, district, cursor='', limit=100, include_inspected=False):
-        return page(self._records((' WHERE true' if include_inspected else PUBLIC)+' AND c.district=%s AND c.kiln_id>%s ORDER BY c.kiln_id LIMIT %s', (district,cursor,limit+1), include_inspected=include_inspected), limit)
+        return page(self._records((' WHERE true' if include_inspected else PUBLIC)+' AND c.district=%s AND c.kiln_id>%s ORDER BY c.kiln_id LIMIT %s', (district,cursor,limit+1), include_inspected=include_inspected, requests=True), limit)
 
     def public_detail(self, kiln_id, include_inspected=False):
-        rows = self._records((' WHERE true' if include_inspected else PUBLIC)+' AND c.kiln_id=%s', (kiln_id,), include_inspected=include_inspected)
+        rows = self._records((' WHERE true' if include_inspected else PUBLIC)+' AND c.kiln_id=%s', (kiln_id,), include_inspected=include_inspected, requests=True)
         return rows[0] if rows else None
 
 
@@ -147,3 +152,13 @@ def reset_verdict(connection, kiln_id):
     with closing(connection.cursor()) as cur:
         cur.execute("UPDATE kilnwatch.candidates SET status='flagged',review_state='pending' WHERE kiln_id=%s", (kiln_id,))
         if cur.rowcount != 1: raise ValueError('Kiln not found; nothing reset.')
+
+
+def reset_requests(connection, kiln_id):
+    """Operator-only deletion; daily counter is intentionally retained. Caller owns transaction."""
+    from .contract import ID
+    if not isinstance(kiln_id,str) or not ID.fullmatch(kiln_id): raise ValueError('Full kiln ID required.')
+    with closing(connection.cursor()) as cur:
+        cur.execute('SELECT kiln_id FROM kilnwatch.candidates WHERE kiln_id=%s', (kiln_id,))
+        if not cur.fetchone(): raise ValueError('Kiln not found; nothing reset.')
+        cur.execute('DELETE FROM kilnwatch.inspection_requests WHERE kiln_id=%s', (kiln_id,))

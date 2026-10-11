@@ -2,7 +2,7 @@
 
 Phase R1: a local English/Hindi resident experience using explicit sample data. No account, live AWS connection, submission service, or deployment is required. The private inspector app and backend are unchanged.
 
-Live mode (prompt 36, 11 October 2026) reads the real public API locally: flagged Hapur kilns, their rule checks, exposure and evidence, plus the resident assistant (Ask, the same `POST /ask` the iOS app uses). Fixture mode stays the default. Nothing is hosted.
+Live mode (prompt 36, 11 October 2026) reads the real public API locally: flagged Hapur kilns, their rule checks, exposure and evidence, plus the resident assistant (Ask, the same `POST /ask` the iOS app uses). Fixture mode stays the default. Portal hosting is managed separately; prompt 43 has not re-uploaded it.
 
 ## Run locally
 
@@ -96,7 +96,7 @@ A scenario is selected at page load and remains for that document session. Retur
 - Interactive Leaflet street maps use OpenStreetMap tiles, with attribution, pan, zoom, reset, search-radius overlays, numbered selections and record location maps. Geography is real; all demo sites are fictional. Tile requests expose the viewed map area and IP address to OpenStreetMap. Near the poles or on map failure, the list remains usable.
 - Synthetic before/after evidence, single/missing/broken evidence, per-image outlines, source links, provisional predictions, unknown facts, and deterministic explanations.
 - Up to ten selected records in an editable inspection request. Optional personal details and explicit location opt-in. Copy, UTF-8 text download, and browser Print/Save as PDF. Evidence URLs are references, not attachments. Nothing is filed or sent.
-- Language/theme preferences are the only local-storage values. Other state is memory-only; refresh loses it. Meaningful unsaved draft changes prompt before replacement or unloading. Browser unload warnings depend on browser support/user interaction.
+- Language/theme preferences, one random browser code, and requested kiln IDs/dates use local storage (with a memory fallback if storage is denied). Sample and live request storage are separate. Written drafts remain memory-only; refresh loses them. Meaningful unsaved draft changes prompt before replacement or unloading. Browser unload warnings depend on browser support/user interaction.
 - No external geocoding, analytics, service worker, citizen account, notification system, private image proxy, model weights, or automatic complaint submission.
 - Legal sources are references with stated limits. The UP habitation threshold is unresolved. A sample orchard comparison is not a finding about a real site.
 
@@ -107,3 +107,11 @@ A scenario is selected at page load and remains for that document session. Retur
 - [Hosting proposal](docs/hosting-proposal.md), [handover](docs/HANDOVER.md), and [verification](docs/verification.md).
 
 Implementation references: [Vite](https://vite.dev/guide/), [Node releases](https://nodejs.org/en/about/previous-releases), [React Router declarative installation](https://reactrouter.com/start/declarative/installation), and [Playwright configuration](https://playwright.dev/docs/test-configuration). Versions actually installed are pinned in `package.json` and `package-lock.json`.
+
+## Inspection requests (prompt 43, 11 October 2026)
+
+Local implementation is complete; backend deployment and portal re-upload are pending. The record page offers a primary **Request an inspection** action with concern checkboxes and a self-reported distance band. The written draft/export flow remains available as **Prepare a written request**.
+
+Live mode sends one `POST /requests` body from the frozen contract in `App/docs/api-contract.md`. No names, phones, free text or precise residential locations are sent. Anonymous, unverified counts appear on records and area results when positive. Successful POST responses update the displayed count immediately; public counts can lag about two minutes. Browser code and requested kiln dates are retained when storage is available; storage denial uses document memory. Duplicate acknowledgements show the already-requested state. Errors preserve answers and writes are never retried automatically.
+
+Fixture mode simulates the flow and keeps its existing sample labels; no request reaches a server. The shared sanitized fixture is `tests/fixtures/requests-recorded.json`. `test:e2e:live` mocks request submissions alongside public reads, Ask and imagery. Request screenshots are under `docs/screens/requests/`.

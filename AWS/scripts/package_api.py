@@ -16,7 +16,7 @@ subprocess.run([sys.executable,'-m','pip','install','--platform','manylinux2014_
                 '--no-compile','--target',str(staging),'-r',str(root/'lambda'/'requirements.txt')],check=True)
 shutil.copy(root/'lambda'/'api_handler.py',staging)
 (staging/'registry').mkdir()
-for name in ('__init__.py','contract.py','db.py','store.py'):
+for name in ('__init__.py','contract.py','db.py','store.py','requests.py'):
     shutil.copy(root/'registry'/name,staging/'registry'/name)
 ca=urllib.request.urlopen('https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem',timeout=30).read()
 (staging/'rds-ca.pem').write_bytes(ca)

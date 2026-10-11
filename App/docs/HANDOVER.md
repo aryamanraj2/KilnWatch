@@ -226,3 +226,14 @@ One live confirmed verdict for `KW-00c562060b40502fb4a7ed2016ce7576`: POST 201, 
 **Prompt 23 — Review tab (2026-10-11):** Read-only fourth tab shows the public 45-item queue (24/17/0/4), verbatim reasons, inspected-inclusive kiln navigation and historical location details; DESIGN §10 updated.
 Core: 99 reported (98 passed, one existing opt-in skip); root build: zero warnings. Six inspected captures and zero confirmed leaks; see [Review tab report](screens/phase-7/review-tab-report.md).
 Live Ask/route/verdict POSTs: 0/0/0; no AWS CLI, backend/contract edits, agents, staging, commits or pushes by this lane. Snapshot until triage is automated; no reviewer sign-in. Stopped for orchestrator review.
+
+## Inspection requests (43) iOS — 2026-10-11
+
+Local client work complete; backend deployment and live iOS read remain pending. KilnWatchCore decodes optional resident request aggregates, preserving older caches and authoritative zero. The kiln detail shows a neutral Resident requests section after exposure (counts, self-reported distance, plain concern words and date); positive counts also appear in Kilns rows. Requests are anonymous and unverified; iOS only displays them.
+
+Verification: `swift test` reports 103 tests (one existing opt-in skip), root iPhone 17 simulator build succeeds; both have zero warnings. Two light-mode stub screenshots are in `screens/phase-8/resident-requests-detail-light.png` and `resident-requests-list-light.png`. No live API/CDN calls, AWS actions, staging, commits or push in this lane. No dark/AX matrix was run, as requested.
+
+Prompt 43b deployment verified on 11 October 2026: live requests and aggregate reads,
+hosted phone page and inspector display confirmed at 1; the sole test request was then
+reset to 0 (daily counter retained). No sub-agents, staging, commit or push in 43b.
+See `AWS/docs/inspection-requests-report.md`, Deploy (43b), for the complete lead report.

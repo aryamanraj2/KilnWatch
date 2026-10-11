@@ -456,3 +456,18 @@ footer nav { display: flex; gap: 24px; }footer a { min-height: 44px; padding: 4p
   }
 }
 @media print { .tab-bar, .action-bar, .glance { display: none !important; } body { padding-bottom: 0 !important; } }
+
+/* Anonymous requests use the existing neutral tokens and comfortable native controls. */
+.request-panel { margin-block: 24px; max-width: 680px; scroll-margin-top: 100px; }
+.request-panel h2 { font-size: 1.2rem; margin-bottom: 12px; }
+.request-panel .sample-tag { margin-bottom: 12px; }
+.request-panel fieldset { margin-top: 20px; }
+.request-panel legend { font-weight: 600; margin-bottom: 8px; }
+.request-option { display: flex; gap: 12px; align-items: center; min-height: 44px; font-weight: 400; cursor: pointer; }
+.request-option input { width: 20px; height: 20px; accent-color: var(--ink); flex: 0 0 auto; }
+.request-panel .primary { margin-top: 12px; }
+.request-count, .request-confirmation { font-variant-numeric: tabular-nums; color: var(--muted); }
+.request-count { font-size: 13px; margin-block: 8px; }
+.request-confirmation { color: var(--ink); font-weight: 600; }
+.request-error { padding: 12px; background: var(--surface2); border-radius: 12px; }
+@media (min-width: 601px) { .request-panel { max-width: none; } .request-panel form { max-width: 600px; } }

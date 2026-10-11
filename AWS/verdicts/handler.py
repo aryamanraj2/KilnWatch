@@ -143,4 +143,7 @@ def handle(event, connection_factory=connect_from_env, s3=None, now=None):
 
 
 def handler(event, context):
+    if event.get('routeKey') == 'POST /requests':
+        from verdicts.requests import handle as handle_request
+        return handle_request(event)
     return handle(event)

@@ -19,7 +19,7 @@ export function Status({ kiln }: { kiln: Kiln }) {
   const { t } = useLocale();
   const values: Record<string, [string, string, string]> = {
     flagged: ['⚑', 'Flagged by satellite · pending inspection', 'उपग्रह से चिह्नित · निरीक्षण लंबित'],
-    confirmed: ['!', 'Confirmed violation', 'पुष्ट उल्लंघन'], compliant: ['✓', 'Compliant', 'नियमों के अनुरूप'],
+    confirmed: ['!', 'Confirmed inspection finding', 'पुष्ट निरीक्षण निष्कर्ष'], compliant: ['✓', 'Compliant', 'नियमों के अनुरूप'],
     not_a_kiln: ['⊘', 'Not a kiln', 'भट्ठा नहीं'], closed: ['Ⅱ', 'Closed or not firing', 'बंद या चालू नहीं'],
   };
   const status = kiln.status === 'flagged' || kiln.human_reviewed ? kiln.status : 'unknown';

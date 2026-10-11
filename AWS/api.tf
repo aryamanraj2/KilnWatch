@@ -181,7 +181,7 @@ resource "aws_apigatewayv2_stage" "default" {
   # Phase 4A and P1: the public, per-call-billed Ask and route-planning routes get their own tighter limit
   # (empty unless enable_assistant / enable_route_planner).
   dynamic "route_settings" {
-    for_each = concat(aws_apigatewayv2_route.ask[*].route_key, aws_apigatewayv2_route.route_plan[*].route_key, aws_apigatewayv2_route.verdicts[*].route_key)
+    for_each = concat(aws_apigatewayv2_route.ask[*].route_key, aws_apigatewayv2_route.route_plan[*].route_key, aws_apigatewayv2_route.verdicts[*].route_key, aws_apigatewayv2_route.requests[*].route_key)
     content {
       route_key              = route_settings.value
       throttling_rate_limit  = 1

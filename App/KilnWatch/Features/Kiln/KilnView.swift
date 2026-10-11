@@ -84,6 +84,9 @@ private struct KilnDetailView: View {
                                   modelled: !isFixture && (!model.isPublicDemo || DemoOptions.string("rulesDemo") == "recorded"),
                                   sample: isFixture || (model.isPublicDemo && DemoOptions.string("rulesDemo") != "recorded")).card()
                 }
+                section("Resident requests", id: "requests") {
+                    ResidentRequestsBlock(requests: kiln.residentRequests).card()
+                }
                 section(isFixture ? "Nearest home and school" : "Location and footprint", id: "map") {
                     BufferMap(kiln: kiln, illustrative: isFixture).card()
                 }

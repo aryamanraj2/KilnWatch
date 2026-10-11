@@ -50,7 +50,7 @@ def read(registry_factory, query):
 
 
 def public(path, query, registry_factory):
-    """No-login resident read. Flagged-only by default (SQL); inspected outcomes require an explicit opt-in."""
+    """No-login read with resident aggregates; inspected outcomes require an explicit opt-in."""
     include_inspected = query.get('include') == 'inspected'
     if 'include' in query and not include_inspected:
         return error(400,'invalid_filter','Include must be inspected.')

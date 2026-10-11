@@ -807,3 +807,33 @@ endpoint policy and runner policy, **with a new go**.
 This removes the public route and its runtime resources; review deletions and secret
 recovery before applying. It does not erase database history. Prompt 39 forbids any
 destroy in the present step, so no kill-switch apply was performed.
+
+## Inspection requests (43): operator reset and kill switch
+
+Live on 11 October 2026, verified under prompt 43b. The requests route and exact
+invocation permission were added (two additions); API/verdicts code and the stage throttle
+changed in place (three changes), with zero destroys. The existing verdicts integration,
+writer login and secret are reused. See `inspection-requests-report.md` for proof.
+Future changes and resets still require a go; do not print private outputs.
+
+Reset only with an operator go, on the runner using administrative credentials:
+
+```sh
+python -m registry.cli reset-requests --kiln <full-id> --confirm
+```
+
+This deletes only the selected kiln's request rows. It retains the UTC day counter and
+never changes a kiln's status or review state. The request writer cannot delete requests;
+an operator reset inside a rolled-back test must return to the administrative role first.
+
+Kill switch (needs a go): set `enable_requests = false` in the ignored tfvars, then review
+and apply a saved targeted plan for `aws_apigatewayv2_route.requests`,
+`aws_lambda_permission.requests`, and `aws_apigatewayv2_stage.default`. This removes the
+requests route and its permission/throttle only. Do not disable verdicts or redeploy Ask
+or route planning. Do not run an untargeted apply. Keep migration 004 and stored data.
+
+When enabling, target those three resources plus `aws_lambda_function.verdicts` and
+`aws_lambda_function.api`. Review the saved plan for only the expressly approved changes;
+stop for anything else. Runner checks precede deployment: migration replay, exact grants,
+unchanged candidate checksum, rolled-back insert/aggregate/operator reset and empty daily
+counter. Follow prompt 43's live checks, upload and final reset after the renewed go.

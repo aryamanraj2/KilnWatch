@@ -1,0 +1,15 @@
+{
+  "kiln_id": "KW-0123456789abcdef0123456789abcdef",
+  "created": true,
+  "resident_requests": {
+    "count": 12,
+    "within_1km": 8,
+    "concerns": {
+      "smoke_or_ash": 9,
+      "near_homes": 7,
+      "near_school_or_hospital": 2,
+      "other": 1
+    },
+    "last_request_on": "2026-10-11"
+  }
+}

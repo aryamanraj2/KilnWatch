@@ -142,6 +142,10 @@ private struct KilnRow: View {
                 Text(kiln.exposure.map { model.usesPublicRegistry ? "\($0.people.grouped) modelled residents within 800 m" : "\($0.people.grouped) people · sample" } ?? "Population exposure not assessed")
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.inkSecondary)
+                if let requests = kiln.residentRequests, requests.count > 0 {
+                    Text("\(requests.count.formatted()) \(requests.count == 1 ? "request" : "requests")")
+                        .font(.footnote).monospacedDigit().foregroundStyle(.inkSecondary)
+                }
             }
         }
         .padding(.vertical, Space.xxs)

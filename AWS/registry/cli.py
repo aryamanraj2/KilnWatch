@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from .contract import ID, assessment_patches, convert, serialize
 from .evidence import attach
-from .store import apply_assessments, persist, reset_verdict
+from .store import apply_assessments, persist, reset_verdict, reset_requests
 from .db import connect_from_env
 
 
@@ -42,7 +42,7 @@ def migrate(connection):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['validate','import','migrate','validate-assessment','apply-assessment','reset-verdict'])
+    parser.add_argument('command',choices=['validate','import','migrate','validate-assessment','apply-assessment','reset-verdict','reset-requests'])
     parser.add_argument('--detections',type=Path)
     parser.add_argument('--district')
     parser.add_argument('--evidence',type=Path)
@@ -53,17 +53,18 @@ def main():
     parser.add_argument('--confirm', action='store_true')
     args=parser.parse_args()
     try:
-        if args.command=='reset-verdict':
+        if args.command in ('reset-verdict','reset-requests'):
             if not args.confirm or not args.kiln or not ID.fullmatch(args.kiln):
                 raise ValueError('--kiln and --confirm required; obtain operator approval each time')
             connection=connect_from_env()
             try:
-                reset_verdict(connection,args.kiln)
+                (reset_requests if args.command=='reset-requests' else reset_verdict)(connection,args.kiln)
                 connection.commit()
             except Exception:
                 connection.rollback(); raise
             finally: connection.close()
-            print('{"reset":true,"history_retained":true}'); return
+            print('{"reset":true,"day_counter_unchanged":true}' if args.command=='reset-requests'
+                  else '{"reset":true,"history_retained":true}'); return
         if args.command=='migrate':
             connection=connect_from_env()
             try: migrate(connection)

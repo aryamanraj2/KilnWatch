@@ -19,6 +19,8 @@ public struct Kiln: Codable, Hashable, Sendable, Identifiable {
     public let lastSeen: Date
     public let violations: [Violation]
     public let exposure: Exposure?
+    /// Anonymous, unverified inspection requests. Nil in records cached before prompt 43.
+    public let residentRequests: ResidentRequests?
     /// Changed only by an inspector's verdict or an approved review.
     public let status: KilnStatus
     public let inspection: Inspection?

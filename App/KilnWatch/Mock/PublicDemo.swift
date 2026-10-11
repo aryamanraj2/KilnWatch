@@ -23,7 +23,7 @@ enum PublicDemo {
 
     static func api(scenario: String) -> KilnWatchAPI {
         let host = "\(UUID().uuidString.lowercased()).example"
-        let records: [[String: Any]] = DemoOptions.string("planDemo").map { _ in PlanDemo.kilns } ?? DemoOptions.string("rulesDemo").map(R1Demo.records) ?? Fixtures.kilns.compactMap { kiln in
+        var records: [[String: Any]] = DemoOptions.string("planDemo").map { _ in PlanDemo.kilns } ?? DemoOptions.string("rulesDemo").map(R1Demo.records) ?? Fixtures.kilns.compactMap { kiln in
             guard let data = try? JSONEncoder.kilnWatch.encode(kiln),
                   var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
             if DemoOptions.string("askDemo") != nil, kiln.kilnId == "KW-0412" { object["kiln_id"] = "KW-00000000000000000000000000000001" }
@@ -34,6 +34,17 @@ enum PublicDemo {
             object["status"] = "flagged"
             object["evidence"] = ["before": NSNull(), "after": NSNull()]
             return object
+        }
+        if let scenario = DemoOptions.string("requestsDemo"), !records.isEmpty {
+            let zero: [String: Any] = ["count": 0, "within_1km": 0,
+                "concerns": ["smoke_or_ash": 0, "near_homes": 0, "near_school_or_hospital": 0, "other": 0],
+                "last_request_on": NSNull()]
+            for index in records.indices { records[index]["resident_requests"] = zero }
+            if scenario == "recorded",
+               let fixture = try? JSONSerialization.jsonObject(with: R1Demo.data("RequestsRecorded")) as? [String: Any] {
+                records[0]["resident_requests"] = fixture["resident_requests"]
+                records[0]["kiln_id"] = fixture["kiln_id"]
+            }
         }
         let details = Dictionary(uniqueKeysWithValues: records.map { ($0["kiln_id"] as! String, (try? JSONSerialization.data(withJSONObject: $0)) ?? Data()) })
         let list = (try? JSONSerialization.data(withJSONObject: ["kilns": records, "next_cursor": NSNull()])) ?? Data()

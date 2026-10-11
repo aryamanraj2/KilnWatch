@@ -68,3 +68,20 @@ Local only, no hosting, deploy, AWS or CORS change. `npm run dev:live` on `http:
 **Phones (prompt 36b, 11 October 2026):** the iOS-style tab bar, compact top bar, search-first area, kiln "At a glance" card with a sticky action bar, Before | After comparator, flags-only amber rule bars and an Ask composer at the bottom. Desktop is unchanged. See [design](DESIGN.md#phones-prompt-36b-11-october-2026) and `docs/screens/mobile/`.
 
 **Phone Area (prompt 36c, 11 October 2026):** after results the search folds to a one-line summary with Edit, "Use my location" is an icon in the search row, and the map starts at 352 px at 393 × 852 (it was about 700). Desktop is pixel-identical (0 differing pixels at 1440 × 900).
+
+## Inspection requests (prompt 43, 11 October 2026)
+
+Portal lane complete locally against the frozen **Inspection requests (43)** contract and shared synthetic recorded response. Backend deployment, live verification and portal re-upload remain pending with the lead; this lane used no AWS, live API/CDN, Xcode, staging, commits or pushes.
+
+- A primary Request an inspection action opens native concern checkboxes (at least one), self-reported distance bands, the privacy line and Send request. English and Hindi use `t()`. The written draft/export remains secondary as Prepare a written request.
+- Live writes use one random UUID v4 browser code, strict response validation, no authentication/cookies, no automatic retry and a fresh aggregate. Browser code and requested kiln IDs/dates use guarded local storage; denied storage falls back to document memory. A stored success or duplicate acknowledgement removes the send action. The immediate POST count bridges public cache lag for up to two minutes; higher subsequent public counts take precedence.
+- Records and area results show positive unverified counts. Success explains the count visible to KilnWatch inspectors and limits. Cap, unavailable/network and not-found states preserve answers. Fixture mode is isolated, sample-labelled and sends nothing. Public records lacking the optional aggregate remain readable. Privacy/About and README describe the actual handling. Pre-existing sample status/evidence/draft copy now uses neutral inspection-finding wording.
+- Checks: typecheck passed; **92 unit/behavior tests passed** (5 files); production build passed using explicit fixture configuration; **15 mocked Chromium live journeys passed**; **10 Chromium sample journeys passed**. Sample checks also preserve written exports, map/comparator interactions, Hindi, semantic accessibility and narrow reflow. An existing drag test now scrolls evidence into view before dragging, because the new request card changes its page position; product evidence behavior is unchanged.
+- Light screenshots at `screens/requests/`: `phone-form-en.png`, `phone-form-send-en.png`, `phone-confirmation-en.png`, `phone-form-hi.png` and `desktop-record-en.png`. Phone viewport width 390; desktop width 1440. Complete-panel captures temporarily hide fixed navigation bars only for capture; the lower-form viewport retains navigation and verifies Send is unobscured. All were visually reviewed and use mocked synthetic configuration.
+
+Open limits: backend deployment is held; counts are anonymous/unverified, browser storage can be cleared, 300 new requests per UTC day, no sign-in or route priority. Storage denial cannot preserve a code across a document reload. Native Hindi review remains outstanding. WebKit was not run for this prompt; the required Chromium checks passed.
+
+Prompt 43b deployment verified on 11 October 2026: live requests and aggregate reads,
+hosted phone page and inspector display confirmed at 1; the sole test request was then
+reset to 0 (daily counter retained). No sub-agents, staging, commit or push in 43b.
+See `AWS/docs/inspection-requests-report.md`, Deploy (43b), for the complete lead report.

@@ -777,3 +777,60 @@ stored reason, verbatim.
 reuses its last read for 60 s, so a change shows up within about two minutes. Stage throttle
 10/s, burst 20 (the `/public/kilns` group). CORS as for the rest of the API (hosted portal and
 `http://localhost:5173`). It never touches the Ask daily counter.
+
+## Inspection requests (43)
+
+Frozen client contract, 11 October 2026. **Live, 11 October 2026 (43b verified).**
+
+`POST /requests` is public, without authentication, with `Content-Type: application/json`.
+The UTF-8 body is at most 4 KB; unknown or duplicate keys return 400 `invalid_request`.
+All five fields are required:
+
+```json
+{"kiln_id":"KW-0123456789abcdef0123456789abcdef","client_id":"a80d2cb8-9e91-4dfd-96fd-a3d6d4c24aa1","concerns":["smoke_or_ash","near_homes"],"distance_band":"under_1km","lang":"en"}
+```
+
+- `kiln_id`: full `KW-` plus 32 lowercase hexadecimal characters. Must exist, any status;
+  an unknown full ID returns 404 `not_found` and is not counted.
+- `client_id`: UUID v4, generated once by the browser and retained in browser storage.
+  The server stores only its SHA-256 hash, after canonical lowercase UUID normalization.
+- `concerns`: 1–4 unique values from `smoke_or_ash`, `near_homes`,
+  `near_school_or_hospital`, `other`.
+- `distance_band`: self-reported residential distance, one of `under_1km`, `1_to_5km`,
+  `over_5km`, `not_said`.
+- `lang`: `en` or `hi`.
+
+One request per browser code per kiln. New pair: 201 with `created: true`.
+Repeated pair: 200 with `created: false`, fresh current aggregate, no additional count,
+regardless of changed answers. A replay remains available at the daily cap.
+
+```json
+{"kiln_id":"KW-0123456789abcdef0123456789abcdef","created":true,"resident_requests":{"count":12,"within_1km":8,"concerns":{"smoke_or_ash":9,"near_homes":7,"near_school_or_hospital":2,"other":1},"last_request_on":"2026-10-11"}}
+```
+
+The cap is 300 new requests per UTC day, atomically checked and counted in the insert
+transaction. Cap returns 429 `daily_cap_reached`, `retryable: true`. Database failure
+returns 503 `registry_unavailable`, `retryable: true`. Validation and not-found errors
+are not retryable. All errors use `{"error":{"code":"…","message":"…","retryable":false}}`.
+Stage throttle: 1 request/s, burst 2; gateway throttling may use its own error body.
+
+`GET /public/kilns` (district and nearby shapes, with or without `include=inspected`)
+and `GET /public/kilns/{id}` include `resident_requests` on every kiln. No requests means:
+
+```json
+{"count":0,"within_1km":0,"concerns":{"smoke_or_ash":0,"near_homes":0,"near_school_or_hospital":0,"other":0},"last_request_on":null}
+```
+
+Zero is an authoritative count. `last_request_on` is a date in Asia/Kolkata (IST),
+never a timestamp. The public allowlist never exposes the client hash, language or row
+IDs. Public caching remains `max-age=60`; counts can lag by up to about two minutes,
+while the POST response is always fresh and `no-store`.
+
+Requests are anonymous and unverified. Anyone can send more by clearing browser storage,
+within the global daily cap. They are a signal for KilnWatch inspectors, never a finding;
+they never change `status` or `review_state`, guarantee an inspection, or imply delivery
+to an authority. No names, phone numbers, free text or precise residential locations.
+The inspector app only displays requests; it does not submit them.
+
+Shared synthetic recorded-shape fixture: `requests-recorded.json` in the portal test
+fixtures and core `RequestFixtures` directories. Both contain identical sanitized bytes.

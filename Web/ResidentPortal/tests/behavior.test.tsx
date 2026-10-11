@@ -21,7 +21,7 @@ function loadImage(image: HTMLElement, size = 256) {
 describe('resident interactions', () => {
   it('does not show a human finding without authoritative human-review metadata', () => {
     render(<LocaleProvider><Status kiln={{ ...kilns[0], status: 'confirmed', human_reviewed: false }} /></LocaleProvider>);
-    expect(screen.getByText('Status not available')).toBeVisible(); expect(screen.queryByText('Confirmed violation')).toBeNull();
+    expect(screen.getByText('Status not available')).toBeVisible(); expect(screen.queryByText('Confirmed inspection finding')).toBeNull();
   });
   it('lets a working image survive failure of the other comparison side', () => {
     render(<LocaleProvider><Evidence kiln={kilns[0]} /></LocaleProvider>);

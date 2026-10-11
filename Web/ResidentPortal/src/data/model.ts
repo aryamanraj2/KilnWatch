@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { residentRequestsSchema } from './requests';
 
 export type Language = 'en' | 'hi';
 export const localized = z.object({ en: z.string(), hi: z.string() });
@@ -52,6 +53,7 @@ export const kilnSchema = z.object({
   assessments: z.array(z.object({ rule_id: z.string(), state: z.enum(['assessed', 'not_evaluated']), measured_distance_m: z.number().finite().nonnegative().nullable(), threshold_m: positive.nullable(), source_url: z.string().url().nullable() })),
   exposure: z.object({ people: z.number().int().nonnegative(), radius_m: positive, source: localized, estimated_at: timestamp.nullable() }).nullable(),
   checks: z.array(checkSchema).optional(), rules_assessment: z.string().max(40).optional(),
+  resident_requests: residentRequestsSchema.optional(),
 });
 export type Kiln = z.infer<typeof kilnSchema>;
 export const pageSchema = z.object({

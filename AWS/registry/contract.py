@@ -91,6 +91,8 @@ PUBLIC_EVIDENCE = ('before', 'after', 'before_metadata', 'after_metadata')
 def public_view(record, include_inspected=False):
     """Resident projection of a serialized record. Allowlist only: any new internal field stays private."""
     view = {k: record[k] for k in PUBLIC_KEYS if k in record}
+    from .requests import public_requests
+    view['resident_requests'] = public_requests(record.get('resident_requests'))
     view['evidence'] = {k: record['evidence'][k] for k in PUBLIC_EVIDENCE if k in record['evidence']}
     if include_inspected:
         inspection = record.get('inspection')

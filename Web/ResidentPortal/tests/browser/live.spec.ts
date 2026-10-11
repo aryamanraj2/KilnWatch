@@ -1,11 +1,12 @@
 import { test, expect, type Page as BrowserPage } from '@playwright/test';
 import { deflateSync } from 'node:zlib';
 import { mockMapTiles } from './map-tiles';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 test.beforeEach(async ({ page }) => { await mockMapTiles(page); });
 
 // Recorded real-shape public responses (sanitized hosts). These tests never contact AWS.
 const api = 'https://public.example.test';
+const requestRecorded = JSON.parse(readFileSync(new URL('../fixtures/requests-recorded.json', import.meta.url), 'utf8'));
 const near = JSON.parse(readFileSync(new URL('../fixtures/hapur-near.json', import.meta.url), 'utf8').replaceAll('cdn.example.test', 'evidence.example.test'));
 const REF = 'KW-6b3b38da681850e5af46b024f3d3f78e', ZERO = 'KW-64e53b7b965453108b2aeea524685304', HIDDEN = 'KW-00c562060b40502fb4a7ed2016ce7576';
 const answer = { answer: `${REF} has one siting flag: C-HAB-800 at 497 m against 800 m.`, citations: [REF], fallback: false,
@@ -140,4 +141,98 @@ test('phone rule list: flags first, other checks grouped; only flags use the sta
   await expect(flagged.locator('.distance-bar')).not.toHaveClass(/neutral/);
   await expect(page.locator('.glance')).toContainText('C-HAB-800'); await expect(page.locator('.glance')).toContainText('4,225');
   await expect(page.locator('.action-bar').getByRole('link', { name: 'Ask about this kiln' })).toHaveAttribute('href', `/ask?kiln=${REF}`);
+});
+
+async function mockRequests(page: BrowserPage, status = 201) {
+  await mockPublicService(page);
+  const writes: unknown[] = [];
+  await page.route(`${api}/requests`, route => {
+    writes.push(route.request().postDataJSON());
+    const body = status === 200 || status === 201 ? { ...requestRecorded, kiln_id: REF, created: status === 201 } : { error: { code: status === 429 ? 'daily_cap_reached' : status === 404 ? 'not_found' : 'registry_unavailable', retryable: true } };
+    return route.fulfill({ status, json: body });
+  });
+  return writes;
+}
+async function openRequest(page: BrowserPage) {
+  await page.goto(`/kilns/${REF}`);
+  await expect(page.locator('.action-bar a[href="#resident-requests"]')).toHaveText('Request an inspection');
+  await page.locator('.request-panel').getByRole('button', { name: 'Request an inspection', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Send request', exact: true })).toBeDisabled();
+  await page.getByLabel('Smoke or ash', { exact: true }).check();
+  await page.getByLabel('Near homes', { exact: true }).check();
+  await page.getByLabel('Under 1 km', { exact: true }).check();
+}
+function screenshotDir() { const directory = 'docs/screens/requests'; mkdirSync(directory, { recursive: true }); return directory; }
+
+test('inspection request: fresh count, browser dedupe, area count and phone screenshots', async ({ page }) => {
+  const writes = await mockRequests(page); await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => { localStorage.setItem('kw-theme', 'light'); });
+  await openRequest(page);
+  await page.locator('.request-panel').scrollIntoViewIfNeeded();
+  await page.locator('.request-panel').screenshot({ path: `${screenshotDir()}/phone-form-en.png`, style: '.action-bar,.tab-bar{visibility:hidden!important}' });
+  await page.getByRole('button', { name: 'Send request', exact: true }).evaluate(element => element.scrollIntoView({ block: 'center' }));
+  const sendBounds = await page.getByRole('button', { name: 'Send request', exact: true }).boundingBox();
+  const barBounds = await page.locator('.action-bar').boundingBox();
+  expect(sendBounds!.y + sendBounds!.height).toBeLessThan(barBounds!.y);
+  await page.screenshot({ path: `${screenshotDir()}/phone-form-send-en.png` });
+  await page.getByRole('button', { name: 'Send request', exact: true }).click();
+  await expect(page.locator('.request-panel')).toContainText('Your request was added. 12 residents have asked for an inspection of this kiln.');
+  await expect(page.locator('.action-bar').getByRole('link', { name: 'View your request', exact: true })).toHaveAttribute('href', '#resident-requests');
+  expect(writes).toHaveLength(1);
+  expect(writes[0]).toMatchObject({ kiln_id: REF, concerns: ['smoke_or_ash', 'near_homes'], distance_band: 'under_1km', lang: 'en' });
+  expect((writes[0] as { client_id: string }).client_id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  await page.locator('.request-panel').evaluate(element => element.scrollIntoView({ block: 'center' }));
+  await page.screenshot({ path: `${screenshotDir()}/phone-confirmation-en.png` });
+  await page.reload(); await expect(page.locator('.request-panel')).toContainText('You asked for an inspection on');
+  await page.locator('.action-bar').getByRole('link', { name: 'View your request', exact: true }).click();
+  await expect(page).toHaveURL(/#resident-requests$/);
+  await expect(page.locator('.request-panel')).toBeInViewport();
+  await expect(page.locator('.request-panel').getByRole('button', { name: 'Send request' })).toHaveCount(0);
+  expect(writes).toHaveLength(1);
+});
+
+test('inspection requests appear in area results and desktop record', async ({ page }) => {
+  await mockPublicService(page);
+  const populated = { ...near, kilns: near.kilns.map((k: { kiln_id: string }) => ({ ...k, resident_requests: k.kiln_id === REF ? requestRecorded.resident_requests : { count: 0, within_1km: 0, concerns: { smoke_or_ash: 0, near_homes: 0, near_school_or_hospital: 0, other: 0 }, last_request_on: null } })) };
+  await page.route(`${api}/public/kilns?**`, route => route.fulfill({ json: populated }));
+  await page.route(`${api}/public/kilns/${REF}`, route => route.fulfill({ json: populated.kilns.find((k: { kiln_id: string }) => k.kiln_id === REF) }));
+  await page.addInitScript(() => { localStorage.setItem('kw-theme', 'light'); });
+  await page.goto('/'); await search(page); await expect(page.locator('.result-list')).toContainText('12 inspection requests · not verified');
+  await page.goto(`/kilns/${REF}`); await expect(page.locator('.request-panel')).toContainText('12 inspection requests · not verified');
+  await expect(page.locator('.location-card .basemap')).toBeVisible();
+  await page.screenshot({ path: `${screenshotDir()}/desktop-record-en.png`, fullPage: true });
+});
+
+for (const [status, message] of [[429, "Today's request limit is reached. Try again tomorrow."], [503, "Couldn't send. Your answers are kept; try again."], [404, 'This kiln record is no longer available.']] as const) {
+  test(`inspection request ${status} preserves answers without retrying`, async ({ page }) => {
+    const writes = await mockRequests(page, status); await openRequest(page);
+    await page.getByRole('button', { name: 'Send request', exact: true }).click();
+    await expect(page.getByRole('alert')).toContainText(message);
+    await expect(page.getByLabel('Smoke or ash', { exact: true })).toBeChecked();
+    await expect(page.getByLabel('Under 1 km', { exact: true })).toBeChecked(); expect(writes).toHaveLength(1);
+  });
+}
+
+test('duplicate request acknowledgement hides send, including with denied storage', async ({ page }) => {
+  const writes = await mockRequests(page, 200);
+  await page.addInitScript(() => { Storage.prototype.getItem = () => { throw new Error('Denied'); }; Storage.prototype.setItem = () => { throw new Error('Denied'); }; });
+  await openRequest(page); await page.getByRole('button', { name: 'Send request', exact: true }).click();
+  await expect(page.locator('.request-panel')).toContainText('You asked for an inspection on');
+  await expect(page.locator('.request-panel')).toContainText('12 residents have asked');
+  await expect(page.getByRole('button', { name: 'Send request', exact: true })).toHaveCount(0); expect(writes).toHaveLength(1);
+});
+
+test('Hindi phone inspection request is fully localized', async ({ page }) => {
+  const writes = await mockRequests(page); await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => { localStorage.setItem('kw-theme', 'light'); localStorage.setItem('kw-language', 'hi'); });
+  await page.goto(`/kilns/${REF}`);
+  await expect(page.locator('.action-bar').getByRole('link', { name: 'निरीक्षण का अनुरोध करें', exact: true })).toBeVisible();
+  await page.locator('.request-panel').getByRole('button', { name: 'निरीक्षण का अनुरोध करें', exact: true }).click();
+  await page.getByLabel('धुआँ या राख', { exact: true }).check();
+  await page.locator('.request-panel').scrollIntoViewIfNeeded();
+  await page.locator('.request-panel').screenshot({ path: `${screenshotDir()}/phone-form-hi.png`, style: '.action-bar,.tab-bar{visibility:hidden!important}' });
+  await page.getByRole('button', { name: 'अनुरोध भेजें', exact: true }).click();
+  await expect(page.locator('.request-panel')).toContainText('आपका अनुरोध जोड़ा गया। 12 निवासियों');
+  await expect(page.locator('.action-bar').getByRole('link', { name: 'अपना अनुरोध देखें', exact: true })).toHaveAttribute('href', '#resident-requests');
+  expect(writes[0]).toMatchObject({ lang: 'hi', concerns: ['smoke_or_ash'], distance_band: 'not_said' });
 });

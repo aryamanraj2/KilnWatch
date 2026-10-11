@@ -1539,3 +1539,62 @@ feature count moved to `current_run_features`.
 from `AWS/assistant.tf`, the review entry from the stage's public throttle group in `AWS/api.tf` and
 the Scan statement from the role, then one targeted apply on those five resources. The gateway
 then answers 404 for the path.
+
+## 43: inspection requests — local, deployment held (2026-10-11)
+
+The frozen contract and identical synthetic fixtures were written before portal and iOS
+agents began. The lead built the AWS lane; only the client agents worked in parallel.
+Both AWS sessions verified, with identities masked; the main user suffix matched.
+
+- Strict public `POST /requests` dispatch in the existing verdicts Lambda; the verdict
+  handler/store behavior is preserved. Browser UUIDs are normalized and hashed; no raw
+  browser IDs are stored. Validation rejects duplicate/unknown keys and bodies over 4 KB.
+- One transactional insert/dedupe/cap operation, 300 new requests per UTC day. Replays and
+  unknown records never consume the counter. Logs contain count, status code and latency.
+- Public reads join a single grouped aggregate for district/nearby/detail shapes, both
+  default and inspected. Empty groups return authoritative zeros, dates use IST, nested
+  fields are allowlisted. The assistant's existing trim drops the aggregate (tested).
+- Migration 004 grants only the stated writer and reader capabilities. Operator reset
+  deletes one kiln's rows, retains the day counter, and leaves candidate state unchanged.
+- Full standard AWS suite: **238 run, 216 pass, 22 skipped** (27 added tests; six new opt-in
+  database tests). Disposable local PostGIS suite: **238 run, 238 pass, 0 skipped**.
+  Real SQL checks include exact grants, existing-login membership, reader privacy, concurrent
+  duplicate insertion and global cap, IST rollover, all read shapes, reset and rollback.
+- Terraform formatting and validation: pass, zero errors/warnings. Provider lock unchanged.
+- No runner migration, targeted plan/apply, live checks, upload, invalidation or live reset
+  performed. The user chose **stop before deployment**: the existing Lambda permission
+  covers only the verdict route. The prepared source adds an exact requests permission;
+  prompt 43's expected list omitted it. A renewed go must cover this second addition.
+- Ask and route source/artifacts remain untouched. No stage, commit or push.
+
+Local package hashes, checks and private credential-verification results are retained
+under `.local/requests/`. Client lane checks and screenshot paths appear in the lead's
+final report and their respective handovers. The contract remains deployment-pending.
+
+Prepared local ZIP SHA-256 (not compared with live, because deployment is held):
+
+- `api_handler`: `328892cbeff8dd97214e280f76c480e1b0f43a3f2be99ce39439fc1610dfda10`
+- `verdicts`: `793c9f998ac36fbb79cb3b060f765eb5bf8d7c86427acf1dabfc43f480d95ea9`
+
+Final lead review: private-identifier scan across changed/untracked text files found
+**0 matches** (actual resource identifiers, not the public project-name prefix).
+Product-source banned-word scan found **0 matches**. Shared request fixture copies are
+byte-identical. Whitespace check passes; protected Ask/route/provider/CDN source is unchanged.
+The disposable PostGIS server created for verification was stopped after testing.
+
+## 43b: inspection requests deployed — 2026-10-11
+
+Prompt 43b added the exact requests invocation permission to scope. Lead only, no sub-agents.
+Runner migration 004/replay and exact grants passed; rolled-back writer insert/dedupe/aggregate
+and administrative reset retained all 39 candidate checksums and empty request/day rows.
+One saved targeted plan/apply: **2 add, 3 in-place changes, 0 destroy** (requests route/permission,
+API/verdicts code, stage throttle). Live code hashes match the recorded ZIPs. Ask and route
+configuration snapshots unchanged; neither called or redeployed.
+
+Live 400/404 probes did not count; sole real request 201/count 1, duplicate 200/not-created/count 1;
+detail and lists carried aggregates (38 default/39 inspected); portal-origin preflight 204.
+One production build/two-pass portal upload and one completed full invalidation. Hosted phone
+read and live inspector capture showed count 1. Final reset removed the request; RDS/public
+count **0**, daily counter retained **1**, candidates unchanged. Contract marked live.
+Final leak scan 0, lock/whitespace/index checks clean. Full evidence and hashes are in the
+single [lead report](inspection-requests-report.md); identifiers remain in ignored local files.

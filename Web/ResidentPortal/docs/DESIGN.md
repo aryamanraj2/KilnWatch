@@ -48,3 +48,7 @@ Up to 600 px wide the portal follows the iOS app's structure. Tablet and desktop
 - **Rule bars (all widths):** only a siting flag uses the flagged amber fill. Beyond-threshold bars use the secondary ink on the `surface2` track, and the threshold tick stays.
 - **Ask:** the answer sits above and the composer at the bottom of the panel, above the tab bar, with the server disclaimer under it.
 - **Type:** phone headings are capped at 1.75rem, with a 20 px screen margin and 20 px card radius. No new colours, gradients or shadows.
+
+## Inspection requests (prompt 43, 11 October 2026)
+
+The record places a neutral Resident requests card before evidence, with an ink primary **Request an inspection** action. On phones the sticky action bar links to this card; Ask remains secondary. Native concern checkboxes and distance-band radio controls have 44 px rows. Send is disabled until at least one concern is selected. The privacy line explains the random browser code and excluded personal details. Confirmation, unverified count and already-requested date use neutral ink and tabular figures. Positive counts also appear in area records. The existing written draft/export remains secondary as **Prepare a written request**. English and Hindi copy use `t()` throughout; fixture requests carry a sample/no-send notice. No status or design-token changes.

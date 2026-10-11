@@ -1,3 +1,4 @@
+import requestFixture from '../../tests/fixtures/requests-recorded.json';
 import { kilnSchema, text, type Kiln, type Rule, type Point } from './model';
 import { destination } from './geo';
 export const CENTER: Point = [77.68, 28.73];
@@ -33,6 +34,7 @@ export const kilns: Kiln[] = Array.from({ length: 7 }, (_, i) => {
       { rule_id: 'C-HAB-800', state: 'not_evaluated', measured_distance_m: null, threshold_m: null, source_url: null },
       { rule_id: 'C-TECH-10K', state: 'not_evaluated', measured_distance_m: null, threshold_m: null, source_url: null },
     ],
+    resident_requests: i === 0 ? requestFixture.resident_requests : { count: 0, within_1km: 0, concerns: { smoke_or_ash: 0, near_homes: 0, near_school_or_hospital: 0, other: 0 }, last_request_on: null },
     exposure: [0, 1, 4, 6].includes(i) ? { people: [1240, 860, 0, 0, 420, 0, 1780][i], radius_m: 800, source: text('Synthetic population example · not a measured health impact', 'काल्पनिक जनसंख्या उदाहरण · स्वास्थ्य प्रभाव का माप नहीं'), estimated_at: UPDATED } : null,
   });
 });

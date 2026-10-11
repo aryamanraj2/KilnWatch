@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { residentRequestsSchema } from './requests';
 import { checkSchema, kilnSchema, safeImage, text, type EvidenceImage, type Kiln, type Page } from './model';
 
 // Real public read API (App/docs/api-contract.md, "Integration 2C" and "R1").
@@ -25,6 +26,7 @@ export const liveKilnSchema = z.object({
   }).nullable().optional(),
   first_seen: timestamp.nullable().optional(), last_seen: timestamp,
   distance_m: z.number().finite().nonnegative().optional(),
+  resident_requests: residentRequestsSchema.optional(),
 });
 export type LiveKiln = z.infer<typeof liveKilnSchema>;
 export const liveListSchema = z.object({ kilns: z.array(liveKilnSchema).max(200), next_cursor: z.string().nullable() });
@@ -57,6 +59,7 @@ export function toKiln(raw: LiveKiln, hosts: string[]): Kiln {
     assessments: [],
     exposure: raw.exposure ? { people: raw.exposure.people, radius_m: 800, source: EXPOSURE_ATTRIBUTION, estimated_at: null } : null,
     checks: raw.rule_checks ?? [], rules_assessment: raw.rules_assessment ?? 'unknown',
+    resident_requests: raw.resident_requests,
   });
 }
 
