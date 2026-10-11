@@ -29,9 +29,15 @@ resource "aws_iam_role_policy" "ecs_task_s3" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
+      Sid      = "ReadModels",
       Effect   = "Allow",
-      Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
-      Resource = [aws_s3_bucket.data.arn, "${aws_s3_bucket.data.arn}/*"]
+      Action   = ["s3:GetObject"],
+      Resource = "${aws_s3_bucket.data.arn}/models/*"
+      }, {
+      Sid      = "WriteDetections",
+      Effect   = "Allow",
+      Action   = ["s3:PutObject"],
+      Resource = "${aws_s3_bucket.data.arn}/detections/*"
     }]
   })
 }

@@ -2,6 +2,8 @@
 
 You are the builder for **one infrastructure step**. Work sequentially in this one chat. No sub-agents. Don't commit, push or stage. The repo is public.
 
+**Run only after prompt 37 (portal hosting) has finished:** both use the same Terraform state. If `terraform plan` reports a state lock, stop and report; never force-unlock.
+
 **Goal:** the detector that produced the 39 Hapur candidates (`Model/scripts/detect_scene.py` with the verified baseline `best.pt`) runs **on AWS**, not only on a laptop:
 - an image in the existing ECR repo `aws_ecr_repository.inference`;
 - a run as the existing Fargate task `aws_ecs_task_definition.inference`;
@@ -22,8 +24,8 @@ This machine has **no Docker**. Build the image on **AWS CodeBuild**, from a sou
    - `aws_sfn_state_machine.inference`: the container override from the execution input;
    - the ECS task role policy, **narrowed** to read `models/*` and write `detections/*`, never widened.
 3. **Uploads:** the verified `best.pt`, its artifact manifest and the build zip, to the data bucket's `models/` and `build/` prefixes.
-4. **Plan and apply:** **one** targeted plan and apply for exactly those resources. Expect additions plus in-place changes and a task-definition replacement (a new revision is normal). Anything else, stop.
-5. **One** CodeBuild build. Up to **2** Step Functions executions: the 2026-10-05 after scene, and optionally the 2023-12-05 before scene (that one feeds the later change triage).
+4. **Plan and apply:** **two** targeted plan-and-applies, nothing else: (a) Step 2, for exactly those resources (additions, in-place changes and a task-definition replacement; a new revision is normal); (b) Step 3.2, after the build, setting the image tag (`aws_ecs_task_definition.inference` and `aws_sfn_state_machine.inference` only: 1 replace + 1 in-place). Anything else, stop.
+5. **One** CodeBuild build. Exactly **2** Step Functions executions: the 2026-10-05 after scene, then the 2023-12-05 before scene (it feeds change triage, prompt 40).
 
 **Out of scope:** the registry import, RDS, the API, the Lambdas, Bedrock, the CDN, the evidence cut, the tfvars beyond `enable_model_pipeline = true` and the image tag, schedules or triggers (manual starts only), the provider lock (`hashicorp/aws 6.68.0`), `destroy` and untargeted applies. If something needs one of these, stop and report.
 
@@ -84,7 +86,7 @@ This machine has **no Docker**. Build the image on **AWS CodeBuild**, from a sou
    - whether `registry.contract.convert` gives the **same 39 kiln IDs**.
 
    CPU and GPU float differences can move a footprint slightly, which changes an ID. Report it honestly, and **do not import**.
-4. Optional, only if run 1 matched well: the execution `{"scene": "S2A_T43RGM_20231205T053206_L2A", "run_id": "m0-before"}`. Report the count, and how many of today's 39 have a match in 2023 (IoU ≥ 0.3), only as a fact for later change triage.
+4. **Required (prompt 40, change triage, needs it):** after run 1 succeeds, the execution `{"scene": "S2A_T43RGM_20231205T053206_L2A", "run_id": "m0-before"}`. Report the count, and how many of today's 39 have a match in 2023 (IoU ≥ 0.3), as a fact only. If run 1 failed, stop instead.
 
 ## Step 4: docs and report
 

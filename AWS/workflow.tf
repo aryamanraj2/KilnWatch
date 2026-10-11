@@ -3,12 +3,13 @@ resource "aws_sfn_state_machine" "inference" {
   role_arn = aws_iam_role.step_functions.arn
 
   definition = jsonencode({
-    Comment = "KilnWatch starter inference workflow. Replace container command/input mapping with the actual inference contract."
+    Comment = "KilnWatch detector run: one Sentinel-2 scene per execution. Input {\"scene\": \"<STAC id>\", \"run_id\": \"<id>\"}. Manual starts only."
     StartAt = "RunInferenceTask"
     States = {
       RunInferenceTask = {
-        Type     = "Task"
-        Resource = "arn:aws:states:::ecs:runTask.sync"
+        Type           = "Task"
+        Resource       = "arn:aws:states:::ecs:runTask.sync"
+        TimeoutSeconds = 3600
         Parameters = {
           LaunchType     = "FARGATE"
           Cluster        = aws_ecs_cluster.main.arn
@@ -20,8 +21,21 @@ resource "aws_sfn_state_machine" "inference" {
               AssignPublicIp = "ENABLED"
             }
           }
+          Overrides = {
+            ContainerOverrides = [{
+              Name        = "inference"
+              "Command.$" = "States.Array('--scene', $.scene, '--run-id', $.run_id)"
+            }]
+          }
         }
-        End = true
+        # ResultPath null: the failure ends the run without echoing task or error data.
+        Catch = [{ ErrorEquals = ["States.ALL"], ResultPath = null, Next = "RunFailed" }]
+        End   = true
+      }
+      RunFailed = {
+        Type  = "Fail"
+        Error = "DetectorRunFailed"
+        Cause = "The detector task failed or timed out. See the task's log stream."
       }
     }
   })

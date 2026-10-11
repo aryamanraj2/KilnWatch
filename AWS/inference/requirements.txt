@@ -1,0 +1,13 @@
+# Same pins as Model/requirements-integration.txt (the local run that produced the 39 candidates),
+# plus the versions that run resolved for torchvision and opencv, and boto3 for S3.
+# torch and torchvision are installed first from the CPU wheel index (see Dockerfile).
+ultralytics==8.4.174
+rasterio==1.4.4
+shapely==2.1.2
+pyproj==3.7.2
+Pillow==12.3.0
+numpy==2.5.3
+torch==2.14.1
+torchvision==0.29.1
+opencv-python==5.0.0.93
+boto3==1.42.73

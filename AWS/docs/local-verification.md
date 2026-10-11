@@ -1368,3 +1368,80 @@ now allows `http://localhost:5173`, `frontend_origin` when set, and the portal o
 Open limits: the Ask cap (100 a day) and route cap are shared with anyone who finds the site,
 so share the link only for the demo. No custom domain. No CSP yet. Rollback needs a go:
 `enable_portal_hosting = false` and one targeted apply.
+
+## M0: detector on AWS (38) — live (2026-10-11)
+
+`Model/scripts/detect_scene.py` with the verified baseline `best.pt` (SHA-256 `3bcbcd0a…f799`) now
+runs on AWS: image in the inference ECR repo, Fargate task `kilnwatch-inference`, started by the
+`kilnwatch-inference-workflow` state machine, weights from S3 `models/`, output to `detections/`.
+The output is **candidates**, not findings. Amendment 38b: the main account's CodeBuild
+concurrent-build quota is 0, so the image is built by CodeBuild in the **second account**
+(`aws.cdn`) and pushed into the main repo through an ECR repository policy that allows only that
+build role the six push actions. Gated by `enable_model_pipeline`.
+
+| Resource | Account |
+|---|---|
+| CodeBuild project, its role, policy and log group; build source bucket (`build/`, 7-day expiry) | second (`aws.cdn`) |
+| ECR repo policy, image, task definition, state machine, task-role policy, `models/` and `detections/` | main |
+
+- **Image** (`AWS/inference/`): `public.ecr.aws/docker/library/python:3.12-slim`, linux/arm64,
+  CPU torch 2.14.1 / torchvision 0.29.1, pins from `Model/requirements-integration.txt`,
+  non-root. `detect_scene.py`, `prepare_data.py` and `verify_checkpoint.py` are copied unchanged
+  into the build zip, with the checkpoint manifest as the pinned hash. `entrypoint.py` refuses to
+  load the checkpoint unless both the S3 manifest and the file hash match the pinned SHA, runs the
+  local run's settings (`--aoi hapur_test --conf 0.25 --iou 0.3 --ios 0.6 --batch 16`), and writes
+  only `detections/<run-id>/kilns.geojson` and `run.json` (scene, model SHA, GeoJSON SHA, counts,
+  timings, image digest). Logs hold counts and timings only. 7 offline tests in
+  `AWS/tests/test_inference_entrypoint.py`.
+- **Runtime:** Fargate ARM64, 4 vCPU / 16 GB (`ecs_task_cpu`/`ecs_task_memory` defaults), public
+  subnet with outbound-only SG (reads Earth Search COGs). State machine: container command from
+  the input, 3600 s timeout, `Catch` to a `Fail` state without data echo. Task role narrowed to
+  `s3:GetObject` on `models/*` and `s3:PutObject` on `detections/*` (no `ListBucket`).
+- **Applies:** (a) one targeted plan/apply: 11 added, 2 changed (task-role policy, state machine),
+  1 replaced (task definition: ARM64, 4096/16384). (b) image tag `m0-aba69ad`: 1 replaced (task
+  definition), 1 changed (state machine). Provider lock unchanged.
+- **Build:** one CodeBuild build, ARM Medium, succeeded; Docker build 61 s, push 42 s, about 2 min
+  in all. Image 1,712 MB uncompressed (553 MB in ECR), digest `sha256:ee177823…49bc`. Build log
+  checked: no registry host and no 12-digit IDs.
+- **Runs:** `m0-after` 78 s end to end (detector 12.9 s, 120 patches, 55 raw detections);
+  `m0-before` 76 s (detector 12.1 s, 120 patches).
+- **Cost:** CodeBuild about $0.02 (billed to the **second account**, which has no budget alarm);
+  Fargate under $0.01 per run; ECR about $0.06 a month for one image; S3 negligible. Well under
+  the $5 cap.
+
+Comparison with the local reference (`.local/integration-1/hapur.geojson`, 39 candidates):
+
+| | `m0-after` (2026-10-05) vs local | `m0-before` (2023-12-05) vs today's 39 |
+|---|---|---|
+| Candidates | 39 (5 CFCBK, 34 FCBK) vs 39 | 32 (26 FCBK, 3 CFCBK, 3 Zigzag) |
+| One-to-one matches | 39 at IoU ≥ 0.9; median IoU 1.0; none unmatched | 15 of 39 at IoU ≥ 0.3 (median 0.77); 24 of today's 39 unmatched; 17 of the 32 unmatched |
+| Class / score | 0 class differences; max score difference 0.0 | 2 class differences among the 15 |
+| Features | identical to the local file | — |
+| `registry.contract.convert` IDs | same 39 kiln IDs | — (different scene, so new IDs by design) |
+
+The 2023 numbers are a fact for change triage (prompt 40) only: a missing 2023 match is not
+evidence that a kiln is new, and no conclusion is drawn here. Nothing was imported; the registry
+is unchanged.
+
+**Start a run** (manual only; no schedules or triggers):
+
+```sh
+aws stepfunctions start-execution --profile kilnwatch --region ap-south-1 \
+  --state-machine-arn <inference-workflow-arn> --name <run-id> \
+  --input '{"scene": "<Sentinel-2 L2A STAC id>", "run_id": "<run-id>"}'
+```
+
+`run_id` is 1–63 lowercase letters, digits and dashes; results land in `detections/<run-id>/`.
+A new image: zip the build context, upload it to the second-account bucket at
+`build/m0/source.zip`, `codebuild start-build` with `IMAGE_TAG=m0-<short sha>`, then set
+`inference_image_tag` and apply the task definition and state machine only.
+
+**Rollback** (needs a go): `enable_model_pipeline = false` and one targeted apply removes the
+second-account build resources and the ECR repository policy (the source bucket has
+`force_destroy`, as it only holds expiring build zips). The task definition and state machine stay;
+reverting them to `bootstrap` is a separate targeted apply.
+
+Open limits: ARM CPU on Fargate instead of the original laptop runtime (results identical for this
+scene); a harmless Ultralytics warning about its settings directory (it falls back to
+`/tmp/Ultralytics`); no import; manual start only; the image tag names commit `aba69ad` but was
+built from the working tree with this step's uncommitted files.

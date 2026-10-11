@@ -57,13 +57,15 @@ variable "db_allocated_storage" {
 }
 
 variable "ecs_task_cpu" {
-  type    = number
-  default = 512
+  description = "Detector task CPU units (Fargate ARM64). 4096 = 4 vCPU."
+  type        = number
+  default     = 4096
 }
 
 variable "ecs_task_memory" {
-  type    = number
-  default = 1024
+  description = "Detector task memory in MiB; must be a valid Fargate pairing with ecs_task_cpu."
+  type        = number
+  default     = 16384
 }
 
 variable "enable_amplify" {
@@ -261,6 +263,12 @@ variable "route_daily_cap" {
 
 variable "enable_portal_hosting" {
   description = "Resident portal hosting: private S3 bucket in the main account plus a CloudFront distribution (OAC) in the second account via aws.cdn. Adds the portal origin to API CORS."
+  type        = bool
+  default     = false
+}
+
+variable "enable_model_pipeline" {
+  description = "Detector image build (prompt 38/38b): CodeBuild, its role, log group and source bucket in the second account via aws.cdn, plus the inference ECR repository policy allowing only that role to push."
   type        = bool
   default     = false
 }

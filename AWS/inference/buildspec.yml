@@ -1,0 +1,22 @@
+# CodeBuild in the second account (prompt 38b). ECR_REGISTRY, ECR_REPOSITORY and ECR_REGION
+# come from the project; IMAGE_TAG from start-build. Docker output goes to files so the
+# registry host never reaches the build log; only the image digest is printed.
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  pre_build:
+    commands:
+      - test -n "$IMAGE_TAG"
+      - aws ecr get-login-password --region "$ECR_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY" > /dev/null 2>&1
+  build:
+    commands:
+      - START=$(date +%s); docker build --platform linux/arm64 -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" . > build.log 2>&1 || { tail -n 40 build.log | sed -e "s#$ECR_REGISTRY#<registry>#g" -E -e 's/[0-9]{12}/<account>/g'; exit 1; }; echo "docker build seconds $(( $(date +%s) - START ))"
+      - docker image inspect --format '{{.Size}}' "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" | awk '{printf "image size MB %.0f\n", $1/1048576}'
+  post_build:
+    commands:
+      - test "$CODEBUILD_BUILD_SUCCEEDING" = 1
+      - docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > push.log 2>&1 || { tail -n 20 push.log | sed -e "s#$ECR_REGISTRY#<registry>#g" -E -e 's/[0-9]{12}/<account>/g'; exit 1; }
+      - D=$(docker image inspect --format '{{index .RepoDigests 0}}' "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"); echo "image digest ${D##*@}"

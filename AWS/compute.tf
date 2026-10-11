@@ -16,6 +16,12 @@ resource "aws_ecs_task_definition" "inference" {
   execution_role_arn       = aws_iam_role.ecs_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
+  # The detector image is built for ARM64 (prompt 38); the command comes from the Step Functions input.
+  runtime_platform {
+    cpu_architecture        = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
   container_definitions = jsonencode([{
     name      = "inference"
     image     = "${aws_ecr_repository.inference.repository_url}:${var.inference_image_tag}"
