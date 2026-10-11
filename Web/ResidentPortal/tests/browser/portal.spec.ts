@@ -27,8 +27,8 @@ test('search, pagination, map/list selection, Back, and direct links', async ({ 
 test('two, single, absent, and failed evidence; rule limits and keyboard comparison', async ({ page }, info) => {
   await page.goto('/kilns/SAMPLE-KW-001'); const slider = page.getByRole('slider', { name: 'Compare images' }); await expect(slider).toBeEnabled();
   await slider.focus(); await page.keyboard.press('ArrowRight'); await expect(slider).toHaveValue('55');
-  await page.getByRole('button', { name: 'Show before', exact: true }).click(); await expect(slider).toHaveValue('0');
-  await page.getByRole('button', { name: 'Show after', exact: true }).click(); await expect(slider).toHaveValue('100');
+  await page.getByRole('button', { name: 'Show before', exact: true }).click(); await expect(slider).toHaveValue('100');
+  await page.getByRole('button', { name: 'Show after', exact: true }).click(); await expect(slider).toHaveValue('0');
   if (info.project.name === 'chromium') await page.screenshot({ path: `${artifacts}/evidence-en.png`, fullPage: true });
   await page.getByRole('button', { name: 'What is missing?', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Some rules have not been assessed');
   await page.getByRole('link', { name: 'C-HAB-800' }).click(); await expect(page.getByRole('heading', { name: 'Distance from homes', exact: true })).toBeVisible(); await expect(page.getByText('Not established', { exact: true })).toBeVisible();
@@ -63,8 +63,8 @@ test('English multi-record draft, personal-data boundaries, edits, download, and
 
 test('Hindi mobile journey, Devanagari coordinates, preserved language, and printable export', async ({ page }, info) => {
   await page.setViewportSize({ width: 375, height: 812 }); await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
-  await page.goto('/'); await page.getByRole('button', { name: 'हिन्दी', exact: true }).click(); await page.reload(); await expect(page.locator('html')).toHaveAttribute('lang', 'hi');
-  await page.getByLabel('अक्षांश', { exact: true }).fill('२८.७३०००'); await page.getByLabel('देशांतर', { exact: true }).fill('७७.६८०००'); await page.getByRole('button', { name: 'क्षेत्र की पुष्टि करके खोजें' }).click(); await expect(page.getByText('3 परिणाम लोड हुए')).toBeVisible();
+  await page.goto('/'); await page.locator('.prefs-menu summary').click(); await page.getByRole('button', { name: 'हिन्दी', exact: true }).click(); await page.reload(); await expect(page.locator('html')).toHaveAttribute('lang', 'hi');
+  await page.getByRole('button', { name: 'बदलें', exact: true }).click(); await page.getByText('क्षेत्र की सेटिंग', { exact: false }).click(); await page.getByLabel('अक्षांश', { exact: true }).fill('२८.७३०००'); await page.getByLabel('देशांतर', { exact: true }).fill('७७.६८०००'); await page.getByRole('button', { name: 'क्षेत्र की पुष्टि करके खोजें' }).click(); await expect(page.getByText('3 परिणाम लोड हुए')).toBeVisible();
   await page.getByRole('button', { name: 'मानचित्र', exact: true }).click(); await expect(page.locator('.map-title').getByText('सड़क मानचित्र', { exact: false })).toBeVisible();
   await page.getByRole('button', { name: 'सूची', exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -127,4 +127,25 @@ test('demo opens populated, map controls preserve selection, and comparison drag
   await page.mouse.move(box!.x + box!.width * .75, box!.y + box!.height * .6);
   await page.mouse.up();
   await expect(page.getByRole('slider', { name: 'Compare images' })).toHaveValue('75');
+});
+
+test('phone tab bar navigates Area, Ask and Draft without horizontal overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 393, height: 852 }); await page.goto('/');
+  const tabs = page.getByRole('navigation', { name: 'Tabs' }); await expect(tabs).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeHidden();
+  await expect(tabs.getByRole('link', { name: 'Area' })).toHaveAttribute('aria-current', 'page');
+  await tabs.getByRole('link', { name: 'Ask' }).click(); await expect(page).toHaveURL(/\/ask$/);
+  await expect(page.getByRole('heading', { name: 'Ask about kilns near you' })).toBeVisible(); await expect(tabs.getByRole('link', { name: 'Ask' })).toHaveAttribute('aria-current', 'page');
+  await tabs.getByRole('link', { name: 'Draft' }).click(); await expect(page).toHaveURL(/\/complaint$/); await expect(tabs.getByRole('link', { name: 'Draft' })).toHaveAttribute('aria-current', 'page');
+  await tabs.getByRole('link', { name: 'Area' }).click(); await expect(page.getByText('3 results loaded')).toBeVisible();
+  // After results the search folds to one line, so the map starts high on the page.
+  const mapTop = await page.locator('.basemap').evaluate(el => el.getBoundingClientRect().top + window.scrollY); expect(mapTop).toBeLessThanOrEqual(360);
+  await expect(page.locator('.search-summary')).toContainText('Pilkhuwa'); await expect(page.locator('.search-summary')).toContainText('Search area, not a legal buffer.');
+  await page.getByRole('button', { name: 'Edit', exact: true }).click(); await expect(page.getByLabel('Place or address', { exact: true })).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Use my location' })).toBeVisible(); await expect(page.getByRole('button', { name: 'Confirm area & search' })).toBeVisible();
+  await expect(page.getByText('This is a search area, not a legal buffer.')).toBeVisible();
+  for (const path of ['/', '/kilns/SAMPLE-KW-001', '/ask', '/complaint']) {
+    await page.setViewportSize({ width: 320, height: 800 }); await page.goto(path); await page.waitForLoadState('networkidle');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), path).toBeLessThanOrEqual(0);
+  }
 });

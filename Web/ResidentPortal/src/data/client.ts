@@ -1,5 +1,6 @@
-import { DataError, kilnSchema, pageSchema, ruleSchema, type Kiln, type Page, type Rule, type Search } from './model';
+import { DataError, type Kiln, type Page, type Rule, type Search } from './model';
 import { distance, validateSearch } from './geo';
+import { askError, AskError, askSchema, liveKilnSchema, toKiln, toPage, type AskAnswer } from './live';
 
 export type Config = { mode: 'fixture' | 'live' | 'invalid'; base: string; imageHosts: string[]; scenario: string };
 export const config: Config = {
@@ -78,6 +79,7 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
       try {
         const res = await fetcher(`${base.href.replace(/\/$/, '')}${path}`, { signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', headers: { Accept: 'application/json' } });
         if (res.status === 404) throw new DataError('not_found');
+        if (res.status === 400) throw new DataError('malformed');
         if (!res.ok) {
           if (attempt === 0 && [408, 429, 502, 503, 504].includes(res.status)) {
             const retry = res.headers.get('Retry-After');
@@ -118,31 +120,58 @@ export function makeClient(cfg: Config, fetcher: typeof fetch = fetch) {
         const next = offset + 3 < hits.length ? String(offset + 3) : null;
         return { items: hits.slice(offset, offset + 3), next_cursor: next, complete: !next, revision: 'sample-1', coverage: known ? 'known' : 'unknown', updated_at: cfg.scenario === 'stale' ? '2025-01-01T00:00:00Z' : f.UPDATED, distance_basis: 'centroid' };
       }
-      const params = new URLSearchParams({ longitude: String(query.center[0]), latitude: String(query.center[1]), radius_m: String(query.radius_m), limit: '3', ...(cursor ? { cursor } : {}) });
-      const result = pageSchema.safeParse(await read(`/public/kilns?${params}`, signal));
-      if (!result.success || !ordered(result.data.items) || result.data.items.some(item => item.distance_m > query.radius_m)) throw new DataError('malformed');
-      try { return { ...result.data, items: appendItems([], result.data.items) }; }
+      // The real near query is one page (next_cursor null); there is nothing to continue.
+      if (cursor) throw new DataError('pagination');
+      const params = new URLSearchParams({ lat: query.center[1].toFixed(6), lon: query.center[0].toFixed(6), radius_m: String(query.radius_m) });
+      const body = await read(`/public/kilns?${params}`, signal);
+      try { const page = toPage(body, query.radius_m, cfg.imageHosts); return { ...page, items: appendItems([], page.items) }; }
       catch { throw new DataError('malformed'); }
     },
     async detail(id: string, signal?: AbortSignal): Promise<Kiln> {
       if (!/^[A-Za-z0-9-]{1,100}$/.test(id)) throw new DataError('not_found');
       if (cfg.mode === 'fixture') { const f = await fixtures(signal); const k = f.kilns.find(k => k.id === id); if (!k) throw new DataError('not_found'); if (cfg.scenario === 'image-error') return { ...k, evidence: { before: null, after: k.evidence.after && { ...k.evidence.after, url: '/samples/unavailable.svg' } } }; return k; }
-      const result = kilnSchema.safeParse(await read(`/public/kilns/${encodeURIComponent(id)}`, signal));
-      if (!result.success || result.data.id !== id) throw new DataError('malformed');
-      return result.data;
+      const result = liveKilnSchema.safeParse(await read(`/public/kilns/${encodeURIComponent(id)}`, signal));
+      if (!result.success || result.data.kiln_id !== id) throw new DataError('malformed');
+      try { return toKiln(result.data, cfg.imageHosts); } catch { throw new DataError('malformed'); }
     },
     async rule(id: string, signal?: AbortSignal): Promise<Rule> {
       if (!/^[A-Za-z0-9-]{1,100}$/.test(id)) throw new DataError('not_found');
       if (cfg.mode === 'fixture') { const f = await fixtures(signal); const r = f.rules.find(r => r.id === id); if (!r) throw new DataError('not_found'); return r; }
-      const result = ruleSchema.safeParse(await read(`/public/rules/${encodeURIComponent(id)}`, signal));
-      if (!result.success || result.data.id !== id) throw new DataError('malformed');
-      return result.data;
+      // The real API has no rule route; live rule pages are built from a kiln's rule_checks.
+      throw new DataError('configuration');
+    },
+    // POST /ask: one request, never retried automatically. Rejects with AskError.
+    async ask(question: string, kilnId: string | null, signal?: AbortSignal): Promise<AskAnswer> {
+      let base: URL;
+      try { base = new URL(cfg.base); } catch { throw new AskError('configuration', false); }
+      if (cfg.mode !== 'live' || base.protocol !== 'https:' || base.username || base.password || base.search || base.hash) throw new AskError('configuration', false);
+      const trimmed = question.trim();
+      if (!trimmed || trimmed.length > 500) throw new AskError('invalid', false);
+      const controller = new AbortController();
+      const abort = () => controller.abort();
+      signal?.addEventListener('abort', abort, { once: true });
+      const timer = setTimeout(abort, 35000); // The server budget is 28 s.
+      try {
+        const res = await fetcher(`${base.href.replace(/\/$/, '')}/ask`, { method: 'POST', signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ question: trimmed, ...(kilnId ? { kiln_id: kilnId } : {}) }) });
+        let body: unknown = null;
+        try { body = await readJSON(res); } catch { /* Error bodies may be empty or non-JSON. */ }
+        if (!res.ok) throw askError(res.status, body);
+        const answer = askSchema.safeParse(body);
+        if (!answer.success) throw new AskError('malformed', true);
+        return answer.data;
+      } catch (e) {
+        if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (e instanceof AskError) throw e;
+        throw new AskError('network', true);
+      } finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }
     },
   };
 }
 export const client = makeClient(config);
 export function mergePages(previous: Page, next: Page, seenCursors: Set<string>): Page {
-  if (previous.revision !== next.revision || previous.coverage !== next.coverage || previous.distance_basis !== next.distance_basis || Date.parse(previous.updated_at) !== Date.parse(next.updated_at) || (next.next_cursor && seenCursors.has(next.next_cursor)) || (!next.items.length && next.next_cursor) || !ordered(previous.items) || !ordered(next.items)) throw new DataError('pagination');
+  const sameTime = previous.updated_at === null || next.updated_at === null ? previous.updated_at === next.updated_at : Date.parse(previous.updated_at) === Date.parse(next.updated_at);
+  if (previous.revision !== next.revision || previous.coverage !== next.coverage || previous.distance_basis !== next.distance_basis || !sameTime || (next.next_cursor && seenCursors.has(next.next_cursor)) || (!next.items.length && next.next_cursor) || !ordered(previous.items) || !ordered(next.items)) throw new DataError('pagination');
   const items = appendItems(previous.items, next.items);
   return { ...next, items };
 }

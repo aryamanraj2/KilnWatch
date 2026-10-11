@@ -2,7 +2,7 @@
 
 Phase R1: a local English/Hindi resident experience using explicit sample data. No account, live AWS connection, submission service, or deployment is required. The private inspector app and backend are unchanged.
 
-R2 frontend preparation is now locally implemented. The user confirmed the public backend is not ready; default data remains fictional. See [local R2 preparation](docs/R2-local-preparation.md) for the tested path and service inputs still needed.
+Live mode (prompt 36, 11 October 2026) reads the real public API locally: flagged Hapur kilns, their rule checks, exposure and evidence, plus the resident assistant (Ask, the same `POST /ask` the iOS app uses). Fixture mode stays the default. Nothing is hosted.
 
 ## Run locally
 
@@ -34,9 +34,30 @@ npm run test:e2e:live -- --project=webkit
 
 Functional browser checks mock map tile responses to avoid repeatedly fetching community tiles. Separate visual review checks real provider rendering. Browser checks use one worker, no retries, and a local Vite server. Engines are run sequentially. On this workstation browsers were downloaded to the ignored `.cache/ms-playwright`; set `PLAYWRIGHT_BROWSERS_PATH=.cache/ms-playwright` when running tests. Do not install a second cache unnecessarily. The browser suite creates a small set of review artifacts under `docs/screens/`; failure traces and reports are ignored under `test-results/`.
 
-`test:e2e:live` starts a separate Vite server on port 5174 in live mode and intercepts every test API/image request with fictional contract responses and generated 256-pixel PNGs. It does not contact AWS, change `.env`, or establish public publication approval. Set `KW_ARTIFACT_DIR=.cache/sample-review` on sample-suite runs to keep regenerated review files separate from the previously reviewed `docs/screens/` artifacts and Playwright's cleared result directory.
+`test:e2e:live` starts a separate Vite server on port 5174 in live mode and intercepts every API, Ask and image request with recorded real-shape responses (`tests/fixtures/hapur-near.json`, sanitized hosts) and generated 256-pixel PNGs. It does not contact AWS. Run it on Chromium. Set `KW_ARTIFACT_DIR=.cache/sample-review` on sample-suite runs to keep regenerated review files separate from the previously reviewed `docs/screens/` artifacts and Playwright's cleared result directory.
 
 `npm run preview` serves the production `dist/` build locally. No script deploys, commits, or pushes. Tests use fictional personal details only. The production build has no source maps and no development fault controls.
+
+## Live mode
+
+The API's CORS allows exactly the origin `http://localhost:5173`; `127.0.0.1:5173` is a different origin and the browser blocks it. Create an ignored `.env.local` (all `.env*` files are ignored) with placeholder-shaped values:
+
+```sh
+VITE_DATA_MODE=live
+VITE_PUBLIC_API_BASE_URL=https://<public-api-host>
+VITE_PUBLIC_IMAGE_HOSTS=<evidence-cdn-host>
+```
+
+Then run `npm run dev:live` and open `http://localhost:5173/`. Never commit the real values or put them in screenshots. Unit and browser tests force their own configuration, so a local `.env.local` does not affect them; `npm run dev` and `npm run build` do read it.
+
+What live mode shows, from the real contract (`App/docs/api-contract.md`, Integration 2C, R1 and Phase 4A):
+
+- Search sends `GET /public/kilns?lat=…&lon=…&radius_m=…` (one page, at most 50, distance to the kiln footprint). Records use the full kiln ID as their name and say "Flagged by satellite · pending inspection". Predictions are unverified; the score is a detector score.
+- Rule checks are shown as published, with the iOS status words. Inconclusive is never shown as clear; a record with no siting flag says it did not pass anything. Rule pages are built from a kiln's own `rule_checks` (there is no rule route).
+- Exposure is modelled residents within 800 m of the kiln edge, with the HRSL attribution; null is "not assessed". Evidence images load only from the configured CDN host, with the Copernicus attribution.
+- The API does not publish a dataset revision, coverage or update time, so the page says "Update time not published" and "Coverage unknown".
+- Default reads only: a kiln that is no longer public (for example after an inspector verdict) shows the not-found state.
+- **Ask** (`/ask`, and "Ask about this kiln" on a record): one trimmed question of 1–500 characters, one request at a time, no automatic retry. It shows the answer as plain text, the server's step labels, citation links to records, the fallback state and the server disclaimer. Answers are English only. The shared daily cap applies; a 429 with `daily_cap_reached` says the limit resets at 05:30 IST.
 
 ## Data configuration
 
@@ -45,13 +66,13 @@ The default is `fixture`. To make it explicit, copy `.env.example` to ignored `.
 | Variable | Meaning |
 |---|---|
 | `VITE_DATA_MODE` | `fixture` (default) or `live`. An unknown value fails closed. |
-| `VITE_PUBLIC_API_BASE_URL` | Future approved HTTPS public API prefix. No `/v1` is appended automatically. Blank in R1. No inspector token. |
-| `VITE_PUBLIC_IMAGE_HOSTS` | Comma-separated exact HTTPS evidence hosts, no wildcard. Empty in R1. |
+| `VITE_PUBLIC_API_BASE_URL` | HTTPS public API prefix (no `/v1`). Only in an ignored `.env.local`. No inspector token. |
+| `VITE_PUBLIC_IMAGE_HOSTS` | Comma-separated exact HTTPS evidence hosts, no wildcard. Only in an ignored `.env.local`. |
 | `VITE_FIXTURE_SCENARIO` | Optional development-only failure case, listed below. |
 
-Live configuration is exercised by unit tests and local browser journeys, **not completed R2 integration**. It never falls back to fixtures. The user authorized local preparation; do not configure a real endpoint until the public projection and service are approved/ready.
+Live mode never falls back to fixtures. It was checked by hand against the real API on `localhost` (see [handover](docs/HANDOVER.md)); unit tests and `test:e2e:live` use recorded real-shape bodies with fake hosts.
 
-The public client enforces a 1,000,000-byte streamed JSON limit, rejects invalid UTF-8 and API redirects, and verifies page order, supplied distances within the query radius, and snapshot consistency. Configure the final HTTPS API prefix directly. Backend distance rounding and ID ordering must agree with the [proposed contract](docs/public-api-contract.md) before live connection.
+The public client enforces a 1,000,000-byte streamed JSON limit, rejects invalid UTF-8 and API redirects, and verifies page order, supplied distances within the query radius, and snapshot consistency. The [old proposal](docs/public-api-contract.md) is superseded by the real contract.
 
 For local failure review, start in development mode at one of these URLs, then choose a sample area and search:
 
@@ -76,7 +97,7 @@ A scenario is selected at page load and remains for that document session. Retur
 - Synthetic before/after evidence, single/missing/broken evidence, per-image outlines, source links, provisional predictions, unknown facts, and deterministic explanations.
 - Up to ten selected records in an editable inspection request. Optional personal details and explicit location opt-in. Copy, UTF-8 text download, and browser Print/Save as PDF. Evidence URLs are references, not attachments. Nothing is filed or sent.
 - Language/theme preferences are the only local-storage values. Other state is memory-only; refresh loses it. Meaningful unsaved draft changes prompt before replacement or unloading. Browser unload warnings depend on browser support/user interaction.
-- No external geocoding, live assistant, analytics, service worker, citizen account, notification system, private image proxy, model weights, or automatic complaint submission.
+- No external geocoding, analytics, service worker, citizen account, notification system, private image proxy, model weights, or automatic complaint submission.
 - Legal sources are references with stated limits. The UP habitation threshold is unresolved. A sample orchard comparison is not a finding about a real site.
 
 ## Documentation

@@ -35,6 +35,13 @@ export const ruleSchema = z.object({
   applicability: z.enum(['reference_only', 'sample_assessment']),
 });
 export type Rule = z.infer<typeof ruleSchema>;
+// Live rule checks are kept as published (R1 contract); fixture records have none.
+export const checkSchema = z.object({
+  rule_id: z.string().regex(/^[A-Za-z0-9-]{1,40}$/), check: z.string().min(1).max(200), status: z.string().min(1).max(40),
+  threshold_m: z.number().finite().nonnegative().nullable(), measured_distance_m: z.number().finite().nonnegative().nullable(),
+  verification: z.string().max(40).nullable(), source: z.string().max(300),
+});
+export type RuleCheck = z.infer<typeof checkSchema>;
 export const kilnSchema = z.object({
   id: z.string().regex(/^[A-Za-z0-9-]{1,100}$/), name: localized,
   status: z.string().min(1).max(80), human_reviewed: z.boolean(), centroid: point,
@@ -43,13 +50,14 @@ export const kilnSchema = z.object({
   prediction: z.object({ type: z.string().min(1).max(80), score: z.number().min(0).max(1).nullable(), verified: z.boolean() }),
   evidence: z.object({ before: imageSchema.nullable(), after: imageSchema.nullable() }),
   assessments: z.array(z.object({ rule_id: z.string(), state: z.enum(['assessed', 'not_evaluated']), measured_distance_m: z.number().finite().nonnegative().nullable(), threshold_m: positive.nullable(), source_url: z.string().url().nullable() })),
-  exposure: z.object({ people: z.number().int().nonnegative(), radius_m: positive, source: localized, estimated_at: timestamp }).nullable(),
+  exposure: z.object({ people: z.number().int().nonnegative(), radius_m: positive, source: localized, estimated_at: timestamp.nullable() }).nullable(),
+  checks: z.array(checkSchema).optional(), rules_assessment: z.string().max(40).optional(),
 });
 export type Kiln = z.infer<typeof kilnSchema>;
 export const pageSchema = z.object({
   items: z.array(z.object({ kiln: kilnSchema, distance_m: z.number().finite().nonnegative() })).max(100),
   next_cursor: z.string().min(1).nullable(), complete: z.boolean(), revision: z.string().min(1),
-  coverage: z.enum(['known', 'unknown']), updated_at: timestamp, distance_basis: z.literal('centroid'),
+  coverage: z.enum(['known', 'unknown']), updated_at: timestamp.nullable(), distance_basis: z.enum(['centroid', 'footprint']),
 }).refine(p => !(p.complete && p.next_cursor) && !(p.items.length === 0 && p.next_cursor), 'Invalid page completeness');
 export type Page = z.infer<typeof pageSchema>;
 export type Search = { center: Point; radius_m: number };

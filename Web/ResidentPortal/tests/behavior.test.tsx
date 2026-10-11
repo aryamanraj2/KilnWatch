@@ -33,7 +33,9 @@ describe('resident interactions', () => {
   it('provides keyboard-independent comparison buttons once the images load', () => {
     render(<LocaleProvider><Evidence kiln={kilns[0]} /></LocaleProvider>);
     for (const image of screen.getAllByRole('img')) loadImage(image);
-    expect(screen.getByRole('slider')).toBeEnabled(); fireEvent.click(screen.getByText('Show before')); expect(screen.getByRole('slider')).toHaveValue('0'); fireEvent.click(screen.getByText('Show after')); expect(screen.getByRole('slider')).toHaveValue('100');
+    expect(screen.getByRole('slider')).toBeEnabled(); fireEvent.click(screen.getByText('Show before')); expect(screen.getByRole('slider')).toHaveValue('100'); fireEvent.click(screen.getByText('Show after')); expect(screen.getByRole('slider')).toHaveValue('0');
+    // Before sits on the left and After on the right, as in the iOS comparator.
+    expect(screen.getByText('Before', { selector: '.image-date.earlier' })).toBeVisible(); expect(screen.getByText('After', { selector: '.image-date.later' })).toBeVisible();
   });
   it('rejects a decoded image whose size contradicts the supplied outline grid', () => {
     render(<LocaleProvider><Evidence kiln={kilns[0]} /></LocaleProvider>);

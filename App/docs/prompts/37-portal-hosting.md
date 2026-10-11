@@ -21,7 +21,7 @@ You are the builder for **one infrastructure step**. Run it **after prompt 36** 
 
 ## Step 0: preflight (read-only, stop on any failure)
 
-1. Confirm that prompt 36 is in the working tree and that `npm run build` passes in `Web/ResidentPortal`.
+1. Confirm that prompts 36, 36b and 36c are in the working tree (or committed) and that `npm run build` passes in `Web/ResidentPortal`.
 2. Confirm the `cdn_profile` can **read** CloudFront in the second account (`cloudfront list-distributions`, `list-functions`, `list-origin-access-controls`), printing counts only. If `list-functions` is denied, the SPA rewrite can't use a CloudFront Function: stop and report, and the user will ask the second account's owner.
 3. **Cost note** for the report: S3 storage of a few MB, and CloudFront within the free tier at demo traffic. Expect about $0 a month. Say so.
 
@@ -56,15 +56,17 @@ You are the builder for **one infrastructure step**. Run it **after prompt 36** 
 
 1. `/` loads and the search near 28.7306, 77.7759 shows the real kilns. **The browser console has no CORS errors.**
 2. A direct load and a refresh of `/kilns/KW-6b3b38da681850e5af46b024f3d3f78e` show C-HAB-800 at 497 m against 800 m, 4,225 people, and before/after images with the attribution.
-3. A missing asset path (for example `/assets/nope.js`) does **not** return `index.html`.
-4. Direct S3 access to the portal bucket gives 403. A request with `Origin: <portal origin>` to `/public/kilns?...` returns `access-control-allow-origin` equal to the portal origin. `http://localhost:5173` still works.
-5. Ask from the hosted site (at most 2): "How many kilns are flagged in Hapur?" and one question from a kiln page. Report the status, the fallback flag and the latency.
-6. The response headers include HSTS and nosniff.
+3. On a phone-sized window (393 px), the bottom tab bar shows and `/ask` loads on refresh.
+4. A missing asset path (for example `/assets/nope.js`) does **not** return `index.html`.
+5. Direct S3 access to the portal bucket gives 403. A request with `Origin: <portal origin>` to `/public/kilns?...` returns `access-control-allow-origin` equal to the portal origin. `http://localhost:5173` still works.
+6. Ask from the hosted site (at most 2): "How many kilns are flagged in Hapur?" and one question from a kiln page. Report the status, the fallback flag and the latency.
+7. The response headers include HSTS and nosniff.
 
 ## Step 4: docs and report
 
 - `Web/ResidentPortal/docs/hosting-proposal.md`: replace the Amplify text with "Hosted: S3 (main account, private) + CloudFront (second account, OAC)", the deploy commands with placeholders, and how to roll back (`enable_portal_hosting = false`, targeted apply, needs a go).
 - `AWS/docs/local-verification.md`: a short "Portal hosting (37)" entry, with no identifiers.
+- `App/docs/api-contract.md`, "Phase 4A — Ask": the daily cap text still says 50; the live cap is **100 per UTC day** (to go back to 50 after the hackathon). Fix the number and the cost line (≈ $8 typical, ≈ $94 worst case per 30 days at 100). Also note in "Errors, caching, throttling" that CORS now allows `http://localhost:5173` and the hosted portal origin (placeholder, no domain).
 
 **Report:**
 - the preflight;

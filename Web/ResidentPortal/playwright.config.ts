@@ -10,6 +10,7 @@ export default defineConfig({
   webServer: {
     command: liveCheck ? 'npm run dev -- --port 5174 --strictPort' : process.env.KW_PERFORMANCE ? 'npm run preview -- --port 4173 --strictPort' : 'npm run dev',
     url: baseURL, reuseExistingServer: !liveCheck && !process.env.CI, timeout: 30000,
-    ...(liveCheck ? { env: { VITE_DATA_MODE: 'live', VITE_PUBLIC_API_BASE_URL: 'https://public.example.test', VITE_PUBLIC_IMAGE_HOSTS: 'evidence.example.test' } } : {}),
+    // Process env overrides an ignored .env.local, so browser suites never use a real endpoint.
+    env: liveCheck ? { VITE_DATA_MODE: 'live', VITE_PUBLIC_API_BASE_URL: 'https://public.example.test', VITE_PUBLIC_IMAGE_HOSTS: 'evidence.example.test' } : { VITE_DATA_MODE: 'fixture', VITE_PUBLIC_API_BASE_URL: '', VITE_PUBLIC_IMAGE_HOSTS: '' },
   },
 });

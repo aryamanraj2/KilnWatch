@@ -2,7 +2,7 @@
 
 You are the builder for **one web step**. Work sequentially in this one chat. No sub-agents. Don't commit, push or stage. The repo is public.
 
-The resident portal (`Web/ResidentPortal/`, React + Vite, built by the AWS teammate) runs only on fictional sample data. Its "live" mode was written against a *proposed* API shape that doesn't match the real one. This step makes it **show the real 39 Hapur kilns** and adds the **resident assistant** (concept Agent 3). That assistant is the **same live `POST /ask`** the iOS app uses; don't build a second one.
+The resident portal (`Web/ResidentPortal/`, React + Vite, built by the AWS teammate) runs only on fictional sample data. Its "live" mode was written against a *proposed* API shape that doesn't match the real one. This step makes it **show the real flagged Hapur kilns** (38 today; see "Facts") and adds the **resident assistant** (concept Agent 3). That assistant is the **same live `POST /ask`** the iOS app uses; don't build a second one.
 
 **The user gave the go by running this prompt.** The scope is exactly:
 1. edits under `Web/ResidentPortal/` only (code, tests, its docs);
@@ -23,6 +23,7 @@ The resident portal (`Web/ResidentPortal/`, React + Vite, built by the AWS teamm
 - **CORS:** the API allows exactly the origin `http://localhost:5173`. `npm run dev` binds `127.0.0.1`, which is a *different* origin, and the browser will block it. Run live mode on `http://localhost:5173` (add a `dev:live` script with `--host localhost --port 5173 --strictPort`). Don't ask for a CORS change.
 - **Config:** use an ignored `Web/ResidentPortal/.env.local` (`.env*` is already ignored) with `VITE_DATA_MODE=live`, `VITE_PUBLIC_API_BASE_URL` and `VITE_PUBLIC_IMAGE_HOSTS`. Read the API base URL from `.local/integration-2b/outputs.json` (`api_base_url`) and the CDN host from `.local/phase-4/cdn/outputs.json`, without printing them. **Never write either value to a tracked file, a screenshot, a log you commit or this chat.**
 - **The real near query** is `GET /public/kilns?lat=…&lon=…&radius_m=…` (100–5000, at most 50 results, sorted by `distance_m`, `next_cursor: null`). It returns `{"kilns": [...], "next_cursor": …}` with the fields `kiln_id`, `footprint`, `type`, `type_verification`, `detection_confidence`, `status`, `violations`, `rules_assessment`, `rule_checks`, `exposure`, `district`, `evidence` (+ metadata), `first_seen`, `last_seen` and `distance_m`. The detail route is `/public/kilns/{kiln_id}`. There is **no** `/public/rules/{id}`, no localized `name`, no `revision`/`coverage`/`updated_at`/`source_url`.
+- **Since V1 (2026-10-11), one Hapur kiln has an inspector verdict.** `KW-00c562060b40502fb4a7ed2016ce7576` is `confirmed`, so the default public reads return **38** flagged kilns, and its detail returns **404** `not_found`. The operator may reset it before the demo video (then 39). **Keep the default reads; don't use `include=inspected` in this step** (the contract says the portal keeps the default). Don't hardcode 38 or 39 anywhere. A record link to a kiln that isn't public shows the portal's existing not-found state ("not in the public list"), never a generic error and never a fixture.
 - A good test point: Hapur kilns lie around 28.70–28.78 N, 77.70–77.83 E (for example 28.7306, 77.7759). Pilkhuwa, the sample-place default, is at the west edge.
 
 ## Step 1: live data adapter
@@ -63,9 +64,10 @@ Add one simple page or panel, "Ask about kilns near you", that calls `POST {base
 - **Live, by hand** on `http://localhost:5173` with `.env.local`:
   - search near 28.7306, 77.7759 at 3000 m: real kilns appear;
   - open the reference kiln `KW-6b3b38da681850e5af46b024f3d3f78e` and check C-HAB-800 at 497 m against 800 m, 4,225 people, and before/after images with the attribution;
-  - open one zero-flag kiln: not shown as clear.
+  - open one zero-flag kiln: not shown as clear;
+  - open `/…/KW-00c562060b40502fb4a7ed2016ce7576` by direct link: the not-found state, no crash.
 - **Ask (at most 4 live):**
-  1. "How many kilns are flagged in Hapur?"
+  1. "How many kilns are flagged in Hapur?" (expect 38 while the demo verdict stands)
   2. From the reference kiln's page: "What should I check at this kiln?"
   3. "Which Hapur kilns have the most people within 800 m?"
   4. Spare.

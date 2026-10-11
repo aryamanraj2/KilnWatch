@@ -31,7 +31,9 @@ Set the Amplify monorepo app-root variable consistently. Confirm runtime availab
 
 Preview environments should explicitly set `VITE_DATA_MODE=fixture`. Only an authorized R2/R4 production environment receives the approved public API prefix and exact image-host list. No inspector token, AWS key, secret, or private endpoint belongs in Vite variables. The current R1 HTML uses `noindex,nofollow`; keep prototypes out of indexing and revisit public record metadata only after publication approval.
 
-Configure SPA rewrites only for actual frontend routes (`/`, `/area`, `/kilns/<id>`, `/rules/<id>`, `/complaint`, `/about`, `/privacy`). Missing `/assets/*.js`, styles, and images must remain 404s; a broad HTML fallback for missing JavaScript is incorrect. Verify direct-link refresh and missing assets on the hosted environment.
+Hosting needs the API's `frontend_origin` set to the exact hosted origin (one targeted apply, needs a go).
+
+Configure SPA rewrites only for actual frontend routes (`/`, `/area`, `/kilns/<id>`, `/rules/<id>`, `/ask`, `/complaint`, `/about`, `/privacy`). Missing `/assets/*.js`, styles, and images must remain 404s; a broad HTML fallback for missing JavaScript is incorrect. Verify direct-link refresh and missing assets on the hosted environment.
 
 Proposed production header policy, to be reviewed against actual origins: HTTPS/HSTS after domain validation, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, restrictive `frame-ancestors`, and a CSP covering self-hosted scripts/styles, approved `connect-src`/`img-src`, and no object embedding. Current React style attributes for the map/comparator need an explicit compatible style policy. Do not declare a CSP that breaks these controls or simply allow every origin. No remote fonts or workers are used in R1; later MapLibre sources/worker policy require review. Geolocation should be limited to the site's own secure context.
 

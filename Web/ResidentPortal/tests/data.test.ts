@@ -4,6 +4,7 @@ import { CENTER, kilns } from '../src/data/fixtures';
 import { destination, distance, parseCoordinate, ring, validateSearch } from '../src/data/geo';
 import { makeClient, mergePages, type Config } from '../src/data/client';
 import { describe as explainRecord, exportText, makeDraft, missingFacts } from '../src/features/complaint/draft';
+import near from './fixtures/hapur-near.json';
 
 const fixture: Config = { mode: 'fixture', base: '', imageHosts: [], scenario: '' };
 const live: Config = { mode: 'live', base: 'https://public.example.test', imageHosts: [], scenario: '' };
@@ -74,7 +75,7 @@ describe('live client refuses sample recovery', () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json(body)); await expect(makeClient(live, fetcher).nearby(query, null)).rejects.toMatchObject({ code: 'malformed' }); expect(fetcher).toHaveBeenCalledTimes(1);
   });
   it('does not accept the wrong detail ID or retry a non-disclosing 404', async () => {
-    await expect(makeClient(live, vi.fn<typeof fetch>().mockResolvedValue(json(kilns[1]))).detail(kilns[0].id)).rejects.toMatchObject({ code: 'malformed' });
+    await expect(makeClient(live, vi.fn<typeof fetch>().mockResolvedValue(json(near.kilns[1]))).detail(near.kilns[0].kiln_id)).rejects.toMatchObject({ code: 'malformed' });
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json({}, 404)); await expect(makeClient(live, fetcher).detail('SAMPLE-MISSING')).rejects.toMatchObject({ code: 'not_found' }); expect(fetcher).toHaveBeenCalledTimes(1);
   });
   it('fails unconfigured live mode without making any request', async () => {

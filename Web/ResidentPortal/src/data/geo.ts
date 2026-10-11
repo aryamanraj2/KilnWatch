@@ -16,7 +16,7 @@ export function ring(center: Point, radius: number): Point[] {
   return Array.from({ length: 65 }, (_, i) => destination(center, radius, i * 360 / 64));
 }
 export function validateSearch(s: Search): boolean {
-  return point.safeParse(s.center).success && [800, 1000, 2000, 5000].includes(s.radius_m);
+  return point.safeParse(s.center).success && [800, 1000, 2000, 3000, 5000].includes(s.radius_m);
 }
 export function parseCoordinate(value: string): number {
   const normalized = value.replace(/[०-९]/g, c => String(c.charCodeAt(0) - 0x0966)).trim();

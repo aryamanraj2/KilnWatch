@@ -55,3 +55,16 @@ Checks and reviewed screenshots: [demo verification](demo-verification.md).
 OpenStreetMap is a network dependency; the kiln registry and drafts remain local.
 The prepared live client still needs the approved public backend and publication
 proof described above. Existing manual accessibility/translation release gaps remain.
+
+## Live mode on the real API (prompt 36, 11 October 2026)
+
+Local only, no hosting, deploy, AWS or CORS change. `npm run dev:live` on `http://localhost:5173` (the only origin the API's CORS allows) with an ignored `.env.local`; see [README](../README.md#live-mode). Fixture mode remains the default and unchanged.
+
+- `src/data/live.ts` validates the real `GET /public/kilns` near query and detail with zod and maps them into the existing `Kiln`/`Page` model: kiln ID as name, unverified prediction with a detector score, `rule_checks` as published (iOS status words, inconclusive never clear), HRSL exposure (null = not assessed), evidence only from the configured CDN host with Copernicus attribution. Page facts the API lacks are stated as unknown. The near query is one page; there is no `/public/rules` call (rule pages come from a kiln's `rule_checks`).
+- `src/features/ask/AskPage.tsx` is the resident assistant on the shared `POST /ask`: no auth, one request at a time, no automatic retry, steps/citations/fallback/disclaimer as sent, English answers with a Hindi note, and the 400 / 429 cap / 429 throttle / 503 states.
+- Hand checks against the live API passed: near search, the reference kiln (C-HAB-800 497 m vs 800 m, 4,225 people, both images), a zero-flag kiln (not shown as passed), and the inspected kiln by direct link (not found). Three live Ask questions were used. Screens are in `docs/screens/live/`.
+- Open: native Hindi review of the new strings; hosting needs the exact `frontend_origin` (see [hosting](hosting-proposal.md)); WebKit was not run for this step.
+
+**Phones (prompt 36b, 11 October 2026):** the iOS-style tab bar, compact top bar, search-first area, kiln "At a glance" card with a sticky action bar, Before | After comparator, flags-only amber rule bars and an Ask composer at the bottom. Desktop is unchanged. See [design](DESIGN.md#phones-prompt-36b-11-october-2026) and `docs/screens/mobile/`.
+
+**Phone Area (prompt 36c, 11 October 2026):** after results the search folds to a one-line summary with Edit, "Use my location" is an icon in the search row, and the map starts at 352 px at 393 × 852 (it was about 700). Desktop is pixel-identical (0 differing pixels at 1440 × 900).

@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { makeClient, mergePages, type Config } from '../src/data/client';
-import { CENTER, kilns, UPDATED } from '../src/data/fixtures';
+import { kilns, UPDATED } from '../src/data/fixtures';
 import type { Page } from '../src/data/model';
+import near from './fixtures/hapur-near.json';
 
 const live: Config = { mode: 'live', base: 'https://public.example.test', imageHosts: [], scenario: '' };
-const query = { center: CENTER, radius_m: 1000 };
+const nearQuery = { center: [77.7759, 28.7306] as [number, number], radius_m: 5000 };
 const headers = { 'content-type': 'application/json' };
 const json = (data: unknown) => new Response(JSON.stringify(data), { headers });
 const first: Page = { items: [{ kiln: kilns[0], distance_m: 300 }], next_cursor: 'next', complete: false,
@@ -35,14 +36,15 @@ describe('bounded public response reading', () => {
     expect(fetcher).toHaveBeenCalledOnce();
   });
   it('decodes Hindi correctly when a character spans response chunks', async () => {
-    const record = { ...kilns[0], name: { en: 'Test record', hi: 'निरीक्षण' } };
+    const raw = near.kilns[0];
+    const record = { ...raw, rule_checks: [{ ...raw.rule_checks[0], check: 'निरीक्षण' }] };
     const bytes = new TextEncoder().encode(JSON.stringify(record));
     const split = bytes.indexOf(0xe0) + 1;
     const response = new Response(new ReadableStream({ start(controller) {
       controller.enqueue(bytes.slice(0, split)); controller.enqueue(bytes.slice(split, split + 1));
       controller.enqueue(bytes.slice(split + 1)); controller.close();
     } }), { headers });
-    expect((await makeClient(live, vi.fn<typeof fetch>().mockResolvedValue(response)).detail(record.id)).name.hi).toBe(record.name.hi);
+    expect((await makeClient(live, vi.fn<typeof fetch>().mockResolvedValue(response)).detail(record.kiln_id)).checks?.[0].check).toBe('निरीक्षण');
   });
   it('rejects invalid UTF-8 instead of replacing corrupt characters', async () => {
     const bytes = new Uint8Array([0x7b, 0x22, 0xff, 0x22, 0x3a, 0x31, 0x7d]);
@@ -51,8 +53,8 @@ describe('bounded public response reading', () => {
     expect(fetcher).toHaveBeenCalledOnce();
   });
   it('passes redirect refusal to Fetch so search requests cannot follow another destination', async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json(first));
-    await makeClient(live, fetcher).nearby(query, null);
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json(near));
+    await makeClient(live, fetcher).nearby(nearQuery, null);
     expect(fetcher.mock.calls[0][1]).toMatchObject({ redirect: 'error', credentials: 'omit', referrerPolicy: 'no-referrer' });
   });
   it.each(['cancel', 'timeout'] as const)('retains %s behavior during body streaming', async action => {
@@ -69,17 +71,19 @@ describe('bounded public response reading', () => {
 });
 
 describe('consistent nearby result sets', () => {
-  it('deduplicates the first page and rejects conflicting copies within that page', async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(json({ ...first, items: [first.items[0], first.items[0]] }))
-      .mockResolvedValueOnce(json({ ...first, items: [first.items[0], { ...first.items[0], kiln: { ...kilns[0], revision: 'conflicting' } }] }));
-    expect((await makeClient(live, fetcher).nearby(query, null)).items).toHaveLength(1);
-    await expect(makeClient(live, fetcher).nearby(query, null)).rejects.toMatchObject({ code: 'malformed' });
+  it('deduplicates the live page and rejects conflicting copies within it', async () => {
+    const k = near.kilns[0];
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(json({ kilns: [k, k], next_cursor: null }))
+      .mockResolvedValueOnce(json({ kilns: [k, { ...k, distance_m: k.distance_m + 10 }], next_cursor: null }));
+    expect((await makeClient(live, fetcher).nearby(nearQuery, null)).items).toHaveLength(1);
+    await expect(makeClient(live, fetcher).nearby(nearQuery, null)).rejects.toMatchObject({ code: 'malformed' });
   });
-  it.each(['order', 'id-tie', 'radius'] as const)('rejects a first page with invalid %s', async variant => {
-    const items = variant === 'order' ? [next.items[0], first.items[0]] : variant === 'id-tie'
-      ? [{ ...next.items[0], distance_m: 300 }, first.items[0]] : [{ ...first.items[0], distance_m: 1001 }];
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json({ ...first, items }));
-    await expect(makeClient(live, fetcher).nearby(query, null)).rejects.toMatchObject({ code: 'malformed' });
+  it.each(['radius', 'cursor', 'missing-distance'] as const)('rejects a live page with invalid %s', async variant => {
+    const k = near.kilns[0];
+    const body = variant === 'radius' ? { kilns: [{ ...k, distance_m: 5001 }], next_cursor: null } : variant === 'cursor'
+      ? { ...near, next_cursor: 'unexpected' } : { kilns: [{ ...k, distance_m: undefined }], next_cursor: null };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(json(body));
+    await expect(makeClient(live, fetcher).nearby(nearQuery, null)).rejects.toMatchObject({ code: 'malformed' });
     expect(fetcher).toHaveBeenCalledOnce();
   });
   it('rejects changed snapshot time and an earlier unseen record on a later page', () => {

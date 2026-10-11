@@ -1,0 +1,988 @@
+{
+ "kilns": [
+  {
+   "kiln_id": "KW-25672ba2e9aa5340a2ebc51257a4e5fd",
+   "footprint": {
+    "centroid": {
+     "latitude": 28.713294,
+     "longitude": 77.776524
+    },
+    "polygon": [
+     {
+      "latitude": 28.713081,
+      "longitude": 77.775946
+     },
+     {
+      "latitude": 28.712776,
+      "longitude": 77.776309
+     },
+     {
+      "latitude": 28.713506,
+      "longitude": 77.777101
+     },
+     {
+      "latitude": 28.713812,
+      "longitude": 77.776738
+     }
+    ]
+   },
+   "type": "FCBK",
+   "type_confidence": 0.508,
+   "detection_confidence": 0.508,
+   "type_verification": "unverified",
+   "first_seen": "2026-10-05T05:41:03.148000Z",
+   "last_seen": "2026-10-05T05:41:03.148000Z",
+   "status": "flagged",
+   "violations": [
+    {
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+     "rule_id": "C-HAB-800",
+     "measured_to": {
+      "latitude": 28.713081,
+      "longitude": 77.775946
+     },
+     "threshold_m": 800,
+     "evidence_url": null,
+     "measured_distance_m": 0
+    },
+    {
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+     "rule_id": "C-KILN-1K",
+     "measured_to": {
+      "latitude": 28.706111,
+      "longitude": 77.77889
+     },
+     "threshold_m": 1000,
+     "evidence_url": null,
+     "measured_distance_m": 781
+    }
+   ],
+   "rules_assessment": "partially_evaluated",
+   "exposure": {
+    "people": 20838,
+    "adults_over_sixty": 1283,
+    "children_under_five": 2123
+   },
+   "rule_checks": [
+    {
+     "rule_id": "C-HAB-800",
+     "check": "Distance to habitation",
+     "status": "within_threshold",
+     "threshold_m": 800,
+     "measured_distance_m": 0,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-KILN-1K",
+     "check": "Distance to another kiln",
+     "status": "within_threshold",
+     "threshold_m": 1000,
+     "measured_distance_m": 781,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-ORCH-800",
+     "check": "Distance to an orchard",
+     "status": "inconclusive",
+     "threshold_m": 800,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules"
+    },
+    {
+     "rule_id": "UP-SCH-1K",
+     "check": "Distance to a school",
+     "status": "inconclusive",
+     "threshold_m": 1000,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-NH-300",
+     "check": "Distance to a national highway",
+     "status": "beyond_threshold",
+     "threshold_m": 300,
+     "measured_distance_m": 876,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-RAIL-200",
+     "check": "Distance to a railway line",
+     "status": "beyond_threshold",
+     "threshold_m": 200,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-MUN-5K",
+     "check": "Distance to a municipal council, corporation or nagar panchayat",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-TECH-10K",
+     "check": "Technology within 10 km of a non-attainment city",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "Central 2022 rules"
+    }
+   ],
+   "district": "Hapur",
+   "evidence": {
+    "before": "https://cdn.example.test/evidence/ee06c0f7c6f3409e0dd7d83192f73379fa2850de6986c550c75cf799292ef83f.png",
+    "after": "https://cdn.example.test/evidence/ea97594a516615e38c1912d4a05ee4a7acfbba8908d9f074ade0326a993feed3.png",
+    "before_metadata": {
+     "acquired_at": "2023-12-05T05:40:56.807000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2023",
+     "centroid_px": [
+      128.368972,
+      128.935955
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": null,
+     "geotransform": [
+      769950.0,
+      10.0,
+      0.0,
+      3180670.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/ee06c0f7c6f3409e0dd7d83192f73379fa2850de6986c550c75cf799292ef83f.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/ee06c0f7c6f3409e0dd7d83192f73379fa2850de6986c550c75cf799292ef83f.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 0.000186,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "sha256": "ee06c0f7c6f3409e0dd7d83192f73379fa2850de6986c550c75cf799292ef83f",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    },
+    "after_metadata": {
+     "acquired_at": "2026-10-05T05:41:03.148000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2026",
+     "centroid_px": [
+      128.368972,
+      128.935955
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": [
+      [
+       122.775203,
+       131.428815
+      ],
+      [
+       126.401569,
+       134.727316
+      ],
+      [
+       133.953206,
+       126.45438
+      ],
+      [
+       130.32658,
+       123.144817
+      ]
+     ],
+     "geotransform": [
+      769950.0,
+      10.0,
+      0.0,
+      3180670.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/ea97594a516615e38c1912d4a05ee4a7acfbba8908d9f074ade0326a993feed3.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/ea97594a516615e38c1912d4a05ee4a7acfbba8908d9f074ade0326a993feed3.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 5.6e-05,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "sha256": "ea97594a516615e38c1912d4a05ee4a7acfbba8908d9f074ade0326a993feed3",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    }
+   },
+   "distance_m": 1869
+  },
+  {
+   "kiln_id": "KW-e730cb05565c5cf292937929f6bfdb0c",
+   "footprint": {
+    "centroid": {
+     "latitude": 28.726612,
+     "longitude": 77.801514
+    },
+    "polygon": [
+     {
+      "latitude": 28.726183,
+      "longitude": 77.801865
+     },
+     {
+      "latitude": 28.726564,
+      "longitude": 77.802112
+     },
+     {
+      "latitude": 28.727041,
+      "longitude": 77.801165
+     },
+     {
+      "latitude": 28.726659,
+      "longitude": 77.800917
+     }
+    ]
+   },
+   "type": "FCBK",
+   "type_confidence": 0.56,
+   "detection_confidence": 0.56,
+   "type_verification": "unverified",
+   "first_seen": "2026-10-05T05:41:03.148000Z",
+   "last_seen": "2026-10-05T05:41:03.148000Z",
+   "status": "flagged",
+   "violations": [
+    {
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+     "rule_id": "C-HAB-800",
+     "measured_to": {
+      "latitude": 28.727503,
+      "longitude": 77.793189
+     },
+     "threshold_m": 800,
+     "evidence_url": null,
+     "measured_distance_m": 761
+    }
+   ],
+   "rules_assessment": "partially_evaluated",
+   "exposure": {
+    "people": 25701,
+    "adults_over_sixty": 1583,
+    "children_under_five": 2618
+   },
+   "rule_checks": [
+    {
+     "rule_id": "C-HAB-800",
+     "check": "Distance to habitation",
+     "status": "within_threshold",
+     "threshold_m": 800,
+     "measured_distance_m": 761,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-KILN-1K",
+     "check": "Distance to another kiln",
+     "status": "beyond_threshold",
+     "threshold_m": 1000,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-ORCH-800",
+     "check": "Distance to an orchard",
+     "status": "inconclusive",
+     "threshold_m": 800,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules"
+    },
+    {
+     "rule_id": "UP-SCH-1K",
+     "check": "Distance to a school",
+     "status": "inconclusive",
+     "threshold_m": 1000,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-NH-300",
+     "check": "Distance to a national highway",
+     "status": "beyond_threshold",
+     "threshold_m": 300,
+     "measured_distance_m": 1260,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-RAIL-200",
+     "check": "Distance to a railway line",
+     "status": "beyond_threshold",
+     "threshold_m": 200,
+     "measured_distance_m": 733,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-MUN-5K",
+     "check": "Distance to a municipal council, corporation or nagar panchayat",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-TECH-10K",
+     "check": "Technology within 10 km of a non-attainment city",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "Central 2022 rules"
+    }
+   ],
+   "district": "Hapur",
+   "evidence": {
+    "before": "https://cdn.example.test/evidence/8609c688dca6108f95c02425578adf7b2f5453050fad9ae143127d552daf110b.png",
+    "after": "https://cdn.example.test/evidence/31d0776d27d8158a0499ca748d8b34e04d530aa54bb8dd3b689a708661a36ec4.png",
+    "before_metadata": {
+     "acquired_at": "2023-12-05T05:40:56.807000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2023",
+     "centroid_px": [
+      128.125099,
+      128.578355
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": null,
+     "geotransform": [
+      772360.0,
+      10.0,
+      0.0,
+      3182200.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/8609c688dca6108f95c02425578adf7b2f5453050fad9ae143127d552daf110b.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/8609c688dca6108f95c02425578adf7b2f5453050fad9ae143127d552daf110b.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 0.000186,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "sha256": "8609c688dca6108f95c02425578adf7b2f5453050fad9ae143127d552daf110b",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    },
+    "after_metadata": {
+     "acquired_at": "2026-10-05T05:41:03.148000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2026",
+     "centroid_px": [
+      128.125099,
+      128.578355
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": [
+      [
+       131.666884,
+       133.253518
+      ],
+      [
+       133.981177,
+       128.973023
+      ],
+      [
+       124.602885,
+       123.902723
+      ],
+      [
+       122.279061,
+       128.194513
+      ]
+     ],
+     "geotransform": [
+      772360.0,
+      10.0,
+      0.0,
+      3182200.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/31d0776d27d8158a0499ca748d8b34e04d530aa54bb8dd3b689a708661a36ec4.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/31d0776d27d8158a0499ca748d8b34e04d530aa54bb8dd3b689a708661a36ec4.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 5.6e-05,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "sha256": "31d0776d27d8158a0499ca748d8b34e04d530aa54bb8dd3b689a708661a36ec4",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    }
+   },
+   "distance_m": 2479
+  },
+  {
+   "kiln_id": "KW-64e53b7b965453108b2aeea524685304",
+   "footprint": {
+    "centroid": {
+     "latitude": 28.7394,
+     "longitude": 77.74759
+    },
+    "polygon": [
+     {
+      "latitude": 28.739041,
+      "longitude": 77.747906
+     },
+     {
+      "latitude": 28.739416,
+      "longitude": 77.748105
+     },
+     {
+      "latitude": 28.739759,
+      "longitude": 77.747276
+     },
+     {
+      "latitude": 28.739382,
+      "longitude": 77.747076
+     }
+    ]
+   },
+   "type": "FCBK",
+   "type_confidence": 0.57,
+   "detection_confidence": 0.57,
+   "type_verification": "unverified",
+   "first_seen": "2026-10-05T05:41:03.148000Z",
+   "last_seen": "2026-10-05T05:41:03.148000Z",
+   "status": "flagged",
+   "violations": [],
+   "rules_assessment": "partially_evaluated",
+   "exposure": {
+    "people": 9332,
+    "adults_over_sixty": 575,
+    "children_under_five": 951
+   },
+   "rule_checks": [
+    {
+     "rule_id": "C-HAB-800",
+     "check": "Distance to habitation",
+     "status": "inconclusive",
+     "threshold_m": 800,
+     "measured_distance_m": 1131,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-KILN-1K",
+     "check": "Distance to another kiln",
+     "status": "beyond_threshold",
+     "threshold_m": 1000,
+     "measured_distance_m": 1831,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-ORCH-800",
+     "check": "Distance to an orchard",
+     "status": "inconclusive",
+     "threshold_m": 800,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules"
+    },
+    {
+     "rule_id": "UP-SCH-1K",
+     "check": "Distance to a school",
+     "status": "inconclusive",
+     "threshold_m": 1000,
+     "measured_distance_m": 1148,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-NH-300",
+     "check": "Distance to a national highway",
+     "status": "beyond_threshold",
+     "threshold_m": 300,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-RAIL-200",
+     "check": "Distance to a railway line",
+     "status": "beyond_threshold",
+     "threshold_m": 200,
+     "measured_distance_m": 793,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-MUN-5K",
+     "check": "Distance to a municipal council, corporation or nagar panchayat",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-TECH-10K",
+     "check": "Technology within 10 km of a non-attainment city",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "Central 2022 rules"
+    }
+   ],
+   "district": "Hapur",
+   "evidence": {
+    "before": "https://cdn.example.test/evidence/3eb8767ea33af8c5bde1e53ed40c7b21f539d11c80b8e2a4c7ce019a492dc012.png",
+    "after": "https://cdn.example.test/evidence/d8100b33413472078fa929f7e3ad7f426b89987429b0f0f998c571b91ad1ceb2.png",
+    "before_metadata": {
+     "acquired_at": "2023-12-05T05:40:56.807000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2023",
+     "centroid_px": [
+      128.924433,
+      128.089427
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": null,
+     "geotransform": [
+      767050.0,
+      10.0,
+      0.0,
+      3183490.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/3eb8767ea33af8c5bde1e53ed40c7b21f539d11c80b8e2a4c7ce019a492dc012.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/3eb8767ea33af8c5bde1e53ed40c7b21f539d11c80b8e2a4c7ce019a492dc012.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 0.000186,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "sha256": "3eb8767ea33af8c5bde1e53ed40c7b21f539d11c80b8e2a4c7ce019a492dc012",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    },
+    "after_metadata": {
+     "acquired_at": "2026-10-05T05:41:03.148000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2026",
+     "centroid_px": [
+      128.924433,
+      128.089427
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": [
+      [
+       132.103726,
+       131.997913
+      ],
+      [
+       133.952097,
+       127.795934
+      ],
+      [
+       125.764702,
+       124.180482
+      ],
+      [
+       123.90705,
+       128.404843
+      ]
+     ],
+     "geotransform": [
+      767050.0,
+      10.0,
+      0.0,
+      3183490.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/d8100b33413472078fa929f7e3ad7f426b89987429b0f0f998c571b91ad1ceb2.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/d8100b33413472078fa929f7e3ad7f426b89987429b0f0f998c571b91ad1ceb2.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 5.6e-05,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "sha256": "d8100b33413472078fa929f7e3ad7f426b89987429b0f0f998c571b91ad1ceb2",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    }
+   },
+   "distance_m": 2882
+  },
+  {
+   "kiln_id": "KW-6b3b38da681850e5af46b024f3d3f78e",
+   "footprint": {
+    "centroid": {
+     "latitude": 28.747059,
+     "longitude": 77.72956
+    },
+    "polygon": [
+     {
+      "latitude": 28.746674,
+      "longitude": 77.7299
+     },
+     {
+      "latitude": 28.747029,
+      "longitude": 77.730112
+     },
+     {
+      "latitude": 28.747444,
+      "longitude": 77.729221
+     },
+     {
+      "latitude": 28.747089,
+      "longitude": 77.729009
+     }
+    ]
+   },
+   "type": "FCBK",
+   "type_confidence": 0.324,
+   "detection_confidence": 0.324,
+   "type_verification": "unverified",
+   "first_seen": "2026-10-05T05:41:03.148000Z",
+   "last_seen": "2026-10-05T05:41:03.148000Z",
+   "status": "flagged",
+   "violations": [
+    {
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)",
+     "rule_id": "C-HAB-800",
+     "measured_to": {
+      "latitude": 28.749671,
+      "longitude": 77.72481
+     },
+     "threshold_m": 800,
+     "evidence_url": null,
+     "measured_distance_m": 497
+    }
+   ],
+   "rules_assessment": "partially_evaluated",
+   "exposure": {
+    "people": 4225,
+    "adults_over_sixty": 294,
+    "children_under_five": 430
+   },
+   "rule_checks": [
+    {
+     "rule_id": "C-HAB-800",
+     "check": "Distance to habitation",
+     "status": "within_threshold",
+     "threshold_m": 800,
+     "measured_distance_m": 497,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-KILN-1K",
+     "check": "Distance to another kiln",
+     "status": "beyond_threshold",
+     "threshold_m": 1000,
+     "measured_distance_m": 1273,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules; UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-ORCH-800",
+     "check": "Distance to an orchard",
+     "status": "inconclusive",
+     "threshold_m": 800,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "Central 2022 rules"
+    },
+    {
+     "rule_id": "UP-SCH-1K",
+     "check": "Distance to a school",
+     "status": "inconclusive",
+     "threshold_m": 1000,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-NH-300",
+     "check": "Distance to a national highway",
+     "status": "beyond_threshold",
+     "threshold_m": 300,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-RAIL-200",
+     "check": "Distance to a railway line",
+     "status": "beyond_threshold",
+     "threshold_m": 200,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "UP siting rules (2012)"
+    },
+    {
+     "rule_id": "UP-MUN-5K",
+     "check": "Distance to a municipal council, corporation or nagar panchayat",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "secondary_sources",
+     "source": "UP siting rules (2026 amendment)"
+    },
+    {
+     "rule_id": "C-TECH-10K",
+     "check": "Technology within 10 km of a non-attainment city",
+     "status": "not_evaluated",
+     "threshold_m": null,
+     "measured_distance_m": null,
+     "verification": "unverified_compilation",
+     "source": "Central 2022 rules"
+    }
+   ],
+   "district": "Hapur",
+   "evidence": {
+    "before": "https://cdn.example.test/evidence/77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc.png",
+    "after": "https://cdn.example.test/evidence/a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5.png",
+    "before_metadata": {
+     "acquired_at": "2023-12-05T05:40:56.807000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2023",
+     "centroid_px": [
+      128.818205,
+      128.237018
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": null,
+     "geotransform": [
+      765270.0,
+      10.0,
+      0.0,
+      3184300.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 0.000186,
+     "scene_id": "S2A_T43RGM_20231205T053206_L2A",
+     "sha256": "77aa718e93395c091017e1e4094ca714c8191a57e13f16759f077afce4a498fc",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2023/12/S2A_T43RGM_20231205T053206_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    },
+    "after_metadata": {
+     "acquired_at": "2026-10-05T05:41:03.148000Z",
+     "attribution": "Contains modified Copernicus Sentinel data 2026",
+     "centroid_px": [
+      128.818205,
+      128.237018
+     ],
+     "crs": "EPSG:32643",
+     "footprint_px": [
+      [
+       132.237745,
+       132.42878
+      ],
+      [
+       134.218656,
+       128.445917
+      ],
+      [
+       125.408457,
+       124.045025
+      ],
+      [
+       123.427527,
+       128.027871
+      ]
+     ],
+     "geotransform": [
+      765270.0,
+      10.0,
+      0.0,
+      3184300.0,
+      0.0,
+      -10.0
+     ],
+     "grid_code": "MGRS-43RGM",
+     "gsd_m": 10,
+     "nodata_fraction": 0.0,
+     "object_key": "evidence/a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5.png",
+     "patch_px": 256,
+     "published_url": "https://cdn.example.test/evidence/a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5.png",
+     "rendering": "rgb_reflectance_fixed_0_0.3_gamma_1.0_v1",
+     "scene_cloud_pct": 5.6e-05,
+     "scene_id": "S2B_T43RGM_20261005T053448_L2A",
+     "sha256": "a0a6c2ca17915c9ce3efc4f7bf52efc2a9b23628e6dd794673167087b9d42cc5",
+     "source_assets": [
+      {
+       "band": "red",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B04.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "green",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B03.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      },
+      {
+       "band": "blue",
+       "href": "https://e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com/sentinel-2-c1-l2a/43/R/GM/2026/10/S2B_T43RGM_20261005T053448_L2A/B02.tif",
+       "offset": -0.1,
+       "scale": 0.0001
+      }
+     ]
+    }
+   },
+   "distance_m": 4824
+  }
+ ],
+ "next_cursor": null
+}

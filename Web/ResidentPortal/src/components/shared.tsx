@@ -3,6 +3,17 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { DataError, type Kiln } from '../data/model';
 import { useLocale } from '../i18n';
 
+// Phone layout switch (matches the CSS breakpoint). jsdom and old browsers get the desktop layout.
+const PHONE = '(max-width: 600px)';
+export function usePhone() {
+  const [phone, setPhone] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(PHONE).matches);
+  useEffect(() => {
+    const media = window.matchMedia?.(PHONE); if (!media) return;
+    const update = () => setPhone(media.matches); update();
+    media.addEventListener('change', update); return () => media.removeEventListener('change', update);
+  }, []);
+  return phone;
+}
 export function Arrow() { return <span aria-hidden="true">↗</span>; }
 export function Status({ kiln }: { kiln: Kiln }) {
   const { t } = useLocale();

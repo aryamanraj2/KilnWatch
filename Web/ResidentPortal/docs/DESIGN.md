@@ -33,3 +33,18 @@ Source text is rendered as React text, never HTML. Image/source URLs are allowli
 ## Demo completion (10 October 2026)
 
 The user authorized a finished local demo with maps and sample data. This supersedes R1’s diagram-only limitation. Record sidebars now include real street geography around fictional demo coordinates. Additional reviewed examples include synthetic evidence, orchard reference measurements and population context. The missing-data record remains intentionally unassessed; failed imagery is a development scenario. No design-token changes or unrelated inspector/AWS work. Map-provider requests are explained in Privacy.
+
+## Phones (prompt 36b, 11 October 2026)
+
+Up to 600 px wide the portal follows the iOS app's structure. Tablet and desktop layouts are unchanged.
+
+- **Tab bar:** fixed at the bottom with Area, Ask and Draft, each a symbol plus a word, with the selected-record count on Draft. Real links with `aria-current="page"`, 56 px targets, `env(safe-area-inset-bottom)` padding and `viewport-fit=cover`. A solid surface bar with a hairline top border. Translucency is a progressive enhancement on this bar and the top bar only, and text stays legible without it. The top text tabs are hidden on phones.
+- **Top bar:** one sticky row with the mark and "KilnWatch" on the left and a native `<details>` menu on the right holding the language buttons and theme select. The sample/live banner is one line ("Sample data · fictional records") and is always visible.
+- **Area:** a one-line title ("Check an area"), then place search and "Use my location", then a collapsed "Area settings" `<details>` with the coordinates and radius. "This is a search area, not a legal buffer" stays visible. Then the Map/List control, the map at `max(320px, 55svh)`, and the selected record directly below it.
+- **Area search after results (36c):** the form folds to one line ("Pilkhuwa · 1 km", or the coordinates in mono) with an "Edit" button and "Search area, not a legal buffer." under it. Edit, a new search or a validation error keeps the full form open. In the full form, "Use my location" is a 44 × 44 icon button in the search row, and the sample-places, legal-buffer and privacy notes sit under the Confirm button. With fixture results the map starts 352 px from the top at 393 × 852.
+- **Units:** a figure and its unit are one mono token joined by a no-break space. On phones that space is narrowed so `520 m` doesn't read like code.
+- **Kiln:** an "At a glance" card under the ID and status that restates the top rule line, the people line and the latest observation exactly as the page already shows them. Then evidence, rules (siting flags as full cards, the rest under "Other rule checks · N"), exposure and the map. "Model prediction" is collapsible. A sticky action bar above the tab bar has "Ask about this kiln" (`surface2`) and "Add to draft" (ink).
+- **Comparator (all widths):** Before on the left, After on the right, as on iOS. The slider value is the divider position: "Show before" moves it to 100 and "Show after" to 0.
+- **Rule bars (all widths):** only a siting flag uses the flagged amber fill. Beyond-threshold bars use the secondary ink on the `surface2` track, and the threshold tick stays.
+- **Ask:** the answer sits above and the composer at the bottom of the panel, above the tab bar, with the server disclaimer under it.
+- **Type:** phone headings are capped at 1.75rem, with a 20 px screen margin and 20 px card radius. No new colours, gradients or shadows.

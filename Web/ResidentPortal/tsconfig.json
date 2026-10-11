@@ -4,7 +4,7 @@
     "module": "ESNext", "moduleResolution": "Bundler", "jsx": "react-jsx",
     "strict": true, "noUnusedLocals": true, "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true, "noEmit": true, "skipLibCheck": true,
-    "esModuleInterop": true, "allowImportingTsExtensions": true,
+    "esModuleInterop": true, "allowImportingTsExtensions": true, "resolveJsonModule": true,
     "types": ["vite/client", "vitest/globals", "node"]
   },
   "include": ["src", "tests", "*.ts"]

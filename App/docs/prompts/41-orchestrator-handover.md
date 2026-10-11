@@ -99,8 +99,8 @@ Then check `git status` and `git log`.
 ## 6. Open items for the user (ask first)
 
 1. **Resolved (2026-10-11):** the AWS teammate's comment/description edits and the two deleted example files were **restored** after review. They changed no infrastructure, but they dropped useful context and broke references in `AWS/README.md`, `versions.tf` and the runbook. The deployed 39b change in `bridge.tf` is kept. Their patch is saved in the ignored `.local/friend-edits/` if they want any descriptions back.
-2. **Commit:** the staged work holds 39/39b (backend, migration, docs), 22 (iOS) and prompts 22/39/39b/41. Fetch first, leak-scan the staged diff, then commit and push with a go.
-3. **Keep or reset the demo verdict** on `KW-00c562…` (38 vs 39 flagged). A reset needs a go.
+2. **Done (2026-10-11):** committed and pushed as `16e51f3`; leak scan 0. Was: the staged work holds 39/39b (backend, migration, docs), 22 (iOS) and prompts 22/39/39b/41. Fetch first, leak-scan the staged diff, then commit and push with a go.
+3. **Decided (2026-10-11): keep it now; reset once right before recording the demo video** (needs an `aws login` and a go then). Was: keep or reset the demo verdict on `KW-00c562…` (38 vs 39 flagged). A reset needs a go.
 
 ## 7. Next steps (in order)
 
