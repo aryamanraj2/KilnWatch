@@ -136,6 +136,9 @@ The deployed clients share an **API Gateway HTTP API**. Lambda separates public 
 
 <img src="AWS/docs/architecture/01-platform.jpg" width="1100" alt="KilnWatch AWS platform architecture: iOS and web clients, API Gateway, Cognito, Lambda registry API, RDS PostgreSQL with PostGIS and Secrets Manager inside a VPC">
 
+The initial plan was to host the resident web portal using AWS Amplify Hosting. However, we switched to Amazon CloudFront with a private S3 bucket as the origin for the final deployment. CloudFront provides edge caching for faster asset delivery and Origin Access Control (OAC), ensuring the S3 bucket remains private. This approach offers greater control over content delivery and access permissions, while the portal's APIs continue to run on Amazon API Gateway and AWS Lambda.
+
+
 **Public resident services: Ask and route planning**
 
 <img src="AWS/docs/architecture/02-resident-services.jpg" width="1100" alt="Resident Ask and route planning: API Gateway to Lambda, Amazon Bedrock, Amazon Location Service and DynamoDB daily caps">
