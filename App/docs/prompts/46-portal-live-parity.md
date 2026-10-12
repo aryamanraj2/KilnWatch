@@ -4,11 +4,13 @@ Use a **new Codex chat**. One builder, **no sub-agents** (one lane). Don't stage
 
 ## 1. Why this prompt exists
 
-The hosted portal is wired to the live API, but in practice **it doesn't work for a visitor**. The orchestrator opened the hosted site at 390 px (11 Oct, after 43c):
+The hosted portal **is** connected to the live API: the orchestrator tested it at 390 px (11 Oct, after 43c). Coordinates `28.7306, 77.7759` at 5 km returned 22 live kilns with pins, evidence thumbnails and no errors, and portal Ask answered from live data with three cited records. The problem is **getting there**:
 
-- The place field is **disabled** ("Address search needs an approved provider. Enter coordinates below."). A visitor must open Area settings and type latitude/longitude to see anything.
+- The place field is **disabled** ("Address search needs an approved provider. Enter coordinates below."). A visitor must open Area settings and type latitude/longitude to see anything; typing a place does nothing.
 - Nothing is on the map until a search succeeds.
-- The local prompt-45 polish (uncommitted, not uploaded) accepts only the exact word "Hapur", rejects anything else with a validation error, and its 5 km circle around one point returns **22 of the 38** flagged kilns.
+- The largest radius is 5 km, so even a good search shows **22 of the 38** flagged kilns. There is no "all of Hapur" view.
+- Kilns are numbered pins only; iOS also draws each footprint.
+- The local prompt-45 polish (uncommitted, not uploaded) accepts only the exact word "Hapur" and rejects anything else with a validation error.
 
 **User direction (binding):** the portal must work like the iOS app. Whatever a visitor types, they get the **Hapur map with every kiln highlighted**, and everything that's built (records, evidence, Ask, inspection requests, the draft) works on live data. Hapur is the only district for now; the user will add a coverage note **after** recording the video, so **don't add a new coverage warning now** (keep the existing "Hapur, Uttar Pradesh" context line).
 
@@ -19,7 +21,7 @@ The hosted portal is wired to the live API, but in practice **it doesn't work fo
 Running this prompt authorizes:
 - local edits in `Web/ResidentPortal/` only, plus `Web/ResidentPortal/docs/`;
 - GET/HEAD reads of the public API, the evidence CDN and the hosted portal (private config read silently from `.local/` and the ignored `Web/ResidentPortal/.env.production.local`, never printed);
-- **at most 2 live `POST /ask`** calls for the final check (Ask cap is 100/day, shared with iOS); **no** live `POST /requests`, `/verdicts` or `/routes/plan`;
+- **at most 1 live `POST /ask`** call for the final hosted check (the orchestrator already used 1 today) (Ask cap is 100/day, shared with iOS); **no** live `POST /requests`, `/verdicts` or `/routes/plan`;
 - after all checks pass, **one** hosted re-upload by 37's procedure: `npm run build` with the ignored `.env.production.local`, two-pass `s3 sync` to the portal bucket, invalidate `/*`. First check both `aws login` sessions (`kilnwatch`, `kilnwatch-bedrock`) with masked output; if either fails, stop and ask the user to sign in. No other AWS action.
 
 Not allowed: API or contract changes, backend code, Terraform, DB writes, iOS files, new map/geocoding providers that need keys or accounts, analytics.
@@ -51,8 +53,8 @@ Fix anything that is broken or still sample-only in live mode. If something can'
 
 - `npm run typecheck`, `npm test`, `npm run build`, mocked `test:e2e:live` and the sample suite on Chromium. Update tests for the new search behaviour (any text → all kilns; kiln ID → that kiln; coordinates → sorted by distance; no disabled field).
 - Light only, phone width 390 and one desktop. Screenshots in `Web/ResidentPortal/docs/screens/parity-46/`: landing with all kilns, "Delhi" typed and submitted (all kilns), a kiln ID search, a selected kiln card, a record page with evidence, an Ask answer (from the mocked suite).
-- After the upload: open the **hosted** site at 390 px, read-only: landing shows all 38 kilns without any input; submit "Delhi" → all 38; open one record; images load; no page or CORS errors. Use at most 2 live Ask calls total across the whole prompt.
+- After the upload: open the **hosted** site at 390 px, read-only: landing shows all 38 kilns without any input; submit "Delhi" → all 38; open one record; images load; no page or CORS errors. Use at most 1 live Ask call across the whole prompt.
 
 ## 5. Report
 
-Diff summary; what was broken and what you fixed; test counts; screenshots; the hosted check; the upload and invalidation summary (no identifiers); live POST count (Ask ≤ 2, everything else 0); leak check of changed files against every identifier in `.local/` and the tfvars (expect 0); banned-word grep of `Web/ResidentPortal/src` (expect 0); anything that still needs a backend change. Add a short entry to `Web/ResidentPortal/docs/HANDOVER.md`.
+Diff summary; what was broken and what you fixed; test counts; screenshots; the hosted check; the upload and invalidation summary (no identifiers); live POST count (Ask ≤ 1, everything else 0); leak check of changed files against every identifier in `.local/` and the tfvars (expect 0); banned-word grep of `Web/ResidentPortal/src` (expect 0); anything that still needs a backend change. Add a short entry to `Web/ResidentPortal/docs/HANDOVER.md`.
