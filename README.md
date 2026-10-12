@@ -132,50 +132,13 @@ Resident requests are visible context for an inspector; they do **not** currentl
 
 The deployed clients share an **API Gateway HTTP API**. Lambda separates public registry reads, assistant/review access, road-route planning, and verdict/request writes. **RDS PostgreSQL + PostGIS** holds the registry and spatial data; **Amazon S3** holds evidence and field photos.
 
-```mermaid
-flowchart TB
-    subgraph Clients["Product surfaces"]
-        IOS["Inspector app<br/>SwiftUI + MapKit"]
-        WEB["Resident portal<br/>React + Leaflet"]
-    end
+**Platform: clients, API routing and the private registry**
 
-    subgraph Delivery["Web and evidence delivery"]
-        HOST["CloudFront + private S3<br/>portal assets"]
-        CDN["CloudFront + private S3<br/>published evidence"]
-    end
+<img src="AWS/docs/architecture/01-platform.jpg" width="1100" alt="KilnWatch AWS platform architecture: iOS and web clients, API Gateway, Cognito, Lambda registry API, RDS PostgreSQL with PostGIS and Secrets Manager inside a VPC">
 
-    HOST --> WEB
-    CDN --> IOS
-    CDN --> WEB
-    IOS --> API["API Gateway<br/>HTTP API"]
-    WEB --> API
+**Public resident services: Ask and route planning**
 
-    subgraph Services["Lambda services"]
-        READ["Registry Lambda<br/>nearby + detail"]
-        ASK["Assistant Lambda<br/>Ask + review reads"]
-        PLAN["Route Lambda<br/>route planning"]
-        WRITE["Write Lambda<br/>verdicts + requests"]
-    end
-
-    API --> READ
-    API --> ASK
-    API --> PLAN
-    API --> WRITE
-    READ --> DB[("RDS PostgreSQL<br/>PostGIS registry")]
-    WRITE --> DB
-    WRITE --> PHOTO[("S3<br/>field photos")]
-    ASK --> MODEL["Amazon Bedrock<br/>Nova 2 Lite"]
-    ASK --> DDB[("DynamoDB<br/>Ask counter + review queue")]
-    PLAN --> LOCATION["Amazon Location Service<br/>road matrix + route geometry"]
-
-    classDef surface fill:#FAEEE7,stroke:#A64B25,color:#171717;
-    classDef service fill:#F5F5F5,stroke:#B9B9B9,color:#171717;
-    class IOS,WEB surface;
-    class HOST,CDN,API,READ,ASK,PLAN,WRITE,DB,PHOTO,MODEL,DDB,LOCATION service;
-    style Clients fill:#FFFFFF,stroke:#D5D5D5,color:#171717;
-    style Delivery fill:#F8F8F8,stroke:#D5D5D5,color:#171717;
-    style Services fill:#F8F8F8,stroke:#D5D5D5,color:#171717;
-```
+<img src="AWS/docs/architecture/02-resident-services.jpg" width="1100" alt="Resident Ask and route planning: API Gateway to Lambda, Amazon Bedrock, Amazon Location Service and DynamoDB daily caps">
 
 *The assistant's registry and route tools call the shared public API; the route planner also reads public registry data. Neither opens a database connection. Field-photo uploads use presigned S3 URLs issued by the write service.*
 
@@ -196,28 +159,13 @@ The demo uses public endpoints without sign-in, with input validation, throttles
 
 The detector runs on **ECS Fargate**, with **Step Functions** controlling each manually started scene execution. **CodeBuild** builds the image and **ECR** stores it. The container verifies the checkpoint hash before loading it and records scene, model, output and image provenance.
 
-```mermaid
-flowchart TB
-    BUILD["CodeBuild → ECR<br/>versioned detector image"]
-    OP["Operator starts one scene run"] --> SFN["AWS Step Functions<br/>timeout + failure state"]
-    SFN --> TASK["ECS Fargate<br/>tile → detect → merge"]
-    BUILD --> TASK
-    S2["Sentinel-2 L2A<br/>Earth Search"] --> TASK
-    WEIGHTS[("S3<br/>checkpoint + manifest")] --> TASK
-    TASK --> OUTPUT[("S3<br/>candidate GeoJSON + run metadata")]
-    OUTPUT --> IMPORT["Operator-controlled import<br/>and rules/exposure assessment"]
-    IMPORT --> DB[("RDS + PostGIS<br/>published registry")]
-    PATCH["Evidence preparation<br/>dated before/after patches"] --> IMAGES[("Private S3 → CloudFront<br/>published evidence")]
-    IMAGES -->|"evidence references"| DB
-    OUTPUT -. "separate manual triage" .-> TRIAGE["Deterministic scene comparison<br/>+ Bedrock reason text"]
-    DB -. "current records" .-> TRIAGE
-    TRIAGE --> QUEUE[("DynamoDB review queue<br/>read in iOS Review")]
+**Inference execution: from job to registry**
 
-    classDef compute fill:#FAEEE7,stroke:#A64B25,color:#171717;
-    classDef data fill:#F5F5F5,stroke:#B9B9B9,color:#171717;
-    class BUILD,SFN,TASK,IMPORT,PATCH,TRIAGE compute;
-    class OP,S2,WEIGHTS,OUTPUT,DB,IMAGES,QUEUE data;
-```
+<img src="AWS/docs/architecture/03-inference-execution.jpg" width="1100" alt="Inference execution: API Gateway, Job Starter Lambda, Step Functions, ECS Fargate, ECR, S3 and the Registry Publisher writing to RDS">
+
+**Evidence delivery and operations**
+
+<img src="AWS/docs/architecture/04-evidence-and-operations.jpg" width="1100" alt="Evidence delivery through CloudFront with a private S3 origin, plus CloudWatch, SNS and AWS Budgets operations">
 
 **The boundaries matter:** a detector run writes candidate artifacts, not automatic registry updates. Triage is a separate operator-started process, not yet wired into every scene run. Scheduled ingestion, automatic publication and reviewer approval are future work.
 
