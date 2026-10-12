@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="Web/ResidentPortal/public/mark.svg" width="64" height="64" alt="KilnWatch mark">
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/7e99a2f6-fa51-49e9-a47f-ac25b65b4c54" />
+
 
 # KilnWatch
 
