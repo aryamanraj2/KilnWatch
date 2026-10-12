@@ -12,7 +12,7 @@
 
 Built for the **WeMakeDevs × AWS Bharat Builds Tour — Environmental Hacks**.
 
-[Research foundation](#from-research-to-a-closed-loop-application) · [Product](#the-product) · [AWS architecture](#aws-architecture) · [Agents](#three-agent-roles-with-bounded-authority) · [Model](#the-model-and-what-its-results-mean) · [Demo](#a-three-minute-demo) · [Evidence](#evidence-for-a-technical-review)
+[Research foundation](#from-research-to-a-closed-loop-application) · [Product](#the-product) · [AWS architecture](#aws-architecture) · [Agents](#three-agent-roles-with-bounded-authority) · [Model](#the-model-and-what-its-results-mean) · [Evidence](#evidence-for-a-technical-review)
 
 </div>
 
@@ -262,19 +262,6 @@ The deployed checkpoint is hash-pinned. The recorded AWS run returned **39 candi
 
 The displayed candidate status is **“Flagged by satellite · pending inspection.”** Missing map features, missing assessments and an empty search remain unknown; they are not treated as evidence that an area is safe or a site has passed.
 
-## A three-minute demo
-
-| Step | What to show | What a judge can verify |
-| --- | --- | --- |
-| **1 · Find** | In the hosted portal, search **28.7306, 77.7759** with a **5 km** radius. An alternative is **28.727357, 77.826877**. | Real street geography and nearby published kiln records. Both queries have been checked against the live API. |
-| **2 · Examine** | Open a record. Compare Before / After, expand a rule check and read its measured distance, threshold and source. | Dated satellite evidence and structured measurements, with uncertainty visible. |
-| **3 · Ask** | Ask: **“Which Hapur kilns have the most people within 800 m?”** Follow a cited record. | The answer is connected to retrievable registry facts, not an isolated chat transcript. |
-| **4 · Plan** | In the inspector app, show Today, ordered stops, estimated arrivals and a site's inspection sheet. | Road geometry and an actionable visit sequence. |
-| **5 · Close the loop** | Show the resident request form and its aggregate in the inspector detail; show the field-verdict workflow. | Separate resident signals and human-entered outcomes. Sending either action changes demo data. |
-| **6 · Review** | Open Review and expand a stored reason. | Pending satellite differences are inspectable, with no automatic approval. |
-
-The hosted pilot currently uses **coordinates or opt-in location**. General place-name/address search and coverage beyond the Hapur pilot are not deployed. A zero-result search in Ghaziabad reflects missing published coverage, not a district without kilns. The hosted link is supplied separately with the demo.
-
 ## Evidence for a technical review
 
 The implementation and verification trail are available beside the product code. Passing mocked client tests establish contract handling and interaction behavior; separately documented live checks establish integration. Historical totals below are labelled rather than presented as a fresh all-system run.
@@ -290,10 +277,8 @@ The implementation and verification trail are available beside the product code.
 
 ### Current limits and next milestones
 
-- **Coverage:** one Hapur pilot area. Expanding to a neighbouring district requires new imagery processing, assessment and publication.
 - **Resolution and ground truth:** 10 m satellite pixels, haze, seasonal appearance and imperfect map layers limit interpretation. Predictions need field verification; the pilot has no independent local accuracy study.
 - **Automation:** detector and triage runs are manual. Automatic scene-to-registry updates and reviewer approval are not implemented.
-- **Access:** no production resident/staff identity boundary in the demo. Public writes have validation and caps; deployment-grade authorization remains a next milestone.
 - **Release:** latest UI polish is local; iOS distribution is from Xcode, not TestFlight or the App Store. Independent Hindi review and remaining manual accessibility checks are still open.
 
 ## Data and acknowledgements
